@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: species-ws
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration
+  lifecycle:
+    timeout-per-shutdown-phase: 3s
+  config:
+    import: "optional:zookeeper:"
+  cloud:
+    zookeeper:
+      enabled: false
+elasticsearch:
+  hosts: http://localhost:9200
+  index: clb
+  connectionTimeOut: 60000
+  socketTimeOut: 60000
+  connectionRequestTimeOut: 120000
+  maxResultWindow: 20000
+datasource:
+  url: jdbc:postgresql://localhost/clb
+  password: postgres
+  username: postgres
+  hikari:
+    idleTimeout: 20000
+    maximumPoolSize: 4
+    minimumIdle: 1
