@@ -11,6 +11,9 @@ import java.util.List;
 @Schema(description = "Comprehensive taxon usage information including all related data such as vernacular names, synonyms, media, distributions, and bibliography")
 public class UsageInfo {
 
+  @Schema(description = "The core taxonomic usage information")
+  private NameUsage usage;
+
   @Schema(description = "The publication where the name was first published")
   private Reference namePublishedIn;
 

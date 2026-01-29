@@ -29,7 +29,7 @@ public class VernacularName {
   private String sex;
 
   @Schema(description = "Indicates if this is the preferred vernacular name", example = "true")
-  private Boolean isPreferredName;
+  private Boolean preferredName;
 
   @Schema(description = "Source of the vernacular name information", example = "Flora of Germany")
   private String source;
