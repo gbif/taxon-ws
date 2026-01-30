@@ -49,7 +49,6 @@ pipeline {
         allOf {
           not { expression { params.RELEASE } };
           branch 'dev';
-          false;
         }
       }
       steps {
