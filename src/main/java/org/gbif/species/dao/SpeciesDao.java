@@ -38,19 +38,11 @@ public class SpeciesDao {
   private NameUsage conv(NameUsageBase nub) {
     var nu = new NameUsage();
     nu.setDatasetKey(map.toGBIF(nub.getDatasetKey()));
-    nu.setKey(nub.getId());
+    nu.setTaxonID(nub.getId());
     var n = nub.getName();
-    nu.setRank(n.getRank());
+    nu.setTaxonRank(n.getRank());
     nu.setScientificName(n.getScientificName());
     return nu;
   }
 
-  private NameUsage dummy(UUID uuid, String taxonKey) {
-    var nu = new NameUsage();
-    nu.setDatasetKey(uuid);
-    nu.setKey(taxonKey);
-    nu.setRank(Rank.SPECIES);
-    nu.setScientificName("Abies alba");
-    return nu;
-  }
 }

@@ -13,3 +13,9 @@ application-*.yml
 
 # virtual machine crash logs
 hs_err_pid*
+
+# maven
+pom.xml.*
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
