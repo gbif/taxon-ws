@@ -2,6 +2,8 @@ package org.gbif.species.api;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -11,8 +13,8 @@ import java.util.List;
 @Schema(description = "Comprehensive taxon usage information including all related data such as vernacular names, synonyms, media, distributions, and bibliography")
 public class UsageInfo {
 
-  @Schema(description = "The core taxonomic usage information")
-  private NameUsage usage;
+  @Schema(description = "The identifier for the accepted taxonomic usage this info object is about")
+  private String taxonID;
 
   @Schema(description = "The publication where the name was first published")
   private Reference namePublishedIn;
@@ -24,7 +26,7 @@ public class UsageInfo {
   private List<VernacularName> vernacularNames;
 
   @Schema(description = "List of synonyms and nomenclatural combinations for the taxon")
-  private List<NameUsage> synonyms;
+  private List<SimpleUsage> synonyms;
 
   @Schema(description = "Media items (images, videos, sounds) associated with the taxon")
   private List<Media> media;
@@ -37,7 +39,7 @@ public class UsageInfo {
 
   @Schema(description = "Link to the taxon page on ChecklistBank",
     example = "https://www.checklistbank.org/dataset/3/taxon/2435099")
-  private String checklistBankLink;
+  private URI checklistBankLink;
 
   @Schema(description = "Environments where the taxon occurs (marine, freshwater, terrestrial, brackish)")
   private List<String> environment;

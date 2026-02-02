@@ -3,6 +3,8 @@ package org.gbif.species.api;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.net.URI;
+
 /**
  * Media (images, videos, sounds, etc.) associated with a taxon.
  */
@@ -31,7 +33,7 @@ public class Media {
 
   @Schema(description = "Link to references or source information",
     example = "https://example.com/media/details/12345")
-  private String references;
+  private URI references;
 
   @Schema(description = "Source of the media", example = "iNaturalist")
   private String source;

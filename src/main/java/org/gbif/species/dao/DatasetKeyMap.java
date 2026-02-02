@@ -38,10 +38,9 @@ public class DatasetKeyMap {
 
   private UUID lookupByClb(Integer datasetKey) {
     try (var session = factory.openSession()) {
-      //TODO: create more efficient mybatis query
-      var d = session.getMapper(DatasetMapper.class).get(datasetKey);
-      if (d != null) {
-        UUID key = d.getGbifKey();
+      var dataset = session.getMapper(DatasetMapper.class).get(datasetKey);
+      if (dataset != null) {
+        var key = dataset.getGbifKey();
         if (key != null) {
           gbif2clb.put(key, datasetKey);
           return key;

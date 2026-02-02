@@ -1,7 +1,11 @@
 *.class
 *.log
 .idea/
+.claude/
 target/
+
+# AI
+requirements.md
 
 # config profiles
 application-*.yml

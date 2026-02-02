@@ -64,7 +64,7 @@ public class NameUsage extends SimpleUsage {
   private TaxGroup taxonomicGroup;
 
   @Schema(description = "The genus component of the scientific name", example = "Abies")
-  private String genus;
+  private String genericName;
 
   @Schema(description = "The infrageneric epithet (subgenus, section, etc.)", example = "Pseudotsuga")
   private String infragenericEpithet;

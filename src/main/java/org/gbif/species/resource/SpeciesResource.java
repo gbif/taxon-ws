@@ -13,13 +13,26 @@
  */
 package org.gbif.species.resource;
 
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
+
 import life.catalogue.api.model.NameUsageBase;
+
+import life.catalogue.common.io.UTF8IoUtils;
+import life.catalogue.printer.JsonTreePrinter;
 
 
 import org.gbif.species.api.NameUsage;
+import org.gbif.species.api.SimpleUsage;
+import org.gbif.species.api.UsageInfo;
 import org.gbif.species.dao.SpeciesDao;
 
 
+import java.io.Writer;
+import java.util.List;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -28,6 +41,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -97,4 +111,83 @@ public class SpeciesResource {
     return dao.getCLB(uuid, taxonKey);
   }
 
+  @GetMapping("/{uuid}/{taxonKey}/info")
+  public UsageInfo getInfo(
+    @PathVariable("uuid")
+    @Parameter(
+      description = "UUID for the dataset key",
+      example = "83a00190-7038-3970-a7e8-5e5563c40e37"
+    )
+    UUID uuid,
+    @PathVariable("taxonKey")
+    @Parameter(
+      description = "Taxon key scoped within the dataset",
+      example = "CXA"
+    )
+    String taxonKey
+  ) {
+    return dao.getInfo(uuid, taxonKey);
+  }
+
+  @GetMapping("/{uuid}/{taxonKey}/breakdown")
+  public Response breakdown(
+      @PathVariable("uuid")
+      @Parameter(
+        description = "UUID for the dataset key",
+        example = "83a00190-7038-3970-a7e8-5e5563c40e37"
+      )
+      UUID datasetKey,
+      @PathVariable("taxonKey")
+      @Parameter(
+        description = "Taxon key scoped within the dataset",
+        example = "CXA"
+      )
+      String taxonKey
+    ) {
+    StreamingOutput stream = os -> {
+      try (Writer writer = UTF8IoUtils.writerFromStream(os);
+           JsonTreePrinter printer = dao.childrenBreakdownPrinter(datasetKey, taxonKey, writer)
+      ) {
+        printer.print();
+        writer.flush();
+      }
+    };
+    return Response.ok(stream).build();
+  }
+
+
+  @GetMapping("/{uuid}/{taxonKey}/related")
+  public List<SimpleUsage> getRelated(
+    @PathVariable("uuid")
+    @Parameter(
+      description = "UUID for the dataset key",
+      example = "83a00190-7038-3970-a7e8-5e5563c40e37"
+    )
+    UUID uuid,
+    @PathVariable("taxonKey")
+    @Parameter(
+      description = "Taxon key scoped within the dataset",
+      example = "CXA"
+    )
+    String taxonKey,
+    @RequestParam(required = false)
+    @Parameter(
+      description = "Optional type filter: 'treatments' or 'invasive'"
+    )
+    String type
+  ) {
+    return dao.getRelated(uuid, taxonKey, type);
+  }
+
+  @GetMapping("/search")
+  public List<NameUsage> search() {
+    // TODO: ES integration
+    return List.of();
+  }
+
+  @GetMapping("/suggest")
+  public List<SimpleUsage> suggest() {
+    // TODO: ES integration
+    return List.of();
+  }
 }
