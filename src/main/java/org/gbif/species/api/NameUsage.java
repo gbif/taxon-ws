@@ -39,10 +39,10 @@ public class NameUsage extends SimpleUsage {
   @Schema(description = "The original name usage (basionym)")
   private String originalNameUsage;
 
-  @Schema(description = "The identifier of the reference where the name was published according to", example = "ref123")
+  @Schema(description = "The identifier of the taxon concept reference", example = "ref123")
   private String nameAccordingToID;
 
-  @Schema(description = "The reference where the name was published according to", example = "Smith et al. 2020")
+  @Schema(description = "The taxon concept reference", example = "Smith 2020")
   private String nameAccordingTo;
 
   @Schema(description = "The identifier of the publication where the name was first published", example = "pub456")

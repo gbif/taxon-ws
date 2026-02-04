@@ -13,6 +13,8 @@
  */
 package org.gbif.species.resource;
 
+import org.gbif.api.model.common.paging.Pageable;
+import org.gbif.api.model.common.paging.PagingResponse;
 import org.gbif.species.api.TreeUsage;
 import org.gbif.species.dao.SpeciesDao;
 
@@ -40,19 +42,20 @@ public class TreeResource {
   }
 
   @GetMapping("/{uuid}")
-  public List<TreeUsage> root(
+  public PagingResponse<TreeUsage> root(
     @PathVariable("uuid")
     @Parameter(
       description = "UUID for the dataset key",
       example = "83a00190-7038-3970-a7e8-5e5563c40e37"
     )
-    UUID uuid
+    UUID uuid,
+    Pageable page
   ) {
-    return dao.root(uuid);
+    return dao.root(uuid, page);
   }
 
   @GetMapping("/{uuid}/{taxonKey}")
-  public TreeUsage get(
+  public List<TreeUsage> classification(
     @PathVariable("uuid")
     @Parameter(
       description = "UUID for the dataset key",
@@ -66,29 +69,11 @@ public class TreeResource {
     )
     String taxonKey
   ) {
-    return dao.getSimple(uuid, taxonKey);
-  }
-
-  @GetMapping("/{uuid}/{taxonKey}/parents")
-  public List<TreeUsage> parents(
-    @PathVariable("uuid")
-    @Parameter(
-      description = "UUID for the dataset key",
-      example = "83a00190-7038-3970-a7e8-5e5563c40e37"
-    )
-    UUID uuid,
-    @PathVariable("taxonKey")
-    @Parameter(
-      description = "Taxon key scoped within the dataset",
-      example = "CXA"
-    )
-    String taxonKey
-  ) {
-    return dao.parents(uuid, taxonKey);
+    return dao.classification(uuid, taxonKey);
   }
 
   @GetMapping("/{uuid}/{taxonKey}/children")
-  public List<TreeUsage> children(
+  public PagingResponse<TreeUsage> children(
     @PathVariable("uuid")
     @Parameter(
       description = "UUID for the dataset key",
@@ -100,8 +85,9 @@ public class TreeResource {
       description = "Taxon key scoped within the dataset",
       example = "CXA"
     )
-    String taxonKey
+    String taxonKey,
+    Pageable page
   ) {
-    return dao.children(uuid, taxonKey);
+    return dao.children(uuid, taxonKey, page);
   }
 }

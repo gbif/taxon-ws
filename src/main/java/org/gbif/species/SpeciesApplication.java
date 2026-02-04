@@ -16,6 +16,7 @@ package org.gbif.species;
 
 import com.zaxxer.hikari.HikariDataSource;
 
+import life.catalogue.dao.DatasetInfoCache;
 import life.catalogue.db.MybatisFactory;
 
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -48,7 +49,10 @@ public class SpeciesApplication {
 
   @Bean
   public SqlSessionFactory factory(HikariDataSource dataSource) {
-    return MybatisFactory.configure(dataSource, "test-env");
+    var factory = MybatisFactory.configure(dataSource, "test-env");
+    // set factory in DatasetInfoCache singleton
+    DatasetInfoCache.CACHE.setFactory(factory);
+    return factory;
   }
 
   public static void main(String[] args) {

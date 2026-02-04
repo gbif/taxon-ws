@@ -50,6 +50,8 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+
 @OpenAPIDefinition(
     info =
         @Info(
@@ -93,24 +95,6 @@ public class SpeciesResource {
     return dao.get(uuid, taxonKey);
   }
 
-  @GetMapping("/{uuid}/{taxonKey}/_orig")
-  public NameUsageBase getCLB(
-    @PathVariable("uuid")
-    @Parameter(
-      description = "UUID for the dataset key",
-      example = "83a00190-7038-3970-a7e8-5e5563c40e37"
-    )
-    UUID uuid,
-    @PathVariable("taxonKey")
-    @Parameter(
-      description = "Taxon key scoped within the dataset",
-      example = "CXA"
-    )
-    String taxonKey
-  ) {
-    return dao.getCLB(uuid, taxonKey);
-  }
-
   @GetMapping("/{uuid}/{taxonKey}/info")
   public UsageInfo getInfo(
     @PathVariable("uuid")
@@ -130,7 +114,7 @@ public class SpeciesResource {
   }
 
   @GetMapping("/{uuid}/{taxonKey}/breakdown")
-  public Response breakdown(
+  public StreamingResponseBody breakdown(
       @PathVariable("uuid")
       @Parameter(
         description = "UUID for the dataset key",
@@ -144,7 +128,8 @@ public class SpeciesResource {
       )
       String taxonKey
     ) {
-    StreamingOutput stream = os -> {
+
+    return os -> {
       try (Writer writer = UTF8IoUtils.writerFromStream(os);
            JsonTreePrinter printer = dao.childrenBreakdownPrinter(datasetKey, taxonKey, writer)
       ) {
@@ -152,7 +137,6 @@ public class SpeciesResource {
         writer.flush();
       }
     };
-    return Response.ok(stream).build();
   }
 
 

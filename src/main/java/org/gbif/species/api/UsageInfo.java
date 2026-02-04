@@ -19,14 +19,14 @@ public class UsageInfo {
   @Schema(description = "The publication where the name was first published")
   private Reference namePublishedIn;
 
-  @Schema(description = "The reference where the name was published according to")
-  private Reference nameAccordingTo;
+  @Schema(description = "List of synonyms and nomenclatural combinations for the taxon")
+  private List<SimpleUsage> synonyms;
+
+  @Schema(description = "List of parent taxa starting with the xxx")
+  private List<SimpleUsage> classification;
 
   @Schema(description = "List of vernacular (common) names for the taxon")
   private List<VernacularName> vernacularNames;
-
-  @Schema(description = "List of synonyms and nomenclatural combinations for the taxon")
-  private List<SimpleUsage> synonyms;
 
   @Schema(description = "Media items (images, videos, sounds) associated with the taxon")
   private List<Media> media;
@@ -34,8 +34,11 @@ public class UsageInfo {
   @Schema(description = "Distribution information for the taxon")
   private List<Distribution> distributions;
 
-  @Schema(description = "Bibliographic references related to the taxon")
+  @Schema(description = "Bibliographic references related to the taxon, keyed by their identifier")
   private List<Reference> bibliography;
+
+  @Schema(description = "Measurements or facts about the taxon")
+  private List<MeasurementOrFact> measurementOrFacts;
 
   @Schema(description = "Link to the taxon page on ChecklistBank",
     example = "https://www.checklistbank.org/dataset/3/taxon/2435099")

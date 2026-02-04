@@ -22,21 +22,12 @@ mvn spring-boot:run
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
 
 # Generate OpenAPI docs (runs during integration-test phase)
-mvn verify
+mvn verify -Popenapi
 ```
 
 **Local prerequisites:** PostgreSQL on `localhost:5432/clb` (user: postgres/postgres), Elasticsearch on `localhost:9200` (index: clb).
 
 ## Architecture
-
-### Request Flow
-
-```
-SpeciesResource (REST @RequestMapping("/species"))
-  → SpeciesDao (business logic, model conversion)
-    → DatasetKeyMap (Caffeine-cached UUID ↔ CLB numeric ID mapping)
-    → SqlSessionFactory (MyBatis, using CLB's NameUsageMapper/DatasetMapper)
-```
 
 ### Key Layers
 

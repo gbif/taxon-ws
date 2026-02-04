@@ -1,9 +1,11 @@
 package org.gbif.species.dao;
 
+import com.github.benmanes.caffeine.cache.LoadingCache;
+
 import life.catalogue.api.model.DSID;
 import life.catalogue.api.model.NameUsageBase;
 import life.catalogue.api.model.Page;
-import life.catalogue.api.model.TreeNode;
+import life.catalogue.api.model.ResultPage;
 import life.catalogue.dao.MetricsDao;
 import life.catalogue.dao.NameDao;
 import life.catalogue.dao.TaxonDao;
@@ -24,6 +26,9 @@ import life.catalogue.printer.JsonTreePrinter;
 
 import org.apache.ibatis.session.SqlSessionFactory;
 
+
+import org.gbif.api.model.common.paging.Pageable;
+import org.gbif.api.model.common.paging.PagingResponse;
 import org.gbif.species.api.NameUsage;
 import org.gbif.species.api.SimpleUsage;
 import org.gbif.species.api.TreeUsage;
@@ -33,6 +38,7 @@ import org.gbif.species.api.UsageInfo;
 import java.io.Writer;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -57,13 +63,9 @@ public class SpeciesDao {
   }
 
   public NameUsage get(UUID uuid, String taxonKey) {
-    return converter.convert(getCLB(uuid, taxonKey));
-  }
-
-  public NameUsageBase getCLB(UUID uuid, String taxonKey) {
     try (var session = factory.openSession()) {
       var num = session.getMapper(NameUsageMapper.class);
-      return num.get(map.toDSID(uuid, taxonKey));
+      return converter.convert(num.get(map.toDSID(uuid, taxonKey)));
     }
   }
 
@@ -75,43 +77,7 @@ public class SpeciesDao {
       if (usage == null) return null;
 
       var clbInfo = new life.catalogue.api.model.UsageInfo(usage);
-
-      if (!usage.getStatus().isSynonym()) {
-        clbInfo.setVernacularNames(session.getMapper(VernacularNameMapper.class).listByTaxon(dsid));
-        clbInfo.setDistributions(session.getMapper(DistributionMapper.class).listByTaxon(dsid));
-        clbInfo.setMedia(session.getMapper(MediaMapper.class).listByTaxon(dsid));
-        clbInfo.setProperties(session.getMapper(TaxonPropertyMapper.class).listByTaxon(dsid));
-      }
-
-      // synonyms
-      var synonyms = session.getMapper(SynonymMapper.class).listByTaxon(dsid);
-      if (synonyms != null && !synonyms.isEmpty()) {
-        var synonymy = new life.catalogue.api.model.Synonymy();
-        synonymy.getHeterotypic().addAll(synonyms);
-        clbInfo.setSynonyms(synonymy);
-      }
-
-      // published-in reference
-      if (usage.getName().getPublishedInId() != null) {
-        var refMapper = session.getMapper(ReferenceMapper.class);
-        clbInfo.setPublishedIn(refMapper.get(DSID.of(dsid.getDatasetKey(), usage.getName().getPublishedInId())));
-      }
-
-      // collect all referenced reference IDs and load them
-      var refIds = new java.util.HashSet<String>();
-      if (usage.getAccordingToId() != null) {
-        refIds.add(usage.getAccordingToId());
-      }
-      if (!refIds.isEmpty()) {
-        var refMapper = session.getMapper(ReferenceMapper.class);
-        var refs = refMapper.listByIds(dsid.getDatasetKey(), refIds);
-        if (refs != null) {
-          for (var ref : refs) {
-            clbInfo.addReference(ref);
-          }
-        }
-      }
-
+      taxonDao.fillUsageInfo(session, clbInfo, null, true, false, true, true, true, true, false, false, true, true, false, false, false, false, false);
       return converter.convert(clbInfo);
     }
   }
@@ -126,39 +92,36 @@ public class SpeciesDao {
     return List.of();
   }
 
-  public List<TreeUsage> root(UUID uuid) {
+  private static Page page(Pageable p) {
+    return new Page((int)p.getOffset(), p.getLimit());
+  }
+  private static <T, X> PagingResponse<T> resp(ResultPage<X> rp, Function<X, T> converter) {
+    return new PagingResponse<>(rp.getOffset(), rp.getLimit(), (long) rp.getTotal(),
+      rp.getResult().stream().map(converter).toList()
+    );
+  }
+
+  public PagingResponse<TreeUsage> root(UUID uuid, Pageable page) {
     int datasetKey = map.toCLB(uuid);
-    return treeDao.root(datasetKey, datasetKey, false, true, TreeNode.Type.SOURCE, new Page(0, 10000))
-      .getResult().stream()
-      .map(converter::convertTree)
-      .collect(Collectors.toList());
+    var resp = treeDao.root(datasetKey, -1, false, true, null, page(page));
+    return resp(resp, converter::convertTree);
   }
 
-  public TreeUsage getSimple(UUID uuid, String taxonKey) {
+  /**
+   * @return classification starting with the given start id
+   */
+  public List<TreeUsage> classification(UUID uuid, String taxonKey) {
     var dsid = map.toDSID(uuid, taxonKey);
-    int datasetKey = dsid.getDatasetKey();
-    var nodes = treeDao.classification(dsid, datasetKey, false, true, TreeNode.Type.SOURCE, null);
-    if (nodes == null || nodes.isEmpty()) return null;
-    return converter.convertTree(nodes.get(0));
-  }
-
-  public List<TreeUsage> parents(UUID uuid, String taxonKey) {
-    var dsid = map.toDSID(uuid, taxonKey);
-    int datasetKey = dsid.getDatasetKey();
-    var nodes = treeDao.classification(dsid, datasetKey, false, true, TreeNode.Type.SOURCE, null);
+    var nodes = treeDao.classification(dsid, -1, true, false, null, null);
     if (nodes == null || nodes.size() <= 1) return List.of();
-    // classification includes the target node as the first element; skip it
-    return nodes.subList(1, nodes.size()).stream()
+    return nodes.stream()
       .map(converter::convertTree)
       .collect(Collectors.toList());
   }
 
-  public List<TreeUsage> children(UUID uuid, String taxonKey) {
+  public PagingResponse<TreeUsage> children(UUID uuid, String taxonKey, Pageable page) {
     var dsid = map.toDSID(uuid, taxonKey);
-    int datasetKey = dsid.getDatasetKey();
-    return treeDao.children(dsid, datasetKey, false, true, TreeNode.Type.SOURCE, new Page(0, 10000))
-      .getResult().stream()
-      .map(converter::convertTree)
-      .collect(Collectors.toList());
+    var resp = treeDao.children(dsid, -1, false, true, null, page(page));
+    return resp(resp, converter::convertTree);
   }
 }

@@ -11,6 +11,7 @@ import life.catalogue.api.vocab.Country;
 import org.gbif.species.api.*;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
@@ -149,6 +150,8 @@ public class ApiConverter {
     dist.setThreatStatus(d.getThreatStatus() != null ? d.getThreatStatus().name() : null);
     dist.setEventDate(d.getYear() != null ? String.valueOf(d.getYear()) : null);
     dist.setRemarks(d.getRemarks());
+    //TODO: expand refID with citation
+    dist.setSource(d.getReferenceId());
     return dist;
   }
 
@@ -163,6 +166,14 @@ public class ApiConverter {
     return ref;
   }
 
+  MeasurementOrFact convert(TaxonProperty tp) {
+    var p = new MeasurementOrFact();
+    p.setMeasurementType(tp.getProperty());
+    p.setMeasurementValue(tp.getValue());
+    p.setMeasurementRemarks(tp.getRemarks());
+    return p;
+  }
+
   UsageInfo convert(life.catalogue.api.model.UsageInfo ui) {
     var info = new UsageInfo();
     var usage = ui.getUsage();
@@ -174,19 +185,20 @@ public class ApiConverter {
       info.setNamePublishedIn(convert(ui.getPublishedIn()));
     }
 
-    // nameAccordingTo — look up accordingToId in the references map
-    if (usage.getAccordingToId() != null && ui.getReferences() != null) {
-      var accordingToRef = ui.getReferences().get(usage.getAccordingToId());
-      if (accordingToRef != null) {
-        info.setNameAccordingTo(convert(accordingToRef));
-      }
-    }
-
     // vernacularNames
     if (ui.getVernacularNames() != null) {
       info.setVernacularNames(
         ui.getVernacularNames().stream()
           .map(this::convert)
+          .collect(Collectors.toList())
+      );
+    }
+
+    // classification
+    if (ui.getClassification() != null) {
+      info.setClassification(
+        ui.getClassification().stream()
+          .map(this::convertSimple)
           .collect(Collectors.toList())
       );
     }
@@ -222,7 +234,8 @@ public class ApiConverter {
     // bibliography
     if (ui.getReferences() != null) {
       info.setBibliography(
-        ui.getReferences().values().stream()
+        ui.getReferences().values()
+          .stream()
           .map(this::convert)
           .collect(Collectors.toList())
       );
@@ -244,7 +257,9 @@ public class ApiConverter {
 
     // properties: iucnRedlistStatus, citesAppendix, citesDateAdded
     if (ui.getProperties() != null) {
+      var properties = new ArrayList<MeasurementOrFact>();
       for (TaxonProperty prop : ui.getProperties()) {
+        properties.add(convert(prop));
         if (prop.getProperty() != null && prop.getValue() != null) {
           switch (prop.getProperty()) {
             case "iucnRedlistStatus" -> info.setIucnRedlistStatus(prop.getValue());
@@ -253,6 +268,7 @@ public class ApiConverter {
           }
         }
       }
+      info.setMeasurementOrFacts(properties);
     }
 
     return info;

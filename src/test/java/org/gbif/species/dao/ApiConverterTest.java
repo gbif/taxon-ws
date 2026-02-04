@@ -606,7 +606,5 @@ class ApiConverterTest {
 
     assertThat(info.getNamePublishedIn()).isNotNull();
     assertThat(info.getNamePublishedIn().getCitation()).isEqualTo("Published In Citation");
-    assertThat(info.getNameAccordingTo()).isNotNull();
-    assertThat(info.getNameAccordingTo().getCitation()).isEqualTo("According To Citation");
   }
 }

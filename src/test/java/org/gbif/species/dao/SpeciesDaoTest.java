@@ -101,34 +101,6 @@ class SpeciesDaoTest {
   }
 
   @Test
-  void getCLBOpensSessionAndQueriesMapper() {
-    var uuid = UUID.randomUUID();
-    var dsid = DSID.of(101, "t-1");
-    when(map.toDSID(uuid, "t-1")).thenReturn(dsid);
-
-    var taxon = createTaxon("t-1", TaxonomicStatus.ACCEPTED);
-    when(nameUsageMapper.get(dsid)).thenReturn(taxon);
-
-    var result = dao.getCLB(uuid, "t-1");
-
-    assertThat(result).isEqualTo(taxon);
-    verify(factory).openSession();
-    verify(nameUsageMapper).get(dsid);
-  }
-
-  @Test
-  void getCLBReturnsNullWhenNotFound() {
-    var uuid = UUID.randomUUID();
-    var dsid = DSID.of(101, "t-1");
-    when(map.toDSID(uuid, "t-1")).thenReturn(dsid);
-    when(nameUsageMapper.get(dsid)).thenReturn(null);
-
-    var result = dao.getCLB(uuid, "t-1");
-
-    assertThat(result).isNull();
-  }
-
-  @Test
   void getInfoForAcceptedTaxonQueriesAllMappers() {
     var uuid = UUID.randomUUID();
     var dsid = DSID.of(101, "t-1");

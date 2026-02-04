@@ -13,10 +13,19 @@
  */
 package org.gbif.species.config;
 
+import jakarta.ws.rs.ext.Provider;
+
+
 import org.gbif.ws.json.JacksonJsonObjectMapperProvider;
 
 
 import java.util.List;
+
+
+import org.gbif.ws.server.provider.CountryHandlerMethodArgumentResolver;
+import org.gbif.ws.server.provider.PageableHandlerMethodArgumentResolver;
+import org.gbif.ws.server.provider.PageableProvider;
+
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,6 +45,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
     StrictHttpFirewall firewall = new StrictHttpFirewall();
     firewall.setAllowSemicolon(true);
     return firewall;
+  }
+
+  @Override
+  public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+    argumentResolvers.add(new PageableHandlerMethodArgumentResolver());
+    argumentResolvers.add(new CountryHandlerMethodArgumentResolver());
   }
 
   @Primary
