@@ -53,9 +53,7 @@ public class ApiConverter {
     if (nub instanceof Synonym syn && syn.getAccepted() != null) {
       nu.setAcceptedNameUsage(syn.getAccepted().getLabel());
     }
-    nu.setNameAccordingToID(nub.getAccordingToId());
     nu.setNameAccordingTo(nub.getAccordingTo());
-    nu.setNamePublishedInID(name.getPublishedInId());
     nu.setNamePhrase(nub.getNamePhrase());
     nu.setNomenclaturalStatus(name.getNomStatus() != null ? name.getNomStatus().name() : null);
     nu.setNameType(name.getType());
@@ -74,7 +72,7 @@ public class ApiConverter {
     var su = new SimpleUsage();
 
     su.setTaxonID(sn.getId());
-    if (sn.getStatus().isSynonym()) {
+    if (sn.getStatus() != null && sn.getStatus().isSynonym()) {
       su.setAcceptedNameUsageID(sn.getParentId());
     } else {
       su.setParentNameUsageID(sn.getParentId());
@@ -178,12 +176,7 @@ public class ApiConverter {
     var info = new UsageInfo();
     var usage = ui.getUsage();
 
-    info.setTaxonID(usage.getId());
-
-    // namePublishedIn
-    if (ui.getPublishedIn() != null) {
-      info.setNamePublishedIn(convert(ui.getPublishedIn()));
-    }
+    info.setTaxon(convert(usage));
 
     // vernacularNames
     if (ui.getVernacularNames() != null) {

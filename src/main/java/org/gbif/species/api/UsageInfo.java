@@ -13,11 +13,8 @@ import java.util.List;
 @Schema(description = "Comprehensive taxon usage information including all related data such as vernacular names, synonyms, media, distributions, and bibliography")
 public class UsageInfo {
 
-  @Schema(description = "The identifier for the accepted taxonomic usage this info object is about")
-  private String taxonID;
-
-  @Schema(description = "The publication where the name was first published")
-  private Reference namePublishedIn;
+  @Schema(description = "The accepted taxon this info object is about")
+  private NameUsage taxon;
 
   @Schema(description = "List of synonyms and nomenclatural combinations for the taxon")
   private List<SimpleUsage> synonyms;

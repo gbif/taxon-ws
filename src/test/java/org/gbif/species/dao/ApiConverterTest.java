@@ -108,9 +108,7 @@ class ApiConverterTest {
     assertThat(nu.getDatasetKey()).isEqualTo(uuid);
     assertThat(nu.getScientificNameID()).isEqualTo("name-1");
     assertThat(nu.getAcceptedNameUsage()).isNull();
-    assertThat(nu.getNameAccordingToID()).isEqualTo("ref-1");
     assertThat(nu.getNameAccordingTo()).isEqualTo("Author 2020");
-    assertThat(nu.getNamePublishedInID()).isEqualTo("pub-1");
     assertThat(nu.getNamePhrase()).isEqualTo("sensu lato");
     assertThat(nu.getNomenclaturalStatus()).isEqualTo("ESTABLISHED");
     assertThat(nu.getNameType()).isEqualTo(org.gbif.nameparser.api.NameType.SCIENTIFIC);
@@ -531,7 +529,7 @@ class ApiConverterTest {
 
     UsageInfo info = converter.convert(ui);
 
-    assertThat(info.getTaxonID()).isEqualTo("t-1");
+    assertThat(info.getTaxon().getTaxonID()).isEqualTo("t-1");
     assertThat(info.getVernacularNames()).hasSize(1);
     assertThat(info.getVernacularNames().get(0).getVernacularName()).isEqualTo("Silver Fir");
     assertThat(info.getMedia()).hasSize(1);
@@ -564,47 +562,10 @@ class ApiConverterTest {
 
     UsageInfo info = converter.convert(ui);
 
-    assertThat(info.getTaxonID()).isEqualTo("t-2");
+    assertThat(info.getTaxon().getTaxonID()).isEqualTo("t-2");
     assertThat(info.getIucnRedlistStatus()).isNull();
     assertThat(info.getCitesAppendix()).isNull();
     assertThat(info.getChecklistBankLink()).isNotNull();
   }
 
-  @Test
-  void convertUsageInfoWithPublishedInAndAccordingTo() {
-    var name = new Name();
-    name.setId("name-1");
-    name.setScientificName("Test species");
-    name.setRank(Rank.SPECIES);
-    name.setPublishedInId("pub-ref-1");
-
-    var taxon = new Taxon();
-    taxon.setId("t-3");
-    taxon.setDatasetKey(101);
-    taxon.setName(name);
-    taxon.setStatus(TaxonomicStatus.ACCEPTED);
-    taxon.setOrigin(Origin.SOURCE);
-    taxon.setAccordingToId("acc-ref-1");
-
-    var ui = new life.catalogue.api.model.UsageInfo(taxon);
-
-    // publishedIn reference
-    var pubRef = new life.catalogue.api.model.Reference();
-    pubRef.setId("pub-ref-1");
-    pubRef.setDatasetKey(101);
-    pubRef.setCitation("Published In Citation");
-    ui.setPublishedIn(pubRef);
-
-    // accordingTo reference
-    var accRef = new life.catalogue.api.model.Reference();
-    accRef.setId("acc-ref-1");
-    accRef.setDatasetKey(101);
-    accRef.setCitation("According To Citation");
-    ui.addReference(accRef);
-
-    UsageInfo info = converter.convert(ui);
-
-    assertThat(info.getNamePublishedIn()).isNotNull();
-    assertThat(info.getNamePublishedIn().getCitation()).isEqualTo("Published In Citation");
-  }
 }
