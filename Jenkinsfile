@@ -39,7 +39,7 @@ pipeline {
             mavenSettingsConfig: 'bfc2be1e-f172-4b84-bd26-8b033aad06cb',
             traceability: true
         ) {
-            sh '''mvn -B clean -U -T 2 -Pjenkins deploy'''
+            sh '''mvn -B clean verify deploy -U -T 2 -Pjenkins'''
         }
       }
     }
