@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-GBIF Species API v2 — a Spring Boot 3.x REST API that wraps the ChecklistBank (CLB) PostgreSQL database with GBIF-compatible endpoints.
+GBIF Species API v2 — a Spring Boot 3.5.x REST API that wraps the ChecklistBank (CLB) PostgreSQL database with GBIF-compatible endpoints.
 It translates between GBIF UUID-based identifiers and ChecklistBank numeric IDs, exposing taxonomic data (names, synonyms, distributions, media, vernacular names) under `/species`.
 
 ## Terminology & documentation
@@ -44,9 +44,11 @@ mvn verify -Popenapi
 
 ### External Dependencies
 
-- **ChecklistBank DAO** (`life.catalogue:dao`) — MyBatis mappers and CLB data models
-- **GBIF API** (`org.gbif:gbif-api`) — Shared vocabularies and enums (Rank, TaxonomicStatus, etc.)
-- **GBIF Common WS** (`org.gbif:gbif-common-ws`) — ObjectMapper config, exception handling
+- **ChecklistBank API** (`life.catalogue:api`) — CLB data models and enumerations.
+- **ChecklistBank DAO** (`life.catalogue:dao`) — MyBatis mappers and DAO logic.
+- **GBIF API** (`org.gbif:gbif-api`) — Shared GBIF API classes (PagingResponse, Pageable): https://github.com/gbif/gbif-api
+- **GBIF NameParser API** (`org.gbif:name-parser-api`) — Shared vocabularies and enums (Rank, NameType, NomCode): https://github.com/gbif/name-parser
+- **GBIF Common WS** (`org.gbif:gbif-common-ws`) — ObjectMapper config, exception handling, HandlerMethodArgumentResolver, Spring Boot 3.5.x: https://github.com/gbif/gbif-common-ws
 
 ## Code Style
 
