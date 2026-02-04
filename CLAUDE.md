@@ -4,7 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-GBIF Species API v2 — a Spring Boot 3.x REST API that wraps the ChecklistBank (CLB) PostgreSQL database with GBIF-compatible endpoints. It translates between GBIF UUID-based identifiers and ChecklistBank numeric IDs, exposing taxonomic data (names, synonyms, distributions, media, vernacular names) under `/species`.
+GBIF Species API v2 — a Spring Boot 3.x REST API that wraps the ChecklistBank (CLB) PostgreSQL database with GBIF-compatible endpoints.
+It translates between GBIF UUID-based identifiers and ChecklistBank numeric IDs, exposing taxonomic data (names, synonyms, distributions, media, vernacular names) under `/species`.
+
+## Terminology & documentation
+Terminology and semantics of fields are based on Darwin Core (DwC) if possible: https://dwc.tdwg.org/terms/
+For some DTOs DwC/GBIF extension definitions have been used: https://rs.gbif.org/extensions.html
+Otherwise the Catalogue of Life Data Package (ColDP) specification is used: https://github.com/CatalogueOfLife/coldp/blob/master/README.md
 
 ## Build & Run Commands
 
