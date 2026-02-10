@@ -66,7 +66,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
       @Server(url = "https://api.gbif-uat.org/v2/", description = "User testing")
     })
 @Tag(name = "Species", description = "Species indexed by ChecklistBank for GBIF")
-@RequestMapping(value = "species", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "taxon", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
 public class SpeciesResource {
   private static final Logger LOG = LoggerFactory.getLogger(SpeciesResource.class);

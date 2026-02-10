@@ -31,7 +31,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "Tree", description = "Taxonomic tree navigation")
-@RequestMapping(value = "species/tree", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "taxon/tree", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
 public class TreeResource {
 
