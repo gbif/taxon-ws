@@ -2,6 +2,7 @@ package org.gbif.species.dao;
 
 import life.catalogue.api.model.DSID;
 import life.catalogue.api.model.Dataset;
+import life.catalogue.cache.LatestDatasetKeyCache;
 import life.catalogue.db.mapper.DatasetMapper;
 
 import org.apache.ibatis.session.SqlSession;
@@ -30,13 +31,16 @@ class DatasetKeyMapTest {
   @Mock
   private DatasetMapper datasetMapper;
 
+  @Mock
+  private LatestDatasetKeyCache cache;
+
   private DatasetKeyMap map;
 
   @BeforeEach
   void setUp() {
     when(factory.openSession()).thenReturn(session);
     when(session.getMapper(DatasetMapper.class)).thenReturn(datasetMapper);
-    map = new DatasetKeyMap(factory);
+    map = new DatasetKeyMap(factory, cache);
   }
 
   @Test

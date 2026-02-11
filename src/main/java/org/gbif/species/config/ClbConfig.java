@@ -1,5 +1,10 @@
 package org.gbif.species.config;
 
+import life.catalogue.cache.LatestDatasetKeyCache;
+
+import life.catalogue.cache.LatestDatasetKeyCacheImpl;
+
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
@@ -13,6 +18,12 @@ import com.zaxxer.hikari.HikariDataSource;
 @Configuration
 public class ClbConfig {
   private static final Logger LOG = LoggerFactory.getLogger(ClbConfig.class);
+
+  @Bean
+  @Primary
+  public LatestDatasetKeyCache latestDatasetKeyCache(SqlSessionFactory factory) {
+    return new LatestDatasetKeyCacheImpl(factory);
+  }
 
   @Bean
   @Primary

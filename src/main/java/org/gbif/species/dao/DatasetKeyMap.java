@@ -5,19 +5,29 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 
 import life.catalogue.api.model.DSID;
 
+import life.catalogue.api.vocab.Datasets;
+import life.catalogue.cache.LatestDatasetKeyCache;
 import life.catalogue.db.mapper.DatasetMapper;
 
 import org.apache.ibatis.session.SqlSessionFactory;
+
+
+import org.gbif.api.model.Constants;
+
+
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
 @Component
 public class DatasetKeyMap {
+  public static final UUID COL_BR_DATASET_KEY = UUID.fromString("e007cc4a-8704-449d-8829-bb209d26d6c8");
   private SqlSessionFactory factory;
+  private LatestDatasetKeyCache cache;
 
-  public DatasetKeyMap(SqlSessionFactory factory) {
+  public DatasetKeyMap(SqlSessionFactory factory, LatestDatasetKeyCache cache) {
     this.factory = factory;
+    this.cache = cache;
   }
 
   private final LoadingCache<UUID, Integer> gbif2clb = Caffeine.newBuilder()
@@ -27,6 +37,15 @@ public class DatasetKeyMap {
     .build(this::lookupByClb);
 
   private Integer lookupByGbif(UUID uuid) {
+    if (Constants.COL_DATASET_KEY.equals(uuid)) {
+      // we map the UUID to the latest XR
+      return cache.getLatestRelease(Datasets.COL, true);
+
+    } else if (COL_BR_DATASET_KEY.equals(uuid)) {
+      // we map the UUID to the latest Base Release
+      return cache.getLatestRelease(Datasets.COL, false);
+    }
+    // lookup all others
     try (var session = factory.openSession()) {
       Integer dkey = session.getMapper(DatasetMapper.class).getKeyByGBIF(uuid);
       if (dkey != null) {
