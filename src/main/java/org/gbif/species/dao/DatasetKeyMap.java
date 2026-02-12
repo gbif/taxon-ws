@@ -37,15 +37,6 @@ public class DatasetKeyMap {
     .build(this::lookupByClb);
 
   private Integer lookupByGbif(UUID uuid) {
-    if (Constants.COL_DATASET_KEY.equals(uuid)) {
-      // we map the UUID to the latest XR
-      return cache.getLatestRelease(Datasets.COL, true);
-
-    } else if (COL_BR_DATASET_KEY.equals(uuid)) {
-      // we map the UUID to the latest Base Release
-      return cache.getLatestRelease(Datasets.COL, false);
-    }
-    // lookup all others
     try (var session = factory.openSession()) {
       Integer dkey = session.getMapper(DatasetMapper.class).getKeyByGBIF(uuid);
       if (dkey != null) {
@@ -78,9 +69,22 @@ public class DatasetKeyMap {
   }
 
   public int toCLB(UUID datasetKey) {
-    Integer dk = gbif2clb.get(datasetKey);
+    Integer dk;
+    if (Constants.COL_DATASET_KEY.equals(datasetKey)) {
+      // we map the UUID to the latest XR
+      dk = cache.getLatestRelease(Datasets.COL, true);
+    } else if (COL_BR_DATASET_KEY.equals(datasetKey)) {
+      // we map the UUID to the latest Base Release
+      dk = cache.getLatestRelease(Datasets.COL, false);
+    } else {
+      dk = gbif2clb.get(datasetKey);
+    }
+
     if (dk == null) {
       throw new IllegalArgumentException("Unknown dataset key: " + datasetKey);
+    } else {
+      // we cache the reverse mapping as mapping COL releases to the GBIF UUIDs via the db is difficult otherwise
+      clb2gbif.put(dk, datasetKey);
     }
     return dk;
   }
