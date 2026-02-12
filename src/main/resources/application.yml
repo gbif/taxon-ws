@@ -1,6 +1,6 @@
 spring:
   application:
-    name: species-ws
+    name: taxon-ws
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration
   lifecycle:

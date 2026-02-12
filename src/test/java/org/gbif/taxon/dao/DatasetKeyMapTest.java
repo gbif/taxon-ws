@@ -1,4 +1,4 @@
-package org.gbif.species.dao;
+package org.gbif.taxon.dao;
 
 import life.catalogue.api.model.DSID;
 import life.catalogue.api.model.Dataset;

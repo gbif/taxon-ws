@@ -11,12 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gbif.species.resource;
+package org.gbif.taxon.resource;
 
 import org.gbif.api.model.common.paging.Pageable;
 import org.gbif.api.model.common.paging.PagingResponse;
-import org.gbif.species.api.TreeUsage;
-import org.gbif.species.dao.SpeciesDao;
+import org.gbif.taxon.api.TreeUsage;
+import org.gbif.taxon.dao.TaxonDao;
 
 import java.util.List;
 import java.util.UUID;
@@ -35,9 +35,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 public class TreeResource {
 
-  private final SpeciesDao dao;
+  private final TaxonDao dao;
 
-  public TreeResource(SpeciesDao dao) {
+  public TreeResource(TaxonDao dao) {
     this.dao = dao;
   }
 

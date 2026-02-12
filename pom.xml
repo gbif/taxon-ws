@@ -8,10 +8,10 @@
     <version>59</version>
   </parent>
 
-  <groupId>org.gbif.species</groupId>
-  <artifactId>species-ws</artifactId>
+  <groupId>org.gbif.taxon</groupId>
+  <artifactId>taxon-ws</artifactId>
   <version>1.0.0-SNAPSHOT</version>
-  <name>GBIF Species WS</name>
+  <name>GBIF Taxon WS</name>
 
   <scm>
     <connection>scm:git:git@github.com:gbif/${project.artifactId}.git</connection>
@@ -51,7 +51,7 @@
     <java.version>21</java.version>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
-    <start-class>org.gbif.species.SpeciesApplication</start-class>
+    <start-class>org.gbif.taxon.TaxonApplication</start-class>
 
     <!-- .mvn/jvm.config is not being used by surefire - we need to replicate the settings here! -->
     <java.argLine>

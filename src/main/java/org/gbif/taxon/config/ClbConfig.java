@@ -1,4 +1,4 @@
-package org.gbif.species.config;
+package org.gbif.taxon.config;
 
 import life.catalogue.cache.LatestDatasetKeyCache;
 

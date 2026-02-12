@@ -1,4 +1,4 @@
-package org.gbif.species.dao;
+package org.gbif.taxon.dao;
 
 import life.catalogue.api.model.NameUsageBase;
 import life.catalogue.api.model.SimpleName;
@@ -8,7 +8,7 @@ import life.catalogue.api.model.TaxonProperty;
 import life.catalogue.api.model.TreeNode;
 import life.catalogue.api.vocab.Country;
 
-import org.gbif.species.api.*;
+import org.gbif.taxon.api.*;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -68,7 +68,7 @@ public class ApiConverter {
     return nu;
   }
 
-  SimpleUsage convertSimple(SimpleName sn) {
+  public SimpleUsage convert(SimpleName sn) {
     var su = new SimpleUsage();
 
     su.setTaxonID(sn.getId());
@@ -191,7 +191,7 @@ public class ApiConverter {
     if (ui.getClassification() != null) {
       info.setClassification(
         ui.getClassification().stream()
-          .map(this::convertSimple)
+          .map(this::convert)
           .collect(Collectors.toList())
       );
     }
@@ -201,7 +201,7 @@ public class ApiConverter {
       info.setSynonyms(
         ui.getSynonyms().all().stream()
           .map(SimpleName::new)
-          .map(this::convertSimple)
+          .map(this::convert)
           .collect(Collectors.toList())
       );
     }

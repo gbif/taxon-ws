@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gbif.species;
+package org.gbif.taxon;
 
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -22,30 +22,17 @@ import life.catalogue.db.MybatisFactory;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 
-import org.gbif.species.config.ClbConfig;
-
-
-import org.gbif.species.resource.SpeciesResource;
-
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.autoconfigure.elasticsearch.ElasticsearchRestHealthContributorAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
-import java.util.Arrays;
-
 @SpringBootApplication(exclude = {ElasticsearchRestHealthContributorAutoConfiguration.class})
 @EnableConfigurationProperties
-@ComponentScan(basePackages = {"org.gbif.ws.server.mapper", "org.gbif.species", "org.gbif.species.resource"})
-public class SpeciesApplication {
+@ComponentScan(basePackages = {"org.gbif.ws.server.mapper", "org.gbif.taxon", "org.gbif.taxon.resource"})
+public class TaxonApplication {
 
   @Bean
   public SqlSessionFactory factory(HikariDataSource dataSource) {
@@ -56,7 +43,7 @@ public class SpeciesApplication {
   }
 
   public static void main(String[] args) {
-    SpringApplication.run(SpeciesApplication.class, args);
+    SpringApplication.run(TaxonApplication.class, args);
   }
 
 }

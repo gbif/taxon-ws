@@ -1,4 +1,4 @@
-package org.gbif.species.dao;
+package org.gbif.taxon.dao;
 
 import life.catalogue.api.model.CslData;
 import life.catalogue.api.model.Name;
@@ -21,14 +21,14 @@ import life.catalogue.api.vocab.ThreatStatus;
 
 import org.gbif.nameparser.api.NomCode;
 import org.gbif.nameparser.api.Rank;
-import org.gbif.species.api.Distribution;
-import org.gbif.species.api.Media;
-import org.gbif.species.api.NameUsage;
-import org.gbif.species.api.Reference;
-import org.gbif.species.api.SimpleUsage;
-import org.gbif.species.api.TreeUsage;
-import org.gbif.species.api.UsageInfo;
-import org.gbif.species.api.VernacularName;
+import org.gbif.taxon.api.Distribution;
+import org.gbif.taxon.api.Media;
+import org.gbif.taxon.api.NameUsage;
+import org.gbif.taxon.api.Reference;
+import org.gbif.taxon.api.SimpleUsage;
+import org.gbif.taxon.api.TreeUsage;
+import org.gbif.taxon.api.UsageInfo;
+import org.gbif.taxon.api.VernacularName;
 
 import java.net.URI;
 import java.time.LocalDate;
@@ -191,7 +191,7 @@ class ApiConverterTest {
     sn.setCode(NomCode.ZOOLOGICAL);
     sn.setExtinct(false);
 
-    SimpleUsage su = converter.convertSimple(sn);
+    SimpleUsage su = converter.convert(sn);
 
     assertThat(su.getTaxonID()).isEqualTo("id-1");
     assertThat(su.getParentNameUsageID()).isEqualTo("parent-1");
@@ -210,7 +210,7 @@ class ApiConverterTest {
     sn.setStatus(TaxonomicStatus.SYNONYM);
     sn.setParent("accepted-1");
 
-    SimpleUsage su = converter.convertSimple(sn);
+    SimpleUsage su = converter.convert(sn);
 
     assertThat(su.getAcceptedNameUsageID()).isEqualTo("accepted-1");
     assertThat(su.getParentNameUsageID()).isNull();
@@ -221,7 +221,7 @@ class ApiConverterTest {
     var sn = new SimpleName("id-3", "Some name", Rank.GENUS);
     sn.setStatus(TaxonomicStatus.ACCEPTED);
 
-    SimpleUsage su = converter.convertSimple(sn);
+    SimpleUsage su = converter.convert(sn);
 
     assertThat(su.getNomenclaturalCode()).isNull();
   }

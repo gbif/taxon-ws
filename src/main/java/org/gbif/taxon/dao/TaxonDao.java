@@ -1,22 +1,11 @@
-package org.gbif.species.dao;
+package org.gbif.taxon.dao;
 
-import com.github.benmanes.caffeine.cache.LoadingCache;
-
-import life.catalogue.api.model.DSID;
-import life.catalogue.api.model.NameUsageBase;
 import life.catalogue.api.model.Page;
 import life.catalogue.api.model.ResultPage;
 import life.catalogue.dao.MetricsDao;
 import life.catalogue.dao.NameDao;
-import life.catalogue.dao.TaxonDao;
 import life.catalogue.dao.TreeDao;
-import life.catalogue.db.mapper.DistributionMapper;
-import life.catalogue.db.mapper.MediaMapper;
 import life.catalogue.db.mapper.NameUsageMapper;
-import life.catalogue.db.mapper.ReferenceMapper;
-import life.catalogue.db.mapper.SynonymMapper;
-import life.catalogue.db.mapper.TaxonPropertyMapper;
-import life.catalogue.db.mapper.VernacularNameMapper;
 
 import life.catalogue.es.NameUsageIndexService;
 import life.catalogue.img.ThumborConfig;
@@ -29,10 +18,9 @@ import org.apache.ibatis.session.SqlSessionFactory;
 
 import org.gbif.api.model.common.paging.Pageable;
 import org.gbif.api.model.common.paging.PagingResponse;
-import org.gbif.species.api.NameUsage;
-import org.gbif.species.api.SimpleUsage;
-import org.gbif.species.api.TreeUsage;
-import org.gbif.species.api.UsageInfo;
+import org.gbif.taxon.api.SimpleUsage;
+import org.gbif.taxon.api.TreeUsage;
+import org.gbif.taxon.api.UsageInfo;
 
 
 import java.io.Writer;
@@ -44,14 +32,14 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SpeciesDao {
+public class TaxonDao {
   private DatasetKeyMap map;
   private ApiConverter converter;
   private SqlSessionFactory factory;
   private TreeDao treeDao;
-  private TaxonDao taxonDao;
+  private life.catalogue.dao.TaxonDao taxonDao;
 
-  public SpeciesDao(DatasetKeyMap map, ApiConverter converter, SqlSessionFactory factory) {
+  public TaxonDao(DatasetKeyMap map, ApiConverter converter, SqlSessionFactory factory) {
     this.map = map;
     this.converter = converter;
     this.factory = factory;
@@ -59,13 +47,13 @@ public class SpeciesDao {
     var indexService = NameUsageIndexService.passThru();
     MetricsDao mdao = new MetricsDao(factory);
     NameDao ndao = new NameDao(factory, indexService, NameIndexFactory.passThru(), null);
-    this.taxonDao = new TaxonDao(factory, ndao, mdao, new ThumborService(new ThumborConfig()), indexService, null, null);
+    this.taxonDao = new life.catalogue.dao.TaxonDao(factory, ndao, mdao, new ThumborService(new ThumborConfig()), indexService, null, null);
   }
 
-  public NameUsage get(UUID uuid, String taxonKey) {
+  public SimpleUsage get(UUID uuid, String taxonKey) {
     try (var session = factory.openSession()) {
       var num = session.getMapper(NameUsageMapper.class);
-      return converter.convert(num.get(map.toDSID(uuid, taxonKey)));
+      return converter.convert(num.getSimple(map.toDSID(uuid, taxonKey)));
     }
   }
 

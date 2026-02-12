@@ -11,9 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gbif.species.config;
-
-import jakarta.ws.rs.ext.Provider;
+package org.gbif.taxon.config;
 
 
 import org.gbif.ws.json.JacksonJsonObjectMapperProvider;
@@ -24,7 +22,6 @@ import java.util.List;
 
 import org.gbif.ws.server.provider.CountryHandlerMethodArgumentResolver;
 import org.gbif.ws.server.provider.PageableHandlerMethodArgumentResolver;
-import org.gbif.ws.server.provider.PageableProvider;
 
 
 import org.springframework.context.annotation.Bean;

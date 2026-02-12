@@ -1,9 +1,9 @@
-package org.gbif.species.dao;
+package org.gbif.taxon.dao;
 
 import com.zaxxer.hikari.HikariDataSource;
 
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.gbif.species.api.SimpleUsage;
+import org.gbif.taxon.api.SimpleUsage;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @ActiveProfiles("test")
-class SpeciesDaoIT {
+class TaxonDaoIT {
 
   @MockitoBean
   private HikariDataSource dataSource;
@@ -26,17 +26,17 @@ class SpeciesDaoIT {
   private SqlSessionFactory sqlSessionFactory;
 
   @Autowired
-  private SpeciesDao speciesDao;
+  private TaxonDao taxonDao;
 
   @Test
-  void speciesDaoIsWired() {
-    assertThat(speciesDao).isNotNull();
+  void taxonDaoIsWired() {
+    assertThat(taxonDao).isNotNull();
   }
 
   @Test
   void getRelatedReturnsEmptyList() {
     var uuid = UUID.randomUUID();
-    List<SimpleUsage> result = speciesDao.getRelated(uuid, "t-1", "any-type");
+    List<SimpleUsage> result = taxonDao.getRelated(uuid, "t-1", "any-type");
     assertThat(result).isEmpty();
   }
 }

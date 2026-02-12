@@ -60,4 +60,4 @@ mvn verify -Popenapi
 
 ## CI/CD
 
-Jenkins pipeline (`Jenkinsfile`): builds with Maven 3.9.9 + LibericaJDK21, auto-deploys dev branch to `species-ws-dev-deploy`. Releases run `mvn release:prepare release:perform` on master.
+Jenkins pipeline (`Jenkinsfile`): builds with Maven 3.9.9 + LibericaJDK21, auto-deploys dev branch to `taxon-ws-dev-deploy`. Releases run `mvn release:prepare release:perform` on master.

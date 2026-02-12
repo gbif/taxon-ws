@@ -11,24 +11,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gbif.species.resource;
-
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.StreamingOutput;
-
-import life.catalogue.api.model.NameUsageBase;
+package org.gbif.taxon.resource;
 
 import life.catalogue.common.io.UTF8IoUtils;
 import life.catalogue.printer.JsonTreePrinter;
 
 
-import org.gbif.species.api.NameUsage;
-import org.gbif.species.api.SimpleUsage;
-import org.gbif.species.api.UsageInfo;
-import org.gbif.species.dao.SpeciesDao;
+import org.gbif.taxon.api.NameUsage;
+import org.gbif.taxon.api.SimpleUsage;
+import org.gbif.taxon.api.UsageInfo;
+import org.gbif.taxon.dao.TaxonDao;
 
 
 import java.io.Writer;
@@ -68,17 +60,17 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 @Tag(name = "Species", description = "Species indexed by ChecklistBank for GBIF")
 @RequestMapping(value = "taxon", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
-public class SpeciesResource {
-  private static final Logger LOG = LoggerFactory.getLogger(SpeciesResource.class);
+public class TaxonResource {
+  private static final Logger LOG = LoggerFactory.getLogger(TaxonResource.class);
 
-  private final SpeciesDao dao;
+  private final TaxonDao dao;
 
-  public SpeciesResource(SpeciesDao searchService) {
+  public TaxonResource(TaxonDao searchService) {
     this.dao = searchService;
   }
 
   @GetMapping("/{uuid}/{taxonKey}")
-  public NameUsage get(
+  public SimpleUsage get(
       @PathVariable("uuid")
       @Parameter(
           description = "UUID for the dataset key",

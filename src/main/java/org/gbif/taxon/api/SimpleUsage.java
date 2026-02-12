@@ -1,4 +1,4 @@
-package org.gbif.species.api;
+package org.gbif.taxon.api;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import life.catalogue.api.vocab.TaxonomicStatus;

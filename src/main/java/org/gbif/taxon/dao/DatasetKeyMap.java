@@ -1,4 +1,4 @@
-package org.gbif.species.dao;
+package org.gbif.taxon.dao;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;

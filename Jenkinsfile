@@ -52,7 +52,7 @@ pipeline {
         }
       }
       steps {
-        build job: "species-ws-dev-deploy", wait: false, propagate: false
+        build job: "taxon-ws-dev-deploy", wait: false, propagate: false
       }
     }
 

@@ -1,4 +1,4 @@
-package org.gbif.species.dao;
+package org.gbif.taxon.dao;
 
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -9,7 +9,7 @@ import life.catalogue.api.vocab.Origin;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.gbif.nameparser.api.NomCode;
 import org.gbif.nameparser.api.Rank;
-import org.gbif.species.api.NameUsage;
+import org.gbif.taxon.api.NameUsage;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
