@@ -3,10 +3,13 @@ package org.gbif.species.dao;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 
+import life.catalogue.api.exception.NotFoundException;
 import life.catalogue.api.model.DSID;
 
+import life.catalogue.api.vocab.DatasetOrigin;
 import life.catalogue.api.vocab.Datasets;
 import life.catalogue.cache.LatestDatasetKeyCache;
+import life.catalogue.dao.DatasetInfoCache;
 import life.catalogue.db.mapper.DatasetMapper;
 
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -51,6 +54,17 @@ public class DatasetKeyMap {
       var dataset = session.getMapper(DatasetMapper.class).get(datasetKey);
       if (dataset != null) {
         var key = dataset.getGbifKey();
+        if (key == null) {
+          // try COL releases which are not mapped to a GBIF key in the dataset table
+          try {
+            var info = DatasetInfoCache.CACHE.info(datasetKey, true);
+            if (info != null && info.sourceKey == Datasets.COL) {
+              key = info.origin == DatasetOrigin.XRELEASE ? Constants.COL_DATASET_KEY : COL_BR_DATASET_KEY;
+            }
+          } catch (NotFoundException e) {
+            return null;
+          }
+        }
         if (key != null) {
           gbif2clb.put(key, datasetKey);
           return key;
