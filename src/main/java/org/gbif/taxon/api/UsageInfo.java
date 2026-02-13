@@ -3,6 +3,8 @@ package org.gbif.taxon.api;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import javax.validation.constraints.Null;
+
 import java.net.URI;
 import java.util.List;
 
@@ -44,12 +46,15 @@ public class UsageInfo {
   @Schema(description = "Environments where the taxon occurs (marine, freshwater, terrestrial, brackish)")
   private List<String> environment;
 
+  @Null(message = "This field is not used yet")
   @Schema(description = "IUCN Red List conservation status", example = "LC")
   private String iucnRedlistStatus;
 
+  @Null(message = "This field is not used yet")
   @Schema(description = "CITES appendix designation (I, II, III)", example = "II")
   private String citesAppendix;
 
+  @Null(message = "This field is not used yet")
   @Schema(description = "Date when the taxon was added to CITES", example = "1975-07-01")
   private String citesDateAdded;
 }

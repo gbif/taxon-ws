@@ -13,6 +13,7 @@
  */
 package org.gbif.taxon.resource;
 
+import life.catalogue.api.vocab.DatasetType;
 import life.catalogue.common.io.UTF8IoUtils;
 import life.catalogue.printer.JsonTreePrinter;
 
@@ -148,11 +149,22 @@ public class TaxonResource {
     String taxonKey,
     @RequestParam(required = false)
     @Parameter(
-      description = "Optional type filter: 'treatments' or 'invasive'"
+      description = "Optional dataset type filter: 'article' or 'nomenclatural'",
+      example = "article"
     )
-    String type
+    List<DatasetType> datasetTypes,
+    @RequestParam(required = false)
+    @Parameter(
+      description = "Optional dataset key filter"
+    )
+    List<Integer> datasetKeys,
+    @RequestParam(required = false)
+    @Parameter(
+      description = "Optional filter on dataset publisher keys"
+    )
+    List<UUID> publisherKeys
   ) {
-    return dao.getRelated(uuid, taxonKey, type);
+    return dao.listRelated(uuid, taxonKey, datasetTypes, datasetKeys, publisherKeys);
   }
 
   @GetMapping("/search")

@@ -1,7 +1,10 @@
 package org.gbif.taxon.dao;
 
+import life.catalogue.api.model.DSID;
 import life.catalogue.api.model.Page;
 import life.catalogue.api.model.ResultPage;
+import life.catalogue.api.model.SimpleNameWithNidx;
+import life.catalogue.api.vocab.DatasetType;
 import life.catalogue.dao.MetricsDao;
 import life.catalogue.dao.NameDao;
 import life.catalogue.dao.TreeDao;
@@ -13,6 +16,7 @@ import life.catalogue.img.ThumborService;
 import life.catalogue.matching.nidx.NameIndexFactory;
 import life.catalogue.printer.JsonTreePrinter;
 
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 
@@ -24,6 +28,7 @@ import org.gbif.taxon.api.UsageInfo;
 
 
 import java.io.Writer;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
@@ -31,13 +36,15 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Nullable;
+
 @Service
 public class TaxonDao {
   private DatasetKeyMap map;
   private ApiConverter converter;
   private SqlSessionFactory factory;
   private TreeDao treeDao;
-  private life.catalogue.dao.TaxonDao taxonDao;
+  private life.catalogue.dao.TaxonDao tDao;
 
   public TaxonDao(DatasetKeyMap map, ApiConverter converter, SqlSessionFactory factory) {
     this.map = map;
@@ -47,7 +54,7 @@ public class TaxonDao {
     var indexService = NameUsageIndexService.passThru();
     MetricsDao mdao = new MetricsDao(factory);
     NameDao ndao = new NameDao(factory, indexService, NameIndexFactory.passThru(), null);
-    this.taxonDao = new life.catalogue.dao.TaxonDao(factory, ndao, mdao, new ThumborService(new ThumborConfig()), indexService, null, null);
+    this.tDao = new life.catalogue.dao.TaxonDao(factory, ndao, mdao, new ThumborService(new ThumborConfig()), indexService, null, null);
   }
 
   public SimpleUsage get(UUID uuid, String taxonKey) {
@@ -65,19 +72,23 @@ public class TaxonDao {
       if (usage == null) return null;
 
       var clbInfo = new life.catalogue.api.model.UsageInfo(usage);
-      taxonDao.fillUsageInfo(session, clbInfo, null, true, false, true, true, true, true, false, false, true, true, false, false, false, false, false);
+      tDao.fillUsageInfo(session, clbInfo, null, true, false, true, true, true, true, false, false, true, true, false, false, false, false, false);
       return converter.convert(clbInfo);
     }
   }
 
   public JsonTreePrinter childrenBreakdownPrinter(UUID uuid, String id, Writer writer) {
     int datasetKey = map.toCLB(uuid);
-    return taxonDao.childrenBreakdownPrinter(datasetKey, id, writer);
+    return tDao.childrenBreakdownPrinter(datasetKey, id, writer);
   }
 
-  public List<SimpleUsage> getRelated(UUID uuid, String taxonKey, String type) {
-    // TODO: cross-dataset related usages deferred
-    return List.of();
+  public List<SimpleUsage> listRelated(UUID uuid, String taxonKey,
+                                       @Nullable Collection<DatasetType> datasetTypes,
+                                       @Nullable Collection<Integer> datasetKeys,
+                                       @Nullable Collection<UUID> publisherKeys) {
+    int datasetKey = map.toCLB(uuid);
+    return tDao.related(datasetKey, taxonKey, datasetTypes, datasetKeys, publisherKeys)
+      .stream().map(converter::convert).toList();
   }
 
   private static Page page(Pageable p) {
