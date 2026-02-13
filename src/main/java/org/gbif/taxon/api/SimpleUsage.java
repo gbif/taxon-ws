@@ -7,12 +7,18 @@ import lombok.Data;
 
 import org.gbif.nameparser.api.Rank;
 
+
+import java.util.UUID;
+
 /**
  * Simplified taxon usage class containing core taxonomic information.
  */
 @Data
 @Schema(description = "Simplified taxon usage containing core taxonomic information")
 public class SimpleUsage {
+
+  @Schema(description = "The identifier for the dataset", example = "7ddf754f-d193-4cc9-b351-99906754a03b")
+  private UUID datasetKey;
 
   @Schema(description = "The unique identifier for this taxon", example = "2435099")
   private String taxonID;

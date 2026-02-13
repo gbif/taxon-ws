@@ -1,5 +1,7 @@
 package org.gbif.taxon.dao;
 
+import jakarta.ws.rs.QueryParam;
+
 import life.catalogue.api.model.DSID;
 import life.catalogue.api.model.Page;
 import life.catalogue.api.model.ResultPage;
@@ -87,7 +89,7 @@ public class TaxonDao {
                                        @Nullable Collection<Integer> datasetKeys,
                                        @Nullable Collection<UUID> publisherKeys) {
     int datasetKey = map.toCLB(uuid);
-    return tDao.related(datasetKey, taxonKey, datasetTypes, datasetKeys, publisherKeys)
+    return tDao.related(datasetKey, taxonKey, true, datasetTypes, datasetKeys, publisherKeys)
       .stream().map(converter::convert).toList();
   }
 

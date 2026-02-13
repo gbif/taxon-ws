@@ -2,6 +2,7 @@ package org.gbif.taxon.dao;
 
 import life.catalogue.api.model.NameUsageBase;
 import life.catalogue.api.model.SimpleName;
+import life.catalogue.api.model.SimpleNameInDataset;
 import life.catalogue.api.model.Synonym;
 import life.catalogue.api.model.Taxon;
 import life.catalogue.api.model.TaxonProperty;
@@ -66,6 +67,12 @@ public class ApiConverter {
     nu.setTaxonRemarks(nub.getRemarks());
 
     return nu;
+  }
+
+  public SimpleUsage convert(SimpleNameInDataset sn) {
+    var su = convert((SimpleName)sn);
+    su.setDatasetKey(map.toGBIF(sn.getDatasetKey()));
+    return su;
   }
 
   public SimpleUsage convert(SimpleName sn) {
