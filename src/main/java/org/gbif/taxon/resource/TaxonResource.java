@@ -39,7 +39,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.Explode;
 import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -147,20 +150,25 @@ public class TaxonResource {
       example = "CXA"
     )
     String taxonKey,
-    @RequestParam(required = false)
+    @RequestParam(name = "datasetType", required = false)
     @Parameter(
-      description = "Optional dataset type filter: 'article' or 'nomenclatural'",
-      example = "article"
+      description = "Optional dataset type filter, repeatable: e.g. `?datasetType=article&datasetType=nomenclatural`",
+      explode = Explode.TRUE,
+      array = @ArraySchema(schema = @Schema(implementation = DatasetType.class))
     )
     List<DatasetType> datasetTypes,
-    @RequestParam(required = false)
+    @RequestParam(name = "datasetKey", required = false)
     @Parameter(
-      description = "Optional dataset key filter"
+      description = "Optional dataset key filter, repeatable: e.g. `?datasetKey=1&datasetKey=2`",
+      explode = Explode.TRUE,
+      array = @ArraySchema(schema = @Schema(type = "integer"))
     )
     List<Integer> datasetKeys,
-    @RequestParam(required = false)
+    @RequestParam(name = "publisherKey", required = false)
     @Parameter(
-      description = "Optional filter on dataset publisher keys"
+      description = "Optional publisher key filter, repeatable: e.g. `?publisherKey=<uuid>&publisherKey=<uuid>`",
+      explode = Explode.TRUE,
+      array = @ArraySchema(schema = @Schema(type = "string", format = "uuid"))
     )
     List<UUID> publisherKeys
   ) {
