@@ -8,13 +8,7 @@ import lombok.Data;
  */
 @Data
 @Schema(description = "A common or vernacular name for a taxon")
-public class VernacularName {
-
-  @Schema(description = "The vernacular (common) name", example = "Silver Fir")
-  private String vernacularName;
-
-  @Schema(description = "The language of the vernacular name (ISO 639 code)", example = "en")
-  private String language;
+public class VernacularName extends VernacularNameSimple {
 
   @Schema(description = "Temporal context for the name usage", example = "1900-2000")
   private String temporal;

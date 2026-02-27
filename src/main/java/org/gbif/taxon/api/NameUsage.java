@@ -19,7 +19,7 @@ import java.util.UUID;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "Extended taxon name usage with detailed taxonomic and nomenclatural information")
-public class NameUsage extends SimpleUsage {
+public class NameUsage extends NameUsageSimple {
 
   @Schema(description = "The identifier for the dataset", example = "7ddf754f-d193-4cc9-b351-99906754a03b")
   private UUID datasetKey;

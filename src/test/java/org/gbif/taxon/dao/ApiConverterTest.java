@@ -25,7 +25,7 @@ import org.gbif.taxon.api.Distribution;
 import org.gbif.taxon.api.Media;
 import org.gbif.taxon.api.NameUsage;
 import org.gbif.taxon.api.Reference;
-import org.gbif.taxon.api.SimpleUsage;
+import org.gbif.taxon.api.NameUsageSimple;
 import org.gbif.taxon.api.TreeUsage;
 import org.gbif.taxon.api.UsageInfo;
 import org.gbif.taxon.api.VernacularName;
@@ -191,7 +191,7 @@ class ApiConverterTest {
     sn.setCode(NomCode.ZOOLOGICAL);
     sn.setExtinct(false);
 
-    SimpleUsage su = converter.convert(sn);
+    NameUsageSimple su = converter.convert(sn);
 
     assertThat(su.getTaxonID()).isEqualTo("id-1");
     assertThat(su.getParentNameUsageID()).isEqualTo("parent-1");
@@ -210,7 +210,7 @@ class ApiConverterTest {
     sn.setStatus(TaxonomicStatus.SYNONYM);
     sn.setParent("accepted-1");
 
-    SimpleUsage su = converter.convert(sn);
+    NameUsageSimple su = converter.convert(sn);
 
     assertThat(su.getAcceptedNameUsageID()).isEqualTo("accepted-1");
     assertThat(su.getParentNameUsageID()).isNull();
@@ -221,7 +221,7 @@ class ApiConverterTest {
     var sn = new SimpleName("id-3", "Some name", Rank.GENUS);
     sn.setStatus(TaxonomicStatus.ACCEPTED);
 
-    SimpleUsage su = converter.convert(sn);
+    NameUsageSimple su = converter.convert(sn);
 
     assertThat(su.getNomenclaturalCode()).isNull();
   }

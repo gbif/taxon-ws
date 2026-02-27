@@ -69,14 +69,14 @@ public class ApiConverter {
     return nu;
   }
 
-  public SimpleUsage convert(SimpleNameInDataset sn) {
+  public NameUsageSimple convert(SimpleNameInDataset sn) {
     var su = convert((SimpleName)sn);
     su.setDatasetKey(map.toGBIF(sn.getDatasetKey()));
     return su;
   }
 
-  public SimpleUsage convert(SimpleName sn) {
-    var su = new SimpleUsage();
+  public NameUsageSimple convert(SimpleName sn) {
+    var su = new NameUsageSimple();
 
     su.setTaxonID(sn.getId());
     if (sn.getStatus() != null && sn.getStatus().isSynonym()) {
@@ -184,6 +184,7 @@ public class ApiConverter {
     var usage = ui.getUsage();
 
     info.setTaxon(convert(usage));
+    info.setGroup(ui.getGroup());
 
     // vernacularNames
     if (ui.getVernacularNames() != null) {
@@ -231,6 +232,15 @@ public class ApiConverter {
       );
     }
 
+    // measurements
+    if (ui.getProperties() != null) {
+      info.setMeasurementOrFacts(
+        ui.getProperties().stream()
+          .map(this::convert)
+          .collect(Collectors.toList())
+      );
+    }
+
     // bibliography
     if (ui.getReferences() != null) {
       info.setBibliography(
@@ -253,22 +263,6 @@ public class ApiConverter {
           .map(Enum::name)
           .collect(Collectors.toList())
       );
-    }
-
-    // properties: iucnRedlistStatus, citesAppendix, citesDateAdded
-    if (ui.getProperties() != null) {
-      var properties = new ArrayList<MeasurementOrFact>();
-      for (TaxonProperty prop : ui.getProperties()) {
-        properties.add(convert(prop));
-        if (prop.getProperty() != null && prop.getValue() != null) {
-          switch (prop.getProperty()) {
-            case "iucnRedlistStatus" -> info.setIucnRedlistStatus(prop.getValue());
-            case "citesAppendix" -> info.setCitesAppendix(prop.getValue());
-            case "citesDateAdded" -> info.setCitesDateAdded(prop.getValue());
-          }
-        }
-      }
-      info.setMeasurementOrFacts(properties);
     }
 
     return info;

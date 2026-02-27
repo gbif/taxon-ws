@@ -19,7 +19,7 @@ import life.catalogue.printer.JsonTreePrinter;
 
 
 import org.gbif.taxon.api.NameUsage;
-import org.gbif.taxon.api.SimpleUsage;
+import org.gbif.taxon.api.NameUsageSimple;
 import org.gbif.taxon.api.UsageInfo;
 import org.gbif.taxon.dao.TaxonDao;
 
@@ -74,7 +74,7 @@ public class TaxonResource {
   }
 
   @GetMapping("/{uuid}/{taxonKey}")
-  public SimpleUsage get(
+  public NameUsageSimple get(
       @PathVariable("uuid")
       @Parameter(
           description = "UUID for the dataset key",
@@ -137,7 +137,7 @@ public class TaxonResource {
 
 
   @GetMapping("/{uuid}/{taxonKey}/related")
-  public List<SimpleUsage> getRelated(
+  public List<NameUsageSimple> getRelated(
     @PathVariable("uuid")
     @Parameter(
       description = "UUID for the dataset key",
@@ -182,7 +182,7 @@ public class TaxonResource {
   }
 
   @GetMapping("/suggest")
-  public List<SimpleUsage> suggest() {
+  public List<NameUsageSimple> suggest() {
     // TODO: ES integration
     return List.of();
   }

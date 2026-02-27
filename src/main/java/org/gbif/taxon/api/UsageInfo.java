@@ -1,6 +1,7 @@
 package org.gbif.taxon.api;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import life.catalogue.api.vocab.TaxGroup;
 import lombok.Data;
 
 import javax.validation.constraints.Null;
@@ -18,11 +19,14 @@ public class UsageInfo {
   @Schema(description = "The accepted taxon this info object is about")
   private NameUsage taxon;
 
+  @Schema(description = "The major taxonomic group the taxon is considered in")
+  private TaxGroup group;
+
   @Schema(description = "List of synonyms and nomenclatural combinations for the taxon")
-  private List<SimpleUsage> synonyms;
+  private List<NameUsageSimple> synonyms;
 
   @Schema(description = "List of parent taxa starting with the xxx")
-  private List<SimpleUsage> classification;
+  private List<NameUsageSimple> classification;
 
   @Schema(description = "List of vernacular (common) names for the taxon")
   private List<VernacularName> vernacularNames;
@@ -45,16 +49,4 @@ public class UsageInfo {
 
   @Schema(description = "Environments where the taxon occurs (marine, freshwater, terrestrial, brackish)")
   private List<String> environment;
-
-  @Null(message = "This field is not used yet")
-  @Schema(description = "IUCN Red List conservation status", example = "LC")
-  private String iucnRedlistStatus;
-
-  @Null(message = "This field is not used yet")
-  @Schema(description = "CITES appendix designation (I, II, III)", example = "II")
-  private String citesAppendix;
-
-  @Null(message = "This field is not used yet")
-  @Schema(description = "Date when the taxon was added to CITES", example = "1975-07-01")
-  private String citesDateAdded;
 }

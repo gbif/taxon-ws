@@ -15,7 +15,7 @@ import java.util.UUID;
  */
 @Data
 @Schema(description = "Simplified taxon usage containing core taxonomic information")
-public class SimpleUsage {
+public class NameUsageSimple {
 
   @Schema(description = "The identifier for the dataset", example = "7ddf754f-d193-4cc9-b351-99906754a03b")
   private UUID datasetKey;

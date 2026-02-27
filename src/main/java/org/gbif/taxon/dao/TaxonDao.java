@@ -1,11 +1,7 @@
 package org.gbif.taxon.dao;
 
-import jakarta.ws.rs.QueryParam;
-
-import life.catalogue.api.model.DSID;
 import life.catalogue.api.model.Page;
 import life.catalogue.api.model.ResultPage;
-import life.catalogue.api.model.SimpleNameWithNidx;
 import life.catalogue.api.vocab.DatasetType;
 import life.catalogue.dao.MetricsDao;
 import life.catalogue.dao.NameDao;
@@ -18,13 +14,12 @@ import life.catalogue.img.ThumborService;
 import life.catalogue.matching.nidx.NameIndexFactory;
 import life.catalogue.printer.JsonTreePrinter;
 
-import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 
 import org.gbif.api.model.common.paging.Pageable;
 import org.gbif.api.model.common.paging.PagingResponse;
-import org.gbif.taxon.api.SimpleUsage;
+import org.gbif.taxon.api.NameUsageSimple;
 import org.gbif.taxon.api.TreeUsage;
 import org.gbif.taxon.api.UsageInfo;
 
@@ -59,7 +54,7 @@ public class TaxonDao {
     this.tDao = new life.catalogue.dao.TaxonDao(factory, ndao, mdao, new ThumborService(new ThumborConfig()), indexService, null, null);
   }
 
-  public SimpleUsage get(UUID uuid, String taxonKey) {
+  public NameUsageSimple get(UUID uuid, String taxonKey) {
     try (var session = factory.openSession()) {
       var num = session.getMapper(NameUsageMapper.class);
       return converter.convert(num.getSimple(map.toDSID(uuid, taxonKey)));
@@ -84,10 +79,10 @@ public class TaxonDao {
     return tDao.childrenBreakdownPrinter(datasetKey, id, writer);
   }
 
-  public List<SimpleUsage> listRelated(UUID uuid, String taxonKey,
-                                       @Nullable Collection<DatasetType> datasetTypes,
-                                       @Nullable Collection<Integer> datasetKeys,
-                                       @Nullable Collection<UUID> publisherKeys) {
+  public List<NameUsageSimple> listRelated(UUID uuid, String taxonKey,
+                                           @Nullable Collection<DatasetType> datasetTypes,
+                                           @Nullable Collection<Integer> datasetKeys,
+                                           @Nullable Collection<UUID> publisherKeys) {
     int datasetKey = map.toCLB(uuid);
     return tDao.related(datasetKey, taxonKey, true, datasetTypes, datasetKeys, publisherKeys)
       .stream().map(converter::convert).toList();
