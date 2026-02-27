@@ -17,32 +17,15 @@ package org.gbif.taxon.api.search;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import life.catalogue.api.vocab.TaxGroup;
-
-
-import org.gbif.api.model.common.LinneanClassification;
-import org.gbif.api.model.common.LinneanClassificationKeys;
-import org.gbif.api.util.ClassificationUtils;
-import org.gbif.api.vocabulary.Rank;
-import org.gbif.api.vocabulary.TaxonomicStatus;
-
-
-import java.util.LinkedHashMap;
-import java.util.Objects;
-import java.util.StringJoiner;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-
-import org.gbif.nameparser.api.NomCode;
-
-
-import javax.validation.constraints.NotNull;
+import life.catalogue.api.vocab.TaxonomicStatus;
+import lombok.Data;
+import org.gbif.nameparser.api.Rank;
 
 /**
  * Class used for returning results of a taxon suggest operation.
  * This class contains additional attributes that are required for displaying/providing textual information.
  */
-@SuppressWarnings("unused")
+@Data
 public class NameUsageSuggestResult {
 
   private String taxonID;
@@ -54,10 +37,10 @@ public class NameUsageSuggestResult {
   private String scientificName;
 
   @Schema(description = "The taxonomic rank of the suggested name", example = "SPECIES")
-  private org.gbif.nameparser.api.Rank taxonRank;
+  private Rank taxonRank;
 
   @Schema(description = "The taxonomic status of the taxon (e.g., accepted, synonym)", example = "accepted")
-  private life.catalogue.api.vocab.TaxonomicStatus taxonomicStatus;
+  private TaxonomicStatus taxonomicStatus;
 
   @Schema(description = "The nomenclatural code governing the taxon name", example = "ICNAFP")
   private String nomenclaturalCode;

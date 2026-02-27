@@ -13,18 +13,34 @@
  */
 package org.gbif.taxon.resource;
 
-import life.catalogue.api.vocab.DatasetType;
-import life.catalogue.common.io.UTF8IoUtils;
-import life.catalogue.printer.JsonTreePrinter;
+import life.catalogue.api.search.NameUsageRequest;
+import life.catalogue.api.vocab.NameField;
+import life.catalogue.api.vocab.TaxGroup;
 
 
-import org.gbif.taxon.api.NameUsage;
+import org.gbif.api.documentation.CommonParameters;
+import org.gbif.api.model.common.paging.Pageable;
+import org.gbif.api.model.common.search.FacetedSearchRequest;
+import org.gbif.api.model.common.search.SearchResponse;
+import org.gbif.nameparser.api.NomCode;
+import org.gbif.nameparser.api.NameType;
+import org.gbif.nameparser.api.Rank;
+
 import org.gbif.taxon.api.NameUsageSimple;
 import org.gbif.taxon.api.UsageInfo;
+import org.gbif.taxon.api.search.NameUsageSearchParameter;
+import org.gbif.taxon.api.search.NameUsageSearchRequest;
+import org.gbif.taxon.api.search.NameUsageSearchResult;
+import org.gbif.taxon.api.search.NameUsageSuggestRequest;
+import org.gbif.taxon.api.search.NameUsageSuggestResult;
 import org.gbif.taxon.dao.TaxonDao;
 
 
 import java.io.Writer;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,17 +52,31 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.Explode;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import life.catalogue.api.vocab.DatasetType;
+import life.catalogue.api.vocab.Issue;
+import life.catalogue.api.vocab.Origin;
+import life.catalogue.api.vocab.NomStatus;
+import life.catalogue.api.vocab.TaxonomicStatus;
 
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+import life.catalogue.common.io.UTF8IoUtils;
+import life.catalogue.printer.JsonTreePrinter;
+
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import static java.lang.annotation.ElementType.METHOD;
 
 @OpenAPIDefinition(
     info =
@@ -175,15 +205,188 @@ public class TaxonResource {
     return dao.listRelated(uuid, taxonKey, datasetTypes, datasetKeys, publisherKeys);
   }
 
+  @Operation(
+    operationId = "searchNames",
+    summary = "Full text search over name usages",
+    description = "Full-text search of name usages covering the scientific and vernacular names.\n\n" +
+      "Results are ordered by relevance by default as this search usually returns a lot of results."
+  )
+  @Tag(name = "Searching names")
+  @NameUsageSearchParameters
+  @SearchParameters
+  @SortParameters
+  @CommonParameters.QParameter
+  @Pageable.OffsetLimitParameters
+  @FacetedSearchRequest.FacetParameters
+  @Parameter(
+    name = "request",
+    hidden = true
+  )
+  @ApiResponse(responseCode = "200", description = "Name usages found")
   @GetMapping("/search")
-  public List<NameUsage> search() {
-    // TODO: ES integration
-    return List.of();
+  public SearchResponse<NameUsageSearchResult, NameUsageSearchParameter> search(NameUsageSearchRequest request) {
+    return dao.search(request);
   }
 
+
+  @Operation(
+    operationId = "suggestNames",
+    summary = "Suggestion service for name usages",
+    description = "Prefix search of name usages covering the scientific and vernacular names.\n\n" +
+      "Results are ordered by relevance by default as this search usually returns a lot of results."
+  )
+  @Tag(name = "Searching names")
+  @NameUsageSearchParameters
+  @SortParameters
+  @CommonParameters.QParameter
+  @Pageable.OffsetLimitParameters
+  @FacetedSearchRequest.FacetParameters
+  @Parameter(
+    name = "request",
+    hidden = true
+  )
+  @ApiResponse(responseCode = "200", description = "Name usages found")
   @GetMapping("/suggest")
-  public List<NameUsageSimple> suggest() {
-    // TODO: ES integration
-    return List.of();
+  public List<NameUsageSuggestResult> suggest(NameUsageSuggestRequest request) {
+    return dao.suggest(request);
   }
+
+
+
+  /* Same parameters for search and suggest queries. */
+  @Target({METHOD, ANNOTATION_TYPE})
+  @Retention(RetentionPolicy.RUNTIME)
+  @Inherited
+  @Parameters(
+    value = {
+      @Parameter(
+        name = "datasetKey",
+        description = "A UUID of a checklist dataset.",
+        schema = @Schema(implementation = UUID.class),
+        example = "d7dddbf4-2cf0-4f39-9b2a-bb099caae36c",
+        in = ParameterIn.QUERY
+      ),
+      @Parameter(
+        name = "rank",
+        description = "Filters by taxonomic rank.",
+        schema = @Schema(implementation = Rank.class),
+        in = ParameterIn.QUERY
+      ),
+      @Parameter(
+        name = "taxonID",
+        description = "Filters by any of the higher Linnean rank keys. Note this is within the respective checklist " +
+          "and not searching NUB keys across all checklists.",
+        in = ParameterIn.QUERY
+      ),
+      @Parameter(
+        name = "status",
+        description = "Filters by the taxonomic status as given in our https://api.gbif.org/v1/enumeration/basic/TaxonomicStatus[TaxonomicStatus enum].",
+        schema = @Schema(implementation = TaxonomicStatus.class),
+        in = ParameterIn.QUERY
+      ),
+      @Parameter(
+        name = "extinct",
+        description = "Filters by extinction status.",
+        schema = @Schema(implementation = Boolean.class),
+        in = ParameterIn.QUERY
+      ),
+      @Parameter(
+        name = "nameType",
+        description = "Filters by the name type as given in our https://api.gbif.org/v1/enumeration/basic/NameType[NameType enum].",
+        schema = @Schema(implementation = NameType.class),
+        in = ParameterIn.QUERY
+      ),
+      @Parameter(
+        name = "code",
+        description = "Filters by the nomenclatural code.",
+        schema = @Schema(implementation = NomCode.class),
+        in = ParameterIn.QUERY
+      ),
+      @Parameter(
+        name = "nomStatus",
+        description = "Filters by the nomenclatural status as given in our https://api.gbif.org/v1/enumeration/basic/NomenclaturalStatus[Nomenclatural Status enum].",
+        schema = @Schema(implementation = NomStatus.class),
+        in = ParameterIn.QUERY
+      ),
+      @Parameter(
+        name = "origin",
+        description = "Filters for name usages with a specific origin.",
+        schema = @Schema(implementation = Origin.class),
+        in = ParameterIn.QUERY
+      ),
+      @Parameter(
+        name = "group",
+        description = "Filters for name usages with a specific taxonomic group.",
+        schema = @Schema(implementation = TaxGroup.class),
+        in = ParameterIn.QUERY
+      ),
+      @Parameter(
+        name = "author",
+        description = "Filters for name usages with a specific author.",
+        schema = @Schema(implementation = String.class),
+        in = ParameterIn.QUERY
+      ),
+      @Parameter(
+        name = "year",
+        description = "Filters for name usages with a specific publication year.",
+        schema = @Schema(implementation = Integer.class),
+        in = ParameterIn.QUERY
+      ),
+      @Parameter(
+        name = "field",
+        description = "Filters for name usages with a specific field of the parsed name to be present.",
+        schema = @Schema(implementation = NameField.class),
+        in = ParameterIn.QUERY
+      ),
+      @Parameter(
+        name = "issue",
+        description = "A specific indexing issue as defined in our https://api.gbif.org/v1/enumeration/basic/NameUsageIssue[NameUsageIssue enum].",
+        schema = @Schema(implementation = Issue.class),
+        in = ParameterIn.QUERY
+      )
+    }
+  )
+  @interface NameUsageSearchParameters{}
+
+  @Target({METHOD, ANNOTATION_TYPE})
+  @Retention(RetentionPolicy.RUNTIME)
+  @Inherited
+  @Parameters(
+    value = {
+      @Parameter(
+        name = "sortBy",
+        description = "Filters for name usages with a specific field of the parsed name to be present.",
+        schema = @Schema(implementation = NameUsageRequest.SortBy.class),
+        in = ParameterIn.QUERY
+      ),
+      @Parameter(
+        name = "reverse",
+        description = "Filters for name usages with a specific field of the parsed name to be present.",
+        schema = @Schema(implementation = Boolean.class),
+        in = ParameterIn.QUERY
+      )
+    }
+  )
+  @interface SortParameters{}
+
+
+  @Target({METHOD, ANNOTATION_TYPE})
+  @Retention(RetentionPolicy.RUNTIME)
+  @Inherited
+  @Parameters(
+    value = {
+      @Parameter(
+        name = "searchType",
+        schema = @Schema(implementation = NameUsageRequest.SearchType.class),
+        in = ParameterIn.QUERY
+      ),
+      @Parameter(
+        name = "content",
+        schema = @Schema(implementation = NameUsageRequest.SearchContent.class),
+        in = ParameterIn.QUERY
+      )
+    }
+  )
+  @interface SearchParameters{}
+
 }

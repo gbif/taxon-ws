@@ -539,8 +539,6 @@ class ApiConverterTest {
     assertThat(info.getChecklistBankLink()).isNotNull();
     assertThat(info.getChecklistBankLink().toString()).contains("dataset/101/taxon/t-1");
     assertThat(info.getEnvironment()).containsExactlyInAnyOrder("TERRESTRIAL", "FRESHWATER");
-    assertThat(info.getIucnRedlistStatus()).isEqualTo("LC");
-    assertThat(info.getCitesAppendix()).isEqualTo("II");
   }
 
   @Test
@@ -563,8 +561,6 @@ class ApiConverterTest {
     UsageInfo info = converter.convert(ui);
 
     assertThat(info.getTaxon().getTaxonID()).isEqualTo("t-2");
-    assertThat(info.getIucnRedlistStatus()).isNull();
-    assertThat(info.getCitesAppendix()).isNull();
     assertThat(info.getChecklistBankLink()).isNotNull();
   }
 

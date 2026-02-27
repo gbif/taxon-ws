@@ -1,7 +1,26 @@
 package org.gbif.taxon.api.search;
 
-import org.gbif.api.model.checklistbank.search.NameUsageSearchParameter;
-import org.gbif.api.model.common.search.SearchRequest;
+import java.util.Set;
 
-public class NameUsageSearchRequest extends SearchRequest<NameUsageSearchParameter> {
+import io.swagger.v3.oas.annotations.Hidden;
+import life.catalogue.api.search.NameUsageRequest;
+import lombok.Getter;
+import lombok.Setter;
+
+public class NameUsageSearchRequest extends BaseNameUsageRequest {
+  public enum NameUsageQueryField implements QueryField {
+    SCIENTIFIC(NameUsageRequest.SearchContent.SCIENTIFIC_NAME),
+    AUTHORSHIP(NameUsageRequest.SearchContent.AUTHORSHIP),
+    VERNACULAR(NameUsageRequest.SearchContent.VERNACULAR_NAME);
+
+    public final NameUsageRequest.SearchContent clbValue;
+
+    NameUsageQueryField(NameUsageRequest.SearchContent clbValue) {
+      this.clbValue = clbValue;
+    }
+  }
+
+  @Hidden @Getter @Setter
+  private NameUsageRequest.SearchType searchType;
+
 }

@@ -7,19 +7,45 @@ import life.catalogue.api.model.Synonym;
 import life.catalogue.api.model.Taxon;
 import life.catalogue.api.model.TaxonProperty;
 import life.catalogue.api.model.TreeNode;
+import life.catalogue.api.search.NameUsageSearchResponse;
+import life.catalogue.api.search.NameUsageSuggestion;
+import life.catalogue.api.search.NameUsageWrapper;
 import life.catalogue.api.vocab.Country;
 
+
+import org.gbif.api.model.common.search.Facet;
+import org.gbif.api.model.common.search.SearchResponse;
 import org.gbif.taxon.api.*;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+
+import org.gbif.taxon.api.search.NameUsageSearchParameter;
+import org.gbif.taxon.api.search.NameUsageSearchResult;
+
+
+import org.gbif.taxon.api.search.NameUsageSuggestResult;
+
 
 import org.springframework.stereotype.Component;
 
 @Component
 public class ApiConverter {
   private static final String CLB_BASE_URL = "https://www.checklistbank.org/dataset/";
+
+  /** Reverse map from CLB search parameter to the corresponding GBIF v2 parameter. */
+  private static final Map<life.catalogue.api.search.NameUsageSearchParameter, NameUsageSearchParameter> CLB_TO_GBIF_PARAM;
+  static {
+    CLB_TO_GBIF_PARAM = new EnumMap<>(life.catalogue.api.search.NameUsageSearchParameter.class);
+    for (var p : NameUsageSearchParameter.values()) {
+      CLB_TO_GBIF_PARAM.put(p.toClb(), p);
+    }
+  }
 
   private DatasetKeyMap map;
 
@@ -266,5 +292,66 @@ public class ApiConverter {
     }
 
     return info;
+  }
+
+  public SearchResponse<NameUsageSearchResult, NameUsageSearchParameter> convert(NameUsageSearchResponse resp) {
+    List<NameUsageSearchResult> results = resp.getResult() == null ? List.of() :
+      resp.getResult().stream().map(this::convert).collect(Collectors.toList());
+    List<Facet<NameUsageSearchParameter>> facets = null;
+    if (resp.getFacets() != null && !resp.getFacets().isEmpty()) {
+      facets = new ArrayList<>();
+      for (var entry : resp.getFacets().entrySet()) {
+        var gbifParam = CLB_TO_GBIF_PARAM.get(entry.getKey());
+        if (gbifParam == null) continue; // CLB parameter has no GBIF equivalent
+        var counts = entry.getValue().stream()
+          .map(fv -> new Facet.Count(
+            fv.getLabel() != null ? fv.getLabel() : String.valueOf(fv.getValue()),
+            (long) fv.getCount()
+          ))
+          .collect(Collectors.toList());
+        facets.add(new Facet<>(gbifParam, counts));
+      }
+    }
+    return new SearchResponse<>(resp.getOffset(), resp.getLimit(), (long) resp.getTotal(), results, facets);
+  }
+
+  private NameUsageSearchResult convert(NameUsageWrapper wrapper) {
+    var result = new NameUsageSearchResult();
+    if (wrapper.getUsage() != null) {
+      result.setUsage(convert(wrapper.getUsage().asUsageBase()));
+    }
+    result.setGroup(wrapper.getGroup());
+    if (wrapper.getClassification() != null) {
+      result.setClassification(
+        wrapper.getClassification().stream().map(this::convert).collect(Collectors.toList())
+      );
+    }
+    if (wrapper.getVernacularNames() != null) {
+      result.setVernacularNames(
+        wrapper.getVernacularNames().stream().map(svn -> {
+          var vn = new VernacularNameSimple();
+          vn.setVernacularName(svn.getName());
+          vn.setLanguage(svn.getLanguage());
+          return vn;
+        }).collect(Collectors.toList())
+      );
+    }
+    return result;
+  }
+
+  public NameUsageSuggestResult convert(NameUsageSuggestion suggest) {
+    var result = new NameUsageSuggestResult();
+    result.setTaxonID(suggest.getUsageId());
+    result.setScientificNameID(suggest.getNameId());
+    result.setScientificName(suggest.getMatch());
+    result.setTaxonRank(suggest.getRank());
+    result.setTaxonomicStatus(suggest.getStatus());
+    result.setNomenclaturalCode(suggest.getNomCode() != null ? suggest.getNomCode().name() : null);
+    result.setAcceptedNameUsageID(suggest.getAcceptedUsageId());
+    result.setAcceptedNameUsage(suggest.getAcceptedName());
+    result.setGroup(suggest.getGroup());
+    result.setContext(suggest.getContext());
+    result.setScore(suggest.getScore());
+    return result;
   }
 }

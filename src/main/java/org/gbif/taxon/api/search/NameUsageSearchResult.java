@@ -13,7 +13,7 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class NameUsageSearchResponseRecord {
+public class NameUsageSearchResult {
   private NameUsageSimple usage;
   @Schema(description = "The major taxonomic group the taxon is considered in")
   private TaxGroup group;

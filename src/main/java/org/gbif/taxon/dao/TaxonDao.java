@@ -1,5 +1,38 @@
 package org.gbif.taxon.dao;
 
+import life.catalogue.es.indexing.NameUsageIndexService;
+import life.catalogue.es.search.NameUsageSearchService;
+
+
+import org.gbif.api.model.common.paging.Pageable;
+import org.gbif.api.model.common.paging.PagingResponse;
+import org.gbif.api.model.common.search.SearchResponse;
+import org.gbif.taxon.api.NameUsageSimple;
+import org.gbif.taxon.api.TreeUsage;
+import org.gbif.taxon.api.UsageInfo;
+import org.gbif.taxon.api.search.BaseNameUsageRequest;
+import org.gbif.taxon.api.search.NameUsageSearchParameter;
+import org.gbif.taxon.api.search.NameUsageSearchRequest;
+import org.gbif.taxon.api.search.NameUsageSearchResult;
+import org.gbif.taxon.api.search.NameUsageSuggestRequest;
+import org.gbif.taxon.api.search.NameUsageSuggestResult;
+
+
+import java.io.Writer;
+import java.util.Collection;
+import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Nullable;
 import life.catalogue.api.model.Page;
 import life.catalogue.api.model.ResultPage;
 import life.catalogue.api.vocab.DatasetType;
@@ -7,33 +40,10 @@ import life.catalogue.dao.MetricsDao;
 import life.catalogue.dao.NameDao;
 import life.catalogue.dao.TreeDao;
 import life.catalogue.db.mapper.NameUsageMapper;
-
-import life.catalogue.es.NameUsageIndexService;
 import life.catalogue.img.ThumborConfig;
 import life.catalogue.img.ThumborService;
 import life.catalogue.matching.nidx.NameIndexFactory;
 import life.catalogue.printer.JsonTreePrinter;
-
-import org.apache.ibatis.session.SqlSessionFactory;
-
-
-import org.gbif.api.model.common.paging.Pageable;
-import org.gbif.api.model.common.paging.PagingResponse;
-import org.gbif.taxon.api.NameUsageSimple;
-import org.gbif.taxon.api.TreeUsage;
-import org.gbif.taxon.api.UsageInfo;
-
-
-import java.io.Writer;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-
-import javax.annotation.Nullable;
 
 @Service
 public class TaxonDao {
@@ -42,8 +52,12 @@ public class TaxonDao {
   private SqlSessionFactory factory;
   private TreeDao treeDao;
   private life.catalogue.dao.TaxonDao tDao;
+  private life.catalogue.es.suggest.NameUsageSuggestionService suggestionService;
+  private life.catalogue.es.search.NameUsageSearchService searchService;
 
-  public TaxonDao(DatasetKeyMap map, ApiConverter converter, SqlSessionFactory factory) {
+  public TaxonDao(DatasetKeyMap map, ApiConverter converter, SqlSessionFactory factory,
+                  NameUsageSearchService searchService,
+                  life.catalogue.es.suggest.NameUsageSuggestionService suggestionService) {
     this.map = map;
     this.converter = converter;
     this.factory = factory;
@@ -52,6 +66,8 @@ public class TaxonDao {
     MetricsDao mdao = new MetricsDao(factory);
     NameDao ndao = new NameDao(factory, indexService, NameIndexFactory.passThru(), null);
     this.tDao = new life.catalogue.dao.TaxonDao(factory, ndao, mdao, new ThumborService(new ThumborConfig()), indexService, null, null);
+    this.searchService = searchService;
+    this.suggestionService = suggestionService;
   }
 
   public NameUsageSimple get(UUID uuid, String taxonKey) {
@@ -120,4 +136,64 @@ public class TaxonDao {
     var resp = treeDao.children(dsid, -1, false, true, null, page(page));
     return resp(resp, converter::convertTree);
   }
+
+  public SearchResponse<NameUsageSearchResult, NameUsageSearchParameter> search(NameUsageSearchRequest request) {
+    return converter.convert(searchService.search(convert(request), page(request)));
+  }
+
+  public List<NameUsageSuggestResult> suggest(NameUsageSuggestRequest request) {
+    return suggestionService.suggest(convert(request)).stream()
+      .map(converter::convert)
+      .toList();
+  }
+
+  private life.catalogue.api.search.NameUsageSearchRequest convert(NameUsageSearchRequest request) {
+    var req = new life.catalogue.api.search.NameUsageSearchRequest();
+    copyCommon(request, req);
+    if (request.getQFields() != null && !request.getQFields().isEmpty()) {
+      req.setContent(request.getQFields().stream()
+        .filter(f -> f instanceof NameUsageSearchRequest.NameUsageQueryField)
+        .map(f -> ((NameUsageSearchRequest.NameUsageQueryField) f).clbValue)
+        .collect(Collectors.toSet()));
+    }
+    return req;
+  }
+
+  private life.catalogue.api.search.NameUsageSuggestRequest convert(NameUsageSuggestRequest request) {
+    var req = new life.catalogue.api.search.NameUsageSuggestRequest();
+    copyCommon(request, req);
+    return req;
+  }
+  private static Page page(BaseNameUsageRequest req) {
+    return new Page((int)req.getOffset(), req.getLimit());
+  }
+
+  /**
+   * Translates the shared request parameters for search and suggest from the GBIF v2 taxon API
+   * to the CLB search API.
+   * @param from the GBIF API request
+   * @param req the CLB API request to translate to
+   */
+  private void copyCommon(BaseNameUsageRequest from, life.catalogue.api.search.NameUsageRequest req) {
+    req.setQ(from.getQ());
+    if (from.getParameters() != null) {
+      Map<life.catalogue.api.search.NameUsageSearchParameter, Set<Object>> filters = new EnumMap<>(life.catalogue.api.search.NameUsageSearchParameter.class);
+      for (var entry : from.getParameters().entrySet()) {
+        var values = entry.getValue();
+        if (values == null || values.isEmpty()) continue;
+        var clbParam = entry.getKey().toClb();
+        if (entry.getKey() == NameUsageSearchParameter.DATASET_KEY) {
+          Set<Object> keys = new HashSet<>();
+          for (String key : values) {
+            keys.add(map.toCLB(UUID.fromString(key)));
+          }
+          filters.put(clbParam, keys);
+        } else {
+          filters.put(clbParam, new HashSet<>(values));
+        }
+      }
+      req.setFilters(filters);
+    }
+  }
+
 }
