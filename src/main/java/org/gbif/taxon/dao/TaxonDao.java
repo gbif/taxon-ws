@@ -138,62 +138,18 @@ public class TaxonDao {
   }
 
   public SearchResponse<NameUsageSearchResult, NameUsageSearchParameter> search(NameUsageSearchRequest request) {
-    return converter.convert(searchService.search(convert(request), page(request)));
+    return converter.convert(searchService.search(converter.convert(request), page(request)));
   }
 
   public List<NameUsageSuggestResult> suggest(NameUsageSuggestRequest request) {
-    return suggestionService.suggest(convert(request)).stream()
+    return suggestionService.suggest(converter.convert(request)).stream()
       .map(converter::convert)
       .toList();
   }
 
-  private life.catalogue.api.search.NameUsageSearchRequest convert(NameUsageSearchRequest request) {
-    var req = new life.catalogue.api.search.NameUsageSearchRequest();
-    copyCommon(request, req);
-    if (request.getQFields() != null && !request.getQFields().isEmpty()) {
-      req.setContent(request.getQFields().stream()
-        .filter(f -> f instanceof NameUsageSearchRequest.NameUsageQueryField)
-        .map(f -> ((NameUsageSearchRequest.NameUsageQueryField) f).clbValue)
-        .collect(Collectors.toSet()));
-    }
-    return req;
-  }
-
-  private life.catalogue.api.search.NameUsageSuggestRequest convert(NameUsageSuggestRequest request) {
-    var req = new life.catalogue.api.search.NameUsageSuggestRequest();
-    copyCommon(request, req);
-    return req;
-  }
   private static Page page(BaseNameUsageRequest req) {
     return new Page((int)req.getOffset(), req.getLimit());
   }
 
-  /**
-   * Translates the shared request parameters for search and suggest from the GBIF v2 taxon API
-   * to the CLB search API.
-   * @param from the GBIF API request
-   * @param req the CLB API request to translate to
-   */
-  private void copyCommon(BaseNameUsageRequest from, life.catalogue.api.search.NameUsageRequest req) {
-    req.setQ(from.getQ());
-    if (from.getParameters() != null) {
-      Map<life.catalogue.api.search.NameUsageSearchParameter, Set<Object>> filters = new EnumMap<>(life.catalogue.api.search.NameUsageSearchParameter.class);
-      for (var entry : from.getParameters().entrySet()) {
-        var values = entry.getValue();
-        if (values == null || values.isEmpty()) continue;
-        var clbParam = entry.getKey().toClb();
-        if (entry.getKey() == NameUsageSearchParameter.DATASET_KEY) {
-          Set<Object> keys = new HashSet<>();
-          for (String key : values) {
-            keys.add(map.toCLB(UUID.fromString(key)));
-          }
-          filters.put(clbParam, keys);
-        } else {
-          filters.put(clbParam, new HashSet<>(values));
-        }
-      }
-      req.setFilters(filters);
-    }
-  }
 
 }
