@@ -103,9 +103,9 @@ public class TaxonResource {
     this.dao = searchService;
   }
 
-  @GetMapping("/{uuid}/{taxonKey}")
+  @GetMapping("/{datasetKey}/{taxonKey}")
   public NameUsageSimple get(
-      @PathVariable("uuid")
+      @PathVariable("datasetKey")
       @Parameter(
           description = "UUID for the dataset key",
           example = "83a00190-7038-3970-a7e8-5e5563c40e37"
@@ -121,9 +121,9 @@ public class TaxonResource {
     return dao.get(uuid, taxonKey);
   }
 
-  @GetMapping("/{uuid}/{taxonKey}/info")
+  @GetMapping("/{datasetKey}/{taxonKey}/info")
   public UsageInfo getInfo(
-    @PathVariable("uuid")
+    @PathVariable("datasetKey")
     @Parameter(
       description = "UUID for the dataset key",
       example = "83a00190-7038-3970-a7e8-5e5563c40e37"
@@ -139,9 +139,9 @@ public class TaxonResource {
     return dao.getInfo(uuid, taxonKey);
   }
 
-  @GetMapping("/{uuid}/{taxonKey}/breakdown")
+  @GetMapping("/{datasetKey}/{taxonKey}/breakdown")
   public StreamingResponseBody breakdown(
-      @PathVariable("uuid")
+      @PathVariable("datasetKey")
       @Parameter(
         description = "UUID for the dataset key",
         example = "83a00190-7038-3970-a7e8-5e5563c40e37"
@@ -166,9 +166,9 @@ public class TaxonResource {
   }
 
 
-  @GetMapping("/{uuid}/{taxonKey}/related")
+  @GetMapping("/{datasetKey}/{taxonKey}/related")
   public List<NameUsageSimple> getRelated(
-    @PathVariable("uuid")
+    @PathVariable("datasetKey")
     @Parameter(
       description = "UUID for the dataset key",
       example = "83a00190-7038-3970-a7e8-5e5563c40e37"

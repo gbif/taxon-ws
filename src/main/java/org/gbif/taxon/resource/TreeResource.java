@@ -41,27 +41,27 @@ public class TreeResource {
     this.dao = dao;
   }
 
-  @GetMapping("/{uuid}")
+  @GetMapping("/{datasetKey}")
   public PagingResponse<TreeUsage> root(
-    @PathVariable("uuid")
+    @PathVariable("datasetKey")
     @Parameter(
       description = "UUID for the dataset key",
       example = "83a00190-7038-3970-a7e8-5e5563c40e37"
     )
-    UUID uuid,
+    UUID datasetKey,
     Pageable page
   ) {
-    return dao.root(uuid, page);
+    return dao.root(datasetKey, page);
   }
 
-  @GetMapping("/{uuid}/{taxonKey}")
+  @GetMapping("/{datasetKey}/{taxonKey}")
   public List<TreeUsage> classification(
-    @PathVariable("uuid")
+    @PathVariable("datasetKey")
     @Parameter(
       description = "UUID for the dataset key",
       example = "83a00190-7038-3970-a7e8-5e5563c40e37"
     )
-    UUID uuid,
+    UUID datasetKey,
     @PathVariable("taxonKey")
     @Parameter(
       description = "Taxon key scoped within the dataset",
@@ -69,17 +69,17 @@ public class TreeResource {
     )
     String taxonKey
   ) {
-    return dao.classification(uuid, taxonKey);
+    return dao.classification(datasetKey, taxonKey);
   }
 
-  @GetMapping("/{uuid}/{taxonKey}/children")
+  @GetMapping("/{datasetKey}/{taxonKey}/children")
   public PagingResponse<TreeUsage> children(
-    @PathVariable("uuid")
+    @PathVariable("datasetKey")
     @Parameter(
       description = "UUID for the dataset key",
       example = "83a00190-7038-3970-a7e8-5e5563c40e37"
     )
-    UUID uuid,
+    UUID datasetKey,
     @PathVariable("taxonKey")
     @Parameter(
       description = "Taxon key scoped within the dataset",
@@ -88,6 +88,6 @@ public class TreeResource {
     String taxonKey,
     Pageable page
   ) {
-    return dao.children(uuid, taxonKey, page);
+    return dao.children(datasetKey, taxonKey, page);
   }
 }
