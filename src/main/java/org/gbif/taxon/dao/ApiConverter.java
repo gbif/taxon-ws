@@ -412,6 +412,33 @@ public class ApiConverter {
 
   public ChecklistMetrics convert(DatasetImport imp) {
     var metrics = new ChecklistMetrics();
+    metrics.setOrigin(imp.getOrigin());
+    metrics.setFormat(imp.getFormat());
+    metrics.setDownload(imp.getDownload());
+    metrics.setAttempt(imp.getAttempt());
+    metrics.setState(imp.getState());
+    metrics.setStarted(imp.getStarted());
+    metrics.setFinished(imp.getFinished());
+
+    metrics.setBareNameCount(imp.getBareNameCount());
+    metrics.setDistributionCount(imp.getDistributionCount());
+    metrics.setEstimateCount(imp.getEstimateCount());
+    metrics.setMediaCount(imp.getMediaCount());
+    metrics.setNameCount(imp.getNameCount());
+    metrics.setReferenceCount(imp.getReferenceCount());
+    metrics.setSynonymCount(imp.getSynonymCount());
+    metrics.setTaxonCount(imp.getTaxonCount());
+    metrics.setTreatmentCount(imp.getTreatmentCount());
+    metrics.setTypeMaterialCount(imp.getTypeMaterialCount());
+    metrics.setVernacularCount(imp.getVernacularCount());
+
+    metrics.setNamesByCodeCount(imp.getNamesByCodeCount());
+    metrics.setNamesByRankCount(imp.getNamesByRankCount());
+    metrics.setNamesByTypeCount(imp.getNamesByTypeCount());
+    metrics.setTaxaByRankCount(imp.getTaxaByRankCount());
+    metrics.setUsagesByStatusCount(imp.getUsagesByStatusCount());
+    metrics.setUsagesByOriginCount(imp.getUsagesByOriginCount());
+
     return metrics;
   }
 }
