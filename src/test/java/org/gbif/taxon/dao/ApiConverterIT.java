@@ -1,10 +1,13 @@
 package org.gbif.taxon.dao;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.zaxxer.hikari.HikariDataSource;
 
 import life.catalogue.api.model.Name;
 import life.catalogue.api.model.Taxon;
 import life.catalogue.api.vocab.Origin;
+import life.catalogue.es.search.NameUsageSearchService;
+import life.catalogue.es.suggest.NameUsageSuggestionService;
 
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.gbif.nameparser.api.NomCode;
@@ -29,6 +32,15 @@ class ApiConverterIT {
 
   @MockitoBean
   private SqlSessionFactory sqlSessionFactory;
+
+  @MockitoBean
+  private ElasticsearchClient elasticsearchClient;
+
+  @MockitoBean
+  private NameUsageSearchService nameUsageSearchService;
+
+  @MockitoBean
+  private NameUsageSuggestionService nameUsageSuggestionService;
 
   @Autowired
   private ApiConverter converter;
