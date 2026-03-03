@@ -39,9 +39,13 @@ public class ClbConfig {
   @Bean
   public EsConfig esClientConfiguration(
     @Value("${elasticsearch.index.name}") String name,
+    @Value("${elasticsearch.hosts:localhost:9200}") String hosts,
     @Value("${elasticsearch.index.numShards:1}") int numShards,
     @Value("${elasticsearch.index.numReplicas:0}") int numReplicas,
-    @Value("${elasticsearch.hosts:http://localhost:9200}") String hosts
+    @Value("${elasticsearch.connectTimeout:10000}") int connectTimeout,
+    @Value("${elasticsearch.socketTimeout:900000}") int socketTimeout,
+    @Value("${elasticsearch.maxConnPerRoute:20}") int maxConnPerRoute,
+    @Value("${elasticsearch.maxConnTotal:100}") int maxConnTotal
   ) {
     var cfg = new EsConfig();
     cfg.hosts = hosts;
@@ -49,6 +53,10 @@ public class ClbConfig {
     cfg.index.name = name;
     cfg.index.numShards = numShards;
     cfg.index.numReplicas = numReplicas;
+    cfg.connectTimeout = connectTimeout;
+    cfg.socketTimeout = socketTimeout;
+    cfg.maxConnPerRoute = maxConnPerRoute;
+    cfg.maxConnTotal = maxConnTotal;
     return cfg;
   }
 
