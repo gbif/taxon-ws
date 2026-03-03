@@ -1,7 +1,8 @@
 # GBIF Species API v2 (`taxon-ws`)
 
 A Spring Boot 3.5.x REST API that wraps the [ChecklistBank](https://checklistbank.org) (CLB) PostgreSQL database and Elasticsearch index with GBIF-compatible endpoints.
-It translates between GBIF UUID-based dataset identifiers and ChecklistBank numeric IDs, exposing taxonomic data under `/species` (and internally `/taxon` and `/dataset`).
+It translates between GBIF UUID-based dataset identifiers and ChecklistBank numeric IDs, exposing taxonomic data under `/taxon` and `/dataset/metrics`
+for checklist datasets.
 
 ## Goals
 
@@ -87,11 +88,12 @@ The service exposes data from **any checklist dataset registered in GBIF that is
 ### Dataset mapping (GBIF UUID → CLB integer key)
 
 Every dataset in ChecklistBank can carry a `gbif_key` property containing the corresponding GBIF dataset UUID.
+This is managed by the ChecklistBank registry sync and used to link CLB datasets with the corresponding GBIF registry entry.
 `DatasetKeyMap` performs the translation by querying the CLB `dataset` table for a matching `gbif_key` and caches the result in a Caffeine in-memory cache.
 
-### Catalogue of Life (special case)
+#### Catalogue of Life (special case)
 
-The [Catalogue of Life dataset in GBIF](https://www.gbif.org/dataset/7ddf754f-d193-4cc9-b351-99906754a03b) is mapped to the **latest extended release** of COL in ChecklistBank (e.g. [`3LXR`](https://www.checklistbank.org/dataset/3LXR)).
+The [Catalogue of Life dataset in GBIF](https://www.gbif.org/dataset/7ddf754f-d193-4cc9-b351-99906754a03b) is mapped to the **latest published extended release** of COL in ChecklistBank (e.g. [`3LXR`](https://www.checklistbank.org/dataset/3LXR)).
 CLB maintains a `LatestDatasetKeyCache` that always points to the current extended release; the mapping is resolved dynamically so no configuration change is needed when a new COL release is published.
 
 A secondary GBIF UUID (`e007cc4a-8704-449d-8829-bb209d26d6c8`) maps to the **latest base release** of COL (the release without extended taxonomic coverage).
