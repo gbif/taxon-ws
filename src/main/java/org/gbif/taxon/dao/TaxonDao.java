@@ -1,5 +1,6 @@
 package org.gbif.taxon.dao;
 
+import life.catalogue.db.mapper.DatasetImportMapper;
 import life.catalogue.es.indexing.NameUsageIndexService;
 import life.catalogue.es.search.NameUsageSearchService;
 
@@ -7,6 +8,7 @@ import life.catalogue.es.search.NameUsageSearchService;
 import org.gbif.api.model.common.paging.Pageable;
 import org.gbif.api.model.common.paging.PagingResponse;
 import org.gbif.api.model.common.search.SearchResponse;
+import org.gbif.taxon.api.ChecklistMetrics;
 import org.gbif.taxon.api.NameUsageSimple;
 import org.gbif.taxon.api.TreeUsage;
 import org.gbif.taxon.api.UsageInfo;
@@ -45,6 +47,8 @@ import life.catalogue.img.ThumborService;
 import life.catalogue.matching.nidx.NameIndexFactory;
 import life.catalogue.printer.JsonTreePrinter;
 
+import static org.gbif.dwc.terms.GbifTerm.taxonKey;
+
 @Service
 public class TaxonDao {
   private DatasetKeyMap map;
@@ -68,6 +72,13 @@ public class TaxonDao {
     this.tDao = new life.catalogue.dao.TaxonDao(factory, ndao, mdao, new ThumborService(new ThumborConfig()), indexService, null, null);
     this.searchService = searchService;
     this.suggestionService = suggestionService;
+  }
+
+  public ChecklistMetrics metrics(UUID uuid) {
+    try (var session = factory.openSession()) {
+      var dim = session.getMapper(DatasetImportMapper.class);
+      return converter.convert(dim.current(map.toCLB(uuid)));
+    }
   }
 
   public NameUsageSimple get(UUID uuid, String taxonKey) {

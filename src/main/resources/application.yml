@@ -12,7 +12,10 @@ spring:
       enabled: false
 elasticsearch:
   hosts: http://localhost:9200
-  index: clb
+  index:
+    name: clb
+    numShards: 1
+    numReplicas: 0
   connectionTimeOut: 60000
   socketTimeOut: 60000
   connectionRequestTimeOut: 120000

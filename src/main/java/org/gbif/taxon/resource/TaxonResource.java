@@ -99,8 +99,8 @@ public class TaxonResource {
 
   private final TaxonDao dao;
 
-  public TaxonResource(TaxonDao searchService) {
-    this.dao = searchService;
+  public TaxonResource(TaxonDao taxonDao) {
+    this.dao = taxonDao;
   }
 
   @GetMapping("/{datasetKey}/{taxonKey}")

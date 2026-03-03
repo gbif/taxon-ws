@@ -6,6 +6,7 @@ import life.catalogue.cache.LatestDatasetKeyCache;
 import life.catalogue.cache.LatestDatasetKeyCacheImpl;
 
 import life.catalogue.config.EsConfig;
+import life.catalogue.config.IndexConfig;
 import life.catalogue.es.EsClientFactory;
 import life.catalogue.es.search.NameUsageSearchService;
 import life.catalogue.es.search.NameUsageSearchServiceEs;
@@ -16,6 +17,7 @@ import life.catalogue.es.suggest.NameUsageSuggestionServiceEs;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -35,9 +37,19 @@ public class ClbConfig {
   }
 
   @Bean
-  @ConfigurationProperties(prefix = "elasticsearch")
-  public EsConfig esClientConfiguration() {
-    return new EsConfig();
+  public EsConfig esClientConfiguration(
+    @Value("${elasticsearch.index.name}") String name,
+    @Value("${elasticsearch.index.numShards:1}") int numShards,
+    @Value("${elasticsearch.index.numReplicas:0}") int numReplicas,
+    @Value("${elasticsearch.hosts:http://localhost:9200}") String hosts
+  ) {
+    var cfg = new EsConfig();
+    cfg.hosts = hosts;
+    cfg.index = new IndexConfig();
+    cfg.index.name = name;
+    cfg.index.numShards = numShards;
+    cfg.index.numReplicas = numReplicas;
+    return cfg;
   }
 
   @Bean
@@ -49,13 +61,25 @@ public class ClbConfig {
   @Bean
   @Primary
   public NameUsageSearchService nameUsageSearchService(EsConfig cfg, ElasticsearchClient client) {
-    return new NameUsageSearchServiceEs(cfg.index.name, client);
+    return new NameUsageSearchServiceEs(resolveIndexName(cfg), client);
   }
 
   @Bean
   @Primary
   public NameUsageSuggestionService nameUsageSuggestionService(EsConfig cfg, ElasticsearchClient client) {
-    return new NameUsageSuggestionServiceEs(cfg.index.name, client);
+    return new NameUsageSuggestionServiceEs(resolveIndexName(cfg), client);
+  }
+
+  private static String resolveIndexName(EsConfig cfg) {
+    if (cfg == null) {
+      throw new IllegalStateException("Missing Elasticsearch configuration bean (EsConfig).");
+    }
+    if (cfg.index == null || cfg.index.name == null || cfg.index.name.isBlank()) {
+      throw new IllegalStateException(
+        "Missing Elasticsearch index configuration. Please configure 'elasticsearch.index.name' (and related settings)"
+      );
+    }
+    return cfg.index.name;
   }
 
   @Bean

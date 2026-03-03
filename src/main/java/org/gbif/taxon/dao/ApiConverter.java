@@ -1,5 +1,6 @@
 package org.gbif.taxon.dao;
 
+import life.catalogue.api.model.DatasetImport;
 import life.catalogue.api.model.NameUsageBase;
 import life.catalogue.api.model.SimpleName;
 import life.catalogue.api.model.SimpleNameInDataset;
@@ -407,5 +408,10 @@ public class ApiConverter {
       }
       req.setFilters(filters);
     }
+  }
+
+  public ChecklistMetrics convert(DatasetImport imp) {
+    var metrics = new ChecklistMetrics();
+    return metrics;
   }
 }
