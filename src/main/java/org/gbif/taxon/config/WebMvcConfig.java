@@ -14,6 +14,9 @@
 package org.gbif.taxon.config;
 
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+
 import org.gbif.ws.json.JacksonJsonObjectMapperProvider;
 
 
@@ -53,6 +56,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
   @Primary
   @Bean
   public ObjectMapper registryObjectMapper() {
-    return JacksonJsonObjectMapperProvider.getObjectMapper();
+    var om = JacksonJsonObjectMapperProvider.getObjectMapper();
+    // support Java 8 date time apis
+    om.registerModule(new JavaTimeModule());
+    return om;
   }
 }
