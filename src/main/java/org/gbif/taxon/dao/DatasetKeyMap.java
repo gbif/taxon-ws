@@ -58,7 +58,7 @@ public class DatasetKeyMap {
           // try COL releases which are not mapped to a GBIF key in the dataset table
           try {
             var info = DatasetInfoCache.CACHE.info(datasetKey, true);
-            if (info != null && info.sourceKey == Datasets.COL) {
+            if (info != null && info.sourceKey != null && info.sourceKey == Datasets.COL) {
               key = info.origin == DatasetOrigin.XRELEASE ? Constants.COL_DATASET_KEY : COL_BR_DATASET_KEY;
             }
           } catch (NotFoundException e) {

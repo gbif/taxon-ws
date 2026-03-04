@@ -11,11 +11,9 @@ spring:
     zookeeper:
       enabled: false
 elasticsearch:
-  hosts: es9master.checklistbank.org:9200,esnine1.checklistbank.org:9200,esnine2.checklistbank.org:9200,esnine3.checklistbank.org:9200
+  hosts: localhost:9200
   index:
-    name: clbdev
-    numShards: 8
-    numReplicas: 1
+    name: clb
   connectTimeout: 8000
   socketTimeout: 10000
 datasource:

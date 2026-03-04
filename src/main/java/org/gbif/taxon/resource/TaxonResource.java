@@ -28,6 +28,7 @@ import org.gbif.nameparser.api.Rank;
 
 import org.gbif.taxon.api.NameUsageSimple;
 import org.gbif.taxon.api.UsageInfo;
+import org.gbif.taxon.api.search.BaseNameUsageRequest;
 import org.gbif.taxon.api.search.NameUsageSearchParameter;
 import org.gbif.taxon.api.search.NameUsageSearchRequest;
 import org.gbif.taxon.api.search.NameUsageSearchResult;
@@ -128,7 +129,7 @@ public class TaxonResource {
       description = "UUID for the dataset key",
       example = "83a00190-7038-3970-a7e8-5e5563c40e37"
     )
-    UUID uuid,
+    UUID datasetKey,
     @PathVariable("taxonKey")
     @Parameter(
       description = "Taxon key scoped within the dataset",
@@ -136,7 +137,7 @@ public class TaxonResource {
     )
     String taxonKey
   ) {
-    return dao.getInfo(uuid, taxonKey);
+    return dao.getInfo(datasetKey, taxonKey);
   }
 
   @GetMapping("/{datasetKey}/{taxonKey}/breakdown")
@@ -223,11 +224,27 @@ public class TaxonResource {
     hidden = true
   )
   @ApiResponse(responseCode = "200", description = "Name usages found")
-  @GetMapping("/search")
-  public SearchResponse<NameUsageSearchResult, NameUsageSearchParameter> search(NameUsageSearchRequest request) {
+  @GetMapping("/search/{datasetKey}")
+  public SearchResponse<NameUsageSearchResult, NameUsageSearchParameter> search(
+    @PathVariable("datasetKey")
+    @Parameter(
+      description = "UUID for the dataset key",
+      example = "83a00190-7038-3970-a7e8-5e5563c40e37"
+    )
+    UUID datasetKey,
+    NameUsageSearchRequest request
+  ) {
+    setDatasetKey(request, datasetKey);
     return dao.search(request);
   }
 
+  private static void setDatasetKey(BaseNameUsageRequest request, UUID datasetKey) {
+    var existing = request.getParameters().get(NameUsageSearchParameter.DATASET_KEY);
+    if (existing != null) {
+      existing.clear();
+    }
+    request.addParameter(NameUsageSearchParameter.DATASET_KEY, datasetKey.toString());
+  }
 
   @Operation(
     operationId = "suggestNames",
@@ -246,8 +263,17 @@ public class TaxonResource {
     hidden = true
   )
   @ApiResponse(responseCode = "200", description = "Name usages found")
-  @GetMapping("/suggest")
-  public List<NameUsageSuggestResult> suggest(NameUsageSuggestRequest request) {
+  @GetMapping("/suggest/{datasetKey}")
+  public List<NameUsageSuggestResult> suggest(
+    @PathVariable("datasetKey")
+    @Parameter(
+      description = "UUID for the dataset key",
+      example = "83a00190-7038-3970-a7e8-5e5563c40e37"
+    )
+    UUID datasetKey,
+    NameUsageSuggestRequest request
+  ) {
+    setDatasetKey(request, datasetKey);
     return dao.suggest(request);
   }
 
@@ -375,6 +401,11 @@ public class TaxonResource {
   @Inherited
   @Parameters(
     value = {
+      @Parameter(
+        name = "datasetKey",
+        schema = @Schema(implementation = NameUsageRequest.SearchType.class),
+        in = ParameterIn.QUERY
+      ),
       @Parameter(
         name = "searchType",
         schema = @Schema(implementation = NameUsageRequest.SearchType.class),
