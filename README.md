@@ -32,8 +32,8 @@ Client
 Spring Boot REST API (taxon-ws)
   │
   ├── TaxonResource    (/taxon/{datasetKey}/{taxonKey}/*)   — name usage detail & search
-  ├── DatasetResource  (/dataset/{datasetKey}/metrics)      — checklist-level statistics
-  └── TreeResource                                          — taxonomic tree traversal
+  ├── TreeResource     (/taxon/tree/{datasetKey}/*)         — taxonomic tree traversal
+  └── DatasetResource  (/dataset/{datasetKey}/metrics)      — checklist-level statistics
   │
   ├── TaxonDao ──────────────────────────────────────────────────────────┐
   │     ├── MyBatis mappers → CLB PostgreSQL (name usages, synonyms,    │
@@ -71,12 +71,12 @@ For search/suggest requests, the flow goes through the CLB Elasticsearch client 
 
 ### External Dependencies
 
-| Dependency | Coordinates | Purpose |
-|------------|-------------|---------|
-| ChecklistBank API | `life.catalogue:api` | CLB data models and enumerations |
-| ChecklistBank DAO | `life.catalogue:dao` | MyBatis mappers and DAO logic |
-| GBIF API | `org.gbif:gbif-api` | Shared API classes (`PagingResponse`, `Pageable`) |
-| GBIF NameParser API | `org.gbif:name-parser-api` | Shared vocabularies (`Rank`, `NameType`, `NomCode`) |
+| Dependency | Coordinates | Purpose                                                             |
+|------------|-------------|---------------------------------------------------------------------|
+| ChecklistBank API | `life.catalogue:api` | CLB data models and enumerations                                    |
+| ChecklistBank DAO | `life.catalogue:dao` | MyBatis mappers, search and DAO logic                               |
+| GBIF API | `org.gbif:gbif-api` | Shared API classes (`PagingResponse`, `Pageable`)                   |
+| GBIF NameParser API | `org.gbif:name-parser-api` | Shared vocabularies (`Rank`, `NameType`, `NomCode`)                 |
 | GBIF Common WS | `org.gbif:gbif-common-ws` | `ObjectMapper` config, exception handling, Spring Boot 3.5.x integration |
 
 ---
@@ -209,14 +209,6 @@ spring:
       connect-string: localhost:2181
 ```
 
-### Local prerequisites (quick-start)
-
-```bash
-# PostgreSQL: CLB database accessible at localhost:5432/clb (user: postgres/postgres)
-# Elasticsearch: running at localhost:9200 with index named "clb"
-```
-
----
 
 ## CI/CD
 
