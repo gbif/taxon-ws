@@ -1,5 +1,7 @@
 package org.gbif.taxon.dao;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 
@@ -18,8 +20,12 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.gbif.api.model.Constants;
 
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
 import java.util.UUID;
 
 @Component
@@ -27,8 +33,11 @@ public class DatasetKeyMap {
   public static final UUID COL_BR_DATASET_KEY = UUID.fromString("e007cc4a-8704-449d-8829-bb209d26d6c8");
   private SqlSessionFactory factory;
   private LatestDatasetKeyCache cache;
+  private URL matchingMetadata;
 
-  public DatasetKeyMap(SqlSessionFactory factory, LatestDatasetKeyCache cache) {
+  public DatasetKeyMap(SqlSessionFactory factory, LatestDatasetKeyCache cache,
+                       @Value("${matching.url}") URL matchingMetadata
+  ) {
     this.factory = factory;
     this.cache = cache;
   }
@@ -85,16 +94,26 @@ public class DatasetKeyMap {
   public int toCLB(UUID datasetKey) {
     Integer dk;
     if (Constants.COL_DATASET_KEY.equals(datasetKey)) {
-      // we map the UUID to the latest XR
-      dk = cache.getLatestRelease(Datasets.COL, true);
+      // we map the extended release to what GBIF is currently indexed against
+      // we cache results and only call this very rarely, so no need to keep the mapper instance around
+      try {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode json = mapper.readTree(matchingMetadata);
+        dk = json
+          .path("mainIndex")
+          .path("clbDatasetKey")
+          .asInt(-1);
+      } catch (IOException e) {
+        dk = null;
+      }
     } else if (COL_BR_DATASET_KEY.equals(datasetKey)) {
-      // we map the UUID to the latest Base Release
+      // we map the base release to the latest published version
       dk = cache.getLatestRelease(Datasets.COL, false);
     } else {
       dk = gbif2clb.get(datasetKey);
     }
 
-    if (dk == null) {
+    if (dk == null || dk < 0) {
       throw new IllegalArgumentException("Unknown dataset key: " + datasetKey);
     } else {
       // we cache the reverse mapping as mapping COL releases to the GBIF UUIDs via the db is difficult otherwise
@@ -105,5 +124,11 @@ public class DatasetKeyMap {
 
   public DSID<String> toDSID(UUID datasetKey, String key) {
     return DSID.of(toCLB(datasetKey), key);
+  }
+
+  public void flush() {
+    gbif2clb.invalidateAll();
+    clb2gbif.invalidateAll();
+    cache.clear();
   }
 }

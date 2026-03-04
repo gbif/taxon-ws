@@ -19,4 +19,5 @@ public class NameUsageSearchResult {
   private TaxGroup group;
   private List<NameUsageSimple> classification;
   private List<VernacularNameSimple> vernacularNames;
+  private Double score;
 }

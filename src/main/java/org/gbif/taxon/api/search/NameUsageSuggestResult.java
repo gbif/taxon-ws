@@ -57,6 +57,6 @@ public class NameUsageSuggestResult {
   // For species this is the first taxon above genus level, mostly the family.
   private String context;
 
-  private float score;
+  private Double score;
 
 }
