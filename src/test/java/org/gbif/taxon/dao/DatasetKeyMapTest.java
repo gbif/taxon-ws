@@ -1,5 +1,10 @@
 package org.gbif.taxon.dao;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+
 import life.catalogue.api.model.DSID;
 import life.catalogue.api.model.Dataset;
 import life.catalogue.cache.LatestDatasetKeyCache;
@@ -12,14 +17,21 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class DatasetKeyMapTest {
 
   @Mock
@@ -34,13 +46,26 @@ class DatasetKeyMapTest {
   @Mock
   private LatestDatasetKeyCache cache;
 
+  @Mock
+  private JsonFetcher jsonFetcher;
+
   private DatasetKeyMap map;
 
   @BeforeEach
-  void setUp() {
+  void setUp() throws IOException {
     when(factory.openSession()).thenReturn(session);
     when(session.getMapper(DatasetMapper.class)).thenReturn(datasetMapper);
-    map = new DatasetKeyMap(factory, cache);
+    JsonNode json = new ObjectMapper().readValue("""
+    {"mainIndex": {"clbDatasetKey": 1234}}
+    """, JsonNode.class);
+    when(jsonFetcher.fetchJson(any())).thenReturn(json);
+    map = new DatasetKeyMap(factory, cache, jsonFetcher, "this is ignored");
+  }
+
+  @Test
+  void retrieveCurrentColXRKey() throws IOException {
+    int result = map.retrieveCurrentColXRKey();
+    assertThat(result).isEqualTo(1234);
   }
 
   @Test

@@ -358,7 +358,7 @@ public class ApiConverter {
     result.setAcceptedNameUsage(suggest.getAcceptedName());
     result.setGroup(suggest.getGroup());
     result.setContext(suggest.getContext());
-    result.setScore(suggest.getScore());
+    //result.setScore(suggest.getScore());
     return result;
   }
 

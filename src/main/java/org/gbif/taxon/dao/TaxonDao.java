@@ -1,5 +1,6 @@
 package org.gbif.taxon.dao;
 
+import life.catalogue.api.vocab.DatasetOrigin;
 import life.catalogue.db.mapper.DatasetImportMapper;
 import life.catalogue.es.indexing.NameUsageIndexService;
 import life.catalogue.es.search.NameUsageSearchService;
@@ -108,10 +109,17 @@ public class TaxonDao {
 
   public List<NameUsageSimple> listRelated(UUID uuid, String taxonKey,
                                            @Nullable Collection<DatasetType> datasetTypes,
-                                           @Nullable Collection<Integer> datasetKeys,
+                                           @Nullable Collection<UUID> datasetKeys,
                                            @Nullable Collection<UUID> publisherKeys) {
     int datasetKey = map.toCLB(uuid);
-    return tDao.related(datasetKey, taxonKey, true, datasetTypes, datasetKeys, publisherKeys)
+    Set<Integer> datasetIntKeys = new HashSet<>();;
+    if (datasetKeys != null) {
+      for (UUID key : datasetKeys) {
+        datasetIntKeys.add(map.toCLB(key));
+      }
+    }
+    Set<Integer> colKeys = Set.of(map.getColKey());
+    return tDao.related(datasetKey, taxonKey, true, colKeys, null, datasetTypes, datasetIntKeys, publisherKeys)
       .stream().map(converter::convert).toList();
   }
 

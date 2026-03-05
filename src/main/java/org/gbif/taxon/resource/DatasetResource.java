@@ -42,6 +42,7 @@ import org.gbif.taxon.api.ChecklistMetrics;
 import org.gbif.taxon.api.NameUsageSimple;
 import org.gbif.taxon.api.UsageInfo;
 import org.gbif.taxon.api.search.*;
+import org.gbif.taxon.dao.DatasetKeyMap;
 import org.gbif.taxon.dao.TaxonDao;
 
 
@@ -51,6 +52,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import java.io.IOException;
 import java.io.Writer;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -79,12 +81,13 @@ import static java.lang.annotation.ElementType.METHOD;
 @RequestMapping(value = "dataset", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
 public class DatasetResource {
-  private static final Logger LOG = LoggerFactory.getLogger(DatasetResource.class);
 
   private final TaxonDao dao;
+  private final DatasetKeyMap keyMap;
 
-  public DatasetResource(TaxonDao taxonDao) {
+  public DatasetResource(TaxonDao taxonDao, DatasetKeyMap keyMap) {
     this.dao = taxonDao;
+    this.keyMap = keyMap;
   }
 
   @GetMapping("/{datasetKey}/metrics")
@@ -98,4 +101,11 @@ public class DatasetResource {
     ) {
     return dao.metrics(datasetKey);
   }
+
+  @DeleteMapping("/flush")
+  public boolean flush() throws IOException {
+    keyMap.flush();
+    return true;
+  }
+
 }

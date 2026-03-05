@@ -111,7 +111,7 @@ public class TaxonResource {
           description = "UUID for the dataset key",
           example = "83a00190-7038-3970-a7e8-5e5563c40e37"
       )
-      UUID uuid,
+      UUID datasetKey,
       @PathVariable("taxonKey")
       @Parameter(
         description = "Taxon key scoped within the dataset",
@@ -119,7 +119,7 @@ public class TaxonResource {
       )
       String taxonKey
     ) {
-    return dao.get(uuid, taxonKey);
+    return dao.get(datasetKey, taxonKey);
   }
 
   @GetMapping("/{datasetKey}/{taxonKey}/info")
@@ -174,7 +174,7 @@ public class TaxonResource {
       description = "UUID for the dataset key",
       example = "83a00190-7038-3970-a7e8-5e5563c40e37"
     )
-    UUID uuid,
+    UUID datasetKey,
     @PathVariable("taxonKey")
     @Parameter(
       description = "Taxon key scoped within the dataset",
@@ -190,11 +190,12 @@ public class TaxonResource {
     List<DatasetType> datasetTypes,
     @RequestParam(name = "datasetKey", required = false)
     @Parameter(
-      description = "Optional dataset key filter, repeatable: e.g. `?datasetKey=1&datasetKey=2`",
+      description = "Optional dataset key filter, repeatable: e.g. " +
+        "`?datasetKey=7ddf754f-d193-4cc9-b351-99906754a03b&datasetKey=83a00190-7038-3970-a7e8-5e5563c40e37`",
       explode = Explode.TRUE,
-      array = @ArraySchema(schema = @Schema(type = "integer"))
+      array = @ArraySchema(schema = @Schema(type = "uuid"))
     )
-    List<Integer> datasetKeys,
+    List<UUID> datasetKeys,
     @RequestParam(name = "publisherKey", required = false)
     @Parameter(
       description = "Optional publisher key filter, repeatable: e.g. `?publisherKey=<uuid>&publisherKey=<uuid>`",
@@ -203,7 +204,7 @@ public class TaxonResource {
     )
     List<UUID> publisherKeys
   ) {
-    return dao.listRelated(uuid, taxonKey, datasetTypes, datasetKeys, publisherKeys);
+    return dao.listRelated(datasetKey, taxonKey, datasetTypes, datasetKeys, publisherKeys);
   }
 
   @Operation(

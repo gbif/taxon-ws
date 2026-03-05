@@ -93,10 +93,16 @@ This is managed by the ChecklistBank registry sync and used to link CLB datasets
 
 #### Catalogue of Life (special case)
 
-The [Catalogue of Life dataset in GBIF](https://www.gbif.org/dataset/7ddf754f-d193-4cc9-b351-99906754a03b) is mapped to the **latest published extended release** of COL in ChecklistBank (e.g. [`3LXR`](https://www.checklistbank.org/dataset/3LXR)).
-CLB maintains a `LatestDatasetKeyCache` that always points to the current extended release; the mapping is resolved dynamically so no configuration change is needed when a new COL release is published.
+The [Catalogue of Life dataset in GBIF](https://www.gbif.org/dataset/7ddf754f-d193-4cc9-b351-99906754a03b) is mapped to the COL XR release used by the
+[current running matching-ws](https://api.gbif.org/v2/species/match/metadata?checklistKey=7ddf754f-d193-4cc9-b351-99906754a03b) in GBIF.
+The key is loaded on startup and cached in memory.
 
-A secondary GBIF UUID (`e007cc4a-8704-449d-8829-bb209d26d6c8`) maps to the **latest base release** of COL (the release without extended taxonomic coverage).
+A secondary GBIF UUID [e007cc4a-8704-449d-8829-bb209d26d6c8](https://www.gbif.org/dataset/7ddf754f-d193-4cc9-b351-99906754a03b)
+maps to the [latest base release of COL](https://www.checklistbank.org/dataset/3LR).
+
+#### Flush
+The cache can be flushed at any time by calling `DatasetKeyMap.flush()` or the exposed admin endpoint `DELETE /dataset/flush`.
+This should be done whenever a new COL release is deployed in the matching-ws.
 
 ---
 
@@ -126,6 +132,7 @@ If a dataset is newly registered or its GBIF key changes, a service restart will
 ## OpenAPI Documentation
 
 The API is documented using [springdoc-openapi](https://springdoc.org/) with OpenAPI v3 annotations (`@Operation`, `@Schema`, `@Parameter`) on all endpoints and DTO fields.
+It is exposed via `/v3/api-docs` for the tech docs to read.
 
 Generate the OpenAPI spec locally:
 
