@@ -98,13 +98,20 @@ public class DatasetKeyMap {
   }
 
   @VisibleForTesting
-  protected int retrieveCurrentColXRKey() throws IOException {
-    JsonNode json = jsonFetcher.fetchJson(matchingMetadata);
-    int key = json
-      .path("mainIndex")
-      .path("clbDatasetKey")
-      .asInt(-1);
-    LOG.info("Retrieved current COL XR key {}", key);
+  protected int retrieveCurrentColXRKey() {
+    int key = 0;
+    try {
+      JsonNode json = jsonFetcher.fetchJson(matchingMetadata);
+      key = json
+        .path("mainIndex")
+        .path("clbDatasetKey")
+        .asInt(-1);
+      LOG.info("Retrieved current COL XR key {}", key);
+    } catch (Exception e) {
+      LOG.error("Failed to retrieve current COL XR key from matcher-ws located at {}", matchingMetadata);
+      // rethrow
+      throw e;
+    }
     return key;
   }
 
