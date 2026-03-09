@@ -41,11 +41,13 @@ public class ClbConfig {
   @Bean
   public DatasetKeys datasetKeys(
     @Value("${datasets.iucn:19491596-35ae-4a91-9a98-85cf505f1bd3}") String iucn,
-    @Value("${datasets.cites:#{null}}") String cites
+    @Value("${datasets.citesI:2104}") Integer cites1,
+    @Value("${datasets.citesII:2094}") Integer cites2
   ) {
     var d = new DatasetKeys();
     d.setIucn( iucn == null ? null : UUID.fromString(iucn) );
-    d.setCites( cites == null ? null : UUID.fromString(cites) );
+    d.setCitesI(cites1);
+    d.setCitesII(cites2);
     return d;
   }
 

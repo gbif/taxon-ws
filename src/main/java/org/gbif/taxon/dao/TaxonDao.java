@@ -34,8 +34,10 @@ import org.gbif.taxon.api.search.NameUsageSuggestResult;
 
 
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -136,23 +138,23 @@ public class TaxonDao {
                                            @Nullable Collection<DatasetType> datasetTypes,
                                            @Nullable Collection<UUID> datasetKeys,
                                            @Nullable Collection<UUID> publisherKeys) {
-    return listRelatedCLB(uuid, taxonKey, datasetTypes, datasetKeys, publisherKeys)
-      .stream().map(converter::convert).toList();
-  }
-
-  private List<SimpleNameInDataset> listRelatedCLB(UUID uuid, String taxonKey,
-                                                @Nullable Collection<DatasetType> datasetTypes,
-                                                @Nullable Collection<UUID> datasetKeys,
-                                                @Nullable Collection<UUID> publisherKeys) {
-    int datasetKey = map.toCLB(uuid);
     Set<Integer> datasetIntKeys = new HashSet<>();;
     if (datasetKeys != null) {
       for (UUID key : datasetKeys) {
         datasetIntKeys.add(map.toCLB(key));
       }
     }
+    return listRelatedCLB(uuid, taxonKey, datasetTypes, datasetIntKeys, publisherKeys)
+      .stream().map(converter::convert).toList();
+  }
+
+  private List<SimpleNameInDataset> listRelatedCLB(UUID uuid, String taxonKey,
+                                                @Nullable Collection<DatasetType> datasetTypes,
+                                                @Nullable Collection<Integer> datasetKeys,
+                                                @Nullable Collection<UUID> publisherKeys) {
+    int datasetKey = map.toCLB(uuid);
     Set<Integer> colKeys = Set.of(map.getColKey());
-    return tDao.related(datasetKey, taxonKey, true, colKeys, null, datasetTypes, datasetIntKeys, publisherKeys);
+    return tDao.related(datasetKey, taxonKey, true, colKeys, null, datasetTypes, datasetKeys, publisherKeys);
   }
 
   private static Page page(Pageable p) {
@@ -205,31 +207,48 @@ public class TaxonDao {
 
   public RelatedInfo listRelatedInfo(UUID datasetKey, String taxonKey) {
     final var relInfo = new RelatedInfo();
+    int datasetKeyCLB = map.toCLB(datasetKey);
     if (datasetKeys.getIucn() != null) {
-      var list = listRelatedCLB(datasetKey, taxonKey, null, Set.of(datasetKeys.getIucn()), null);
-      if (list != null && !list.isEmpty()) {
-        var iucn = list.getFirst();
-        if (iucn != null) {
-          try (var session = factory.openSession()) {
-            DistributionMapper dim = session.getMapper(DistributionMapper.class);
-            var dists = dim.listByTaxon(iucn.toDSID(map.toCLB(datasetKeys.getIucn())));
-            // find global entry
-            for (var d : dists) {
-              if (d.getArea().getName().equalsIgnoreCase("Global") && d.getThreatStatus() != null) {
-                relInfo.setThreatStatus(d.getThreatStatus().name());
-                relInfo.setThreatStatusUsage(converter.convert(iucn));
-                break;
-              }
+      int datasetKeyIucn = map.toCLB(datasetKeys.getIucn());
+      var iucn = findSingleRelated(datasetKeyCLB, taxonKey, datasetKeyIucn);
+      if (iucn != null) {
+        try (var session = factory.openSession()) {
+          DistributionMapper dim = session.getMapper(DistributionMapper.class);
+          var dists = dim.listByTaxon(iucn.toDSID(datasetKeyIucn));
+          // find global entry
+          for (var d : dists) {
+            if (d.getArea().getName().equalsIgnoreCase("Global") && d.getThreatStatus() != null) {
+              relInfo.setThreatStatus(d.getThreatStatus().name());
+              relInfo.setThreatStatusUsage(converter.convert(iucn));
+              break;
             }
           }
         }
       }
     }
 
-    if (datasetKeys.getCites() != null) {
-      // TODO
+    List<String> appendices = new ArrayList<>();
+    if (datasetKeys.getCitesI() != null) {
+      var rel = findSingleRelated(datasetKeyCLB, taxonKey, datasetKeys.getCitesI());
+      if (rel != null) {
+        appendices.add("I");
+      }
     }
-
+    if (datasetKeys.getCitesII() != null) {
+      var rel = findSingleRelated(datasetKeyCLB, taxonKey, datasetKeys.getCitesII());
+      if (rel != null) {
+        appendices.add("II");
+      }
+    }
+    relInfo.setCitesAppendix(appendices);
     return relInfo;
+  }
+
+  private SimpleNameInDataset findSingleRelated(Integer datasetKey, String taxonKey, Integer targetDatasetKey) {
+    var list = tDao.related(datasetKey, taxonKey, false, null, null, null, Set.of(targetDatasetKey), null);
+    if (list != null && !list.isEmpty()) {
+      return list.getFirst();
+    }
+    return null;
   }
 }

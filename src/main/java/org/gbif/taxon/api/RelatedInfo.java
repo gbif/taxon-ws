@@ -23,8 +23,8 @@ public class RelatedInfo {
   @Schema(description = "The global threat status from the IUCN redlist dataset")
   private NameUsageSimple threatStatusUsage;
 
-  @Schema(description = "The CITES appendix the species appears in")
-  private String citesAppendix;
+  @Schema(description = "The CITES appendices the species appears in")
+  private List<String> citesAppendix;
 
   @JsonIgnore
   public boolean hasContent() {

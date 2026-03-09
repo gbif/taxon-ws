@@ -7,5 +7,6 @@ import java.util.UUID;
 @Data
 public class DatasetKeys {
   private UUID iucn;
-  private UUID cites;
+  private Integer citesI;
+  private Integer citesII;
 }
