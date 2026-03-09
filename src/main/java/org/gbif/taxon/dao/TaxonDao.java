@@ -1,6 +1,9 @@
 package org.gbif.taxon.dao;
 
+import life.catalogue.api.model.DatasetImport;
 import life.catalogue.api.vocab.DatasetOrigin;
+import life.catalogue.dao.DatasetImportDao;
+import life.catalogue.dao.DatasetInfoCache;
 import life.catalogue.db.mapper.DatasetImportMapper;
 import life.catalogue.es.indexing.NameUsageIndexService;
 import life.catalogue.es.search.NameUsageSearchService;
@@ -52,13 +55,14 @@ import static org.gbif.dwc.terms.GbifTerm.taxonKey;
 
 @Service
 public class TaxonDao {
-  private DatasetKeyMap map;
-  private ApiConverter converter;
-  private SqlSessionFactory factory;
-  private TreeDao treeDao;
-  private life.catalogue.dao.TaxonDao tDao;
-  private life.catalogue.es.suggest.NameUsageSuggestionService suggestionService;
-  private life.catalogue.es.search.NameUsageSearchService searchService;
+  private final DatasetKeyMap map;
+  private final ApiConverter converter;
+  private final SqlSessionFactory factory;
+  private final TreeDao treeDao;
+  private final DatasetImportDao diDao;
+  private final life.catalogue.dao.TaxonDao tDao;
+  private final life.catalogue.es.suggest.NameUsageSuggestionService suggestionService;
+  private final life.catalogue.es.search.NameUsageSearchService searchService;
 
   public TaxonDao(DatasetKeyMap map, ApiConverter converter, SqlSessionFactory factory,
                   NameUsageSearchService searchService,
@@ -73,12 +77,21 @@ public class TaxonDao {
     this.tDao = new life.catalogue.dao.TaxonDao(factory, ndao, mdao, new ThumborService(new ThumborConfig()), indexService, null, null);
     this.searchService = searchService;
     this.suggestionService = suggestionService;
+    this.diDao = new DatasetImportDao(factory, null);
   }
 
   public ChecklistMetrics metrics(UUID uuid) {
     try (var session = factory.openSession()) {
       var dim = session.getMapper(DatasetImportMapper.class);
-      return converter.convert(dim.current(map.toCLB(uuid)));
+      int datasetKey = map.toCLB(uuid);
+      var info = DatasetInfoCache.CACHE.info(datasetKey);
+      DatasetImport imp;
+      if (info.origin.isRelease()) {
+        imp = diDao.getReleaseAttempt(datasetKey);
+      } else {
+        imp = dim.current(datasetKey);
+      }
+      return imp == null ? null : converter.convert(imp);
     }
   }
 
