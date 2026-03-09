@@ -15,9 +15,38 @@
  */
 package org.gbif.taxon.api.search;
 
+import org.gbif.api.model.common.search.BaseSearchRequest;
+
 /**
  * A name usage specific suggest request.
  */
-public class NameUsageSuggestRequest extends BaseNameUsageRequest {
+public class NameUsageSuggestRequest extends BaseSearchRequest<NameUsageSearchParameter> {
 
+  @Override
+  public void setHighlight(boolean highlight) {
+    throw new UnsupportedOperationException("Highlight parameter is not supported in taxon operations.");
+  }
+
+  @Override
+  public void setSpellCheck(boolean spellCheck) {
+    throw new UnsupportedOperationException("Spell check parameter is supported in taxon operations.");
+  }
+
+  @Override
+  public void setSpellCheckCount(int spellCheckCount) {
+    // the request provider sets this to -1 by default, so we need to allow for that
+    if (spellCheckCount != -1) {
+      throw new UnsupportedOperationException("Spell check count parameter is supported in taxon operations.");
+    }
+  }
+
+  @Override
+  public void setMatchCase(Boolean matchCase) {
+    throw new UnsupportedOperationException("Match case parameter is supported in taxon operations.");
+  }
+
+  @Override
+  public void setShuffle(String shuffle) {
+    throw new UnsupportedOperationException("Shuffle parameter is supported in taxon operations.");
+  }
 }

@@ -16,7 +16,7 @@ import org.gbif.taxon.api.ChecklistMetrics;
 import org.gbif.taxon.api.NameUsageSimple;
 import org.gbif.taxon.api.TreeUsage;
 import org.gbif.taxon.api.UsageInfo;
-import org.gbif.taxon.api.search.BaseNameUsageRequest;
+import org.gbif.api.model.common.search.SearchRequest;
 import org.gbif.taxon.api.search.NameUsageSearchParameter;
 import org.gbif.taxon.api.search.NameUsageSearchRequest;
 import org.gbif.taxon.api.search.NameUsageSearchResult;
@@ -179,7 +179,7 @@ public class TaxonDao {
       .toList();
   }
 
-  private static Page page(BaseNameUsageRequest req) {
+  private static Page page(SearchRequest<NameUsageSearchParameter> req) {
     return new Page((int)req.getOffset(), req.getLimit());
   }
 

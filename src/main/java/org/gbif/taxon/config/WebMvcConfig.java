@@ -23,6 +23,8 @@ import org.gbif.ws.json.JacksonJsonObjectMapperProvider;
 import java.util.List;
 
 
+import org.gbif.taxon.provider.NameUsageSearchRequestHandlerMethodArgumentResolver;
+import org.gbif.taxon.provider.NameUsageSuggestRequestHandlerMethodArgumentResolver;
 import org.gbif.ws.server.provider.CountryHandlerMethodArgumentResolver;
 import org.gbif.ws.server.provider.PageableHandlerMethodArgumentResolver;
 
@@ -51,6 +53,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
   public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
     argumentResolvers.add(new PageableHandlerMethodArgumentResolver());
     argumentResolvers.add(new CountryHandlerMethodArgumentResolver());
+    argumentResolvers.add(new NameUsageSearchRequestHandlerMethodArgumentResolver());
+    argumentResolvers.add(new NameUsageSuggestRequestHandlerMethodArgumentResolver());
   }
 
   @Primary

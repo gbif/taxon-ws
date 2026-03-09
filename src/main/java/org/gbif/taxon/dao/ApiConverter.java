@@ -8,6 +8,7 @@ import life.catalogue.api.model.Synonym;
 import life.catalogue.api.model.Taxon;
 import life.catalogue.api.model.TaxonProperty;
 import life.catalogue.api.model.TreeNode;
+import life.catalogue.api.search.NameUsageRequest;
 import life.catalogue.api.search.NameUsageSearchResponse;
 import life.catalogue.api.search.NameUsageSuggestion;
 import life.catalogue.api.search.NameUsageWrapper;
@@ -29,7 +30,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 
-import org.gbif.taxon.api.search.BaseNameUsageRequest;
+import org.gbif.api.model.common.search.SearchRequest;
 import org.gbif.taxon.api.search.NameUsageSearchParameter;
 import org.gbif.taxon.api.search.NameUsageSearchRequest;
 import org.gbif.taxon.api.search.NameUsageSearchResult;
@@ -388,8 +389,9 @@ public class ApiConverter {
    * @param from the GBIF API request
    * @param req the CLB API request to translate to
    */
-  private void copyCommon(BaseNameUsageRequest from, life.catalogue.api.search.NameUsageRequest req) {
+  private void copyCommon(SearchRequest<NameUsageSearchParameter> from, life.catalogue.api.search.NameUsageRequest req) {
     req.setQ(from.getQ());
+    req.setSortBy(NameUsageRequest.SortBy.RELEVANCE);
     if (from.getParameters() != null) {
       Map<life.catalogue.api.search.NameUsageSearchParameter, Set<Object>> filters = new EnumMap<>(life.catalogue.api.search.NameUsageSearchParameter.class);
       for (var entry : from.getParameters().entrySet()) {
