@@ -27,6 +27,7 @@ import org.gbif.nameparser.api.NameType;
 import org.gbif.nameparser.api.Rank;
 
 import org.gbif.taxon.api.NameUsageSimple;
+import org.gbif.taxon.api.RelatedInfo;
 import org.gbif.taxon.api.UsageInfo;
 import org.gbif.api.model.common.search.SearchRequest;
 import org.gbif.taxon.api.search.NameUsageSearchParameter;
@@ -205,6 +206,25 @@ public class TaxonResource {
     List<UUID> publisherKeys
   ) {
     return dao.listRelated(datasetKey, taxonKey, datasetTypes, datasetKeys, publisherKeys);
+  }
+
+
+  @GetMapping("/{datasetKey}/{taxonKey}/relatedInfo")
+  public RelatedInfo getRelatedInfo(
+    @PathVariable("datasetKey")
+    @Parameter(
+      description = "UUID for the dataset key",
+      example = "83a00190-7038-3970-a7e8-5e5563c40e37"
+    )
+    UUID datasetKey,
+    @PathVariable("taxonKey")
+    @Parameter(
+      description = "Taxon key scoped within the dataset",
+      example = "CXA"
+    )
+    String taxonKey
+  ) {
+    return dao.listRelatedInfo(datasetKey, taxonKey);
   }
 
   @Operation(

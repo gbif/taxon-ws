@@ -1,10 +1,18 @@
 package org.gbif.taxon.dao;
 
+import life.catalogue.api.model.DSID;
 import life.catalogue.api.model.DatasetImport;
-import life.catalogue.api.vocab.DatasetOrigin;
+import life.catalogue.api.model.SimpleName;
+import life.catalogue.api.model.SimpleNameInDataset;
+import life.catalogue.api.vocab.AreaImpl;
+import life.catalogue.api.vocab.Country;
+import life.catalogue.api.vocab.Gazetteer;
+import life.catalogue.api.vocab.LonghurstArea;
+import life.catalogue.api.vocab.TdwgArea;
 import life.catalogue.dao.DatasetImportDao;
 import life.catalogue.dao.DatasetInfoCache;
 import life.catalogue.db.mapper.DatasetImportMapper;
+import life.catalogue.db.mapper.DistributionMapper;
 import life.catalogue.es.indexing.NameUsageIndexService;
 import life.catalogue.es.search.NameUsageSearchService;
 
@@ -14,6 +22,7 @@ import org.gbif.api.model.common.paging.PagingResponse;
 import org.gbif.api.model.common.search.SearchResponse;
 import org.gbif.taxon.api.ChecklistMetrics;
 import org.gbif.taxon.api.NameUsageSimple;
+import org.gbif.taxon.api.RelatedInfo;
 import org.gbif.taxon.api.TreeUsage;
 import org.gbif.taxon.api.UsageInfo;
 import org.gbif.api.model.common.search.SearchRequest;
@@ -26,16 +35,19 @@ import org.gbif.taxon.api.search.NameUsageSuggestResult;
 
 import java.io.Writer;
 import java.util.Collection;
-import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.ibatis.session.SqlSessionFactory;
+
+
+import org.gbif.taxon.config.DatasetKeys;
+
+
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
@@ -51,8 +63,6 @@ import life.catalogue.img.ThumborService;
 import life.catalogue.matching.nidx.NameIndexFactory;
 import life.catalogue.printer.JsonTreePrinter;
 
-import static org.gbif.dwc.terms.GbifTerm.taxonKey;
-
 @Service
 public class TaxonDao {
   private final DatasetKeyMap map;
@@ -63,11 +73,13 @@ public class TaxonDao {
   private final life.catalogue.dao.TaxonDao tDao;
   private final life.catalogue.es.suggest.NameUsageSuggestionService suggestionService;
   private final life.catalogue.es.search.NameUsageSearchService searchService;
+  private final DatasetKeys datasetKeys;
 
-  public TaxonDao(DatasetKeyMap map, ApiConverter converter, SqlSessionFactory factory,
+  public TaxonDao(DatasetKeyMap map, ApiConverter converter, SqlSessionFactory factory, DatasetKeys datasetKeys,
                   NameUsageSearchService searchService,
                   life.catalogue.es.suggest.NameUsageSuggestionService suggestionService) {
     this.map = map;
+    this.datasetKeys = datasetKeys;
     this.converter = converter;
     this.factory = factory;
     this.treeDao = new TreeDao(factory);
@@ -124,6 +136,14 @@ public class TaxonDao {
                                            @Nullable Collection<DatasetType> datasetTypes,
                                            @Nullable Collection<UUID> datasetKeys,
                                            @Nullable Collection<UUID> publisherKeys) {
+    return listRelatedCLB(uuid, taxonKey, datasetTypes, datasetKeys, publisherKeys)
+      .stream().map(converter::convert).toList();
+  }
+
+  private List<SimpleNameInDataset> listRelatedCLB(UUID uuid, String taxonKey,
+                                                @Nullable Collection<DatasetType> datasetTypes,
+                                                @Nullable Collection<UUID> datasetKeys,
+                                                @Nullable Collection<UUID> publisherKeys) {
     int datasetKey = map.toCLB(uuid);
     Set<Integer> datasetIntKeys = new HashSet<>();;
     if (datasetKeys != null) {
@@ -132,8 +152,7 @@ public class TaxonDao {
       }
     }
     Set<Integer> colKeys = Set.of(map.getColKey());
-    return tDao.related(datasetKey, taxonKey, true, colKeys, null, datasetTypes, datasetIntKeys, publisherKeys)
-      .stream().map(converter::convert).toList();
+    return tDao.related(datasetKey, taxonKey, true, colKeys, null, datasetTypes, datasetIntKeys, publisherKeys);
   }
 
   private static Page page(Pageable p) {
@@ -184,4 +203,33 @@ public class TaxonDao {
   }
 
 
+  public RelatedInfo listRelatedInfo(UUID datasetKey, String taxonKey) {
+    final var relInfo = new RelatedInfo();
+    if (datasetKeys.getIucn() != null) {
+      var list = listRelatedCLB(datasetKey, taxonKey, null, Set.of(datasetKeys.getIucn()), null);
+      if (list != null && !list.isEmpty()) {
+        var iucn = list.getFirst();
+        if (iucn != null) {
+          try (var session = factory.openSession()) {
+            DistributionMapper dim = session.getMapper(DistributionMapper.class);
+            var dists = dim.listByTaxon(iucn.toDSID(map.toCLB(datasetKeys.getIucn())));
+            // find global entry
+            for (var d : dists) {
+              if (d.getArea().getName().equalsIgnoreCase("Global") && d.getThreatStatus() != null) {
+                relInfo.setThreatStatus(d.getThreatStatus().name());
+                relInfo.setThreatStatusUsage(converter.convert(iucn));
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    if (datasetKeys.getCites() != null) {
+      // TODO
+    }
+
+    return relInfo;
+  }
 }
