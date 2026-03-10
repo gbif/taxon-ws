@@ -40,6 +40,9 @@ import org.gbif.taxon.api.search.NameUsageSuggestRequest;
 import org.gbif.taxon.api.search.NameUsageSuggestResult;
 
 
+import org.gbif.taxon.config.RelatedInfoConfig;
+
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -56,9 +59,11 @@ public class ApiConverter {
   }
 
   private DatasetKeyMap map;
+  private RelatedInfoConfig cfg;
 
-  public ApiConverter(DatasetKeyMap map) {
+  public ApiConverter(DatasetKeyMap map, RelatedInfoConfig cfg) {
     this.map = map;
+    this.cfg = cfg;
   }
 
   NameUsage convert(NameUsageBase nub) {
@@ -105,7 +110,15 @@ public class ApiConverter {
 
   public NameUsageSimple convert(SimpleNameInDataset sn) {
     var su = convert((SimpleName)sn);
-    su.setDatasetKey(map.toGBIF(sn.getDatasetKey()));
+    // until we have CITES datasets in GBIF we can't map them
+    if (cfg.isCites(sn.getDatasetKey())) {
+      su.setDatasetKey(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+    } else {
+      su.setDatasetKey(map.toGBIF(sn.getDatasetKey()));
+    }
+    if (sn.getLink() != null) {
+      su.setLink(sn.getLink().toString());
+    }
     return su;
   }
 
@@ -213,8 +226,8 @@ public class ApiConverter {
     return p;
   }
 
-  UsageInfo convert(life.catalogue.api.model.UsageInfo ui) {
-    var info = new UsageInfo();
+  NameUsageInfo convert(life.catalogue.api.model.UsageInfo ui) {
+    var info = new NameUsageInfo();
     var usage = ui.getUsage();
 
     info.setTaxon(convert(usage));

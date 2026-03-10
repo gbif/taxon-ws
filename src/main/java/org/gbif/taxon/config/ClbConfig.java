@@ -26,8 +26,6 @@ import org.springframework.context.annotation.Primary;
 
 import com.zaxxer.hikari.HikariDataSource;
 
-import java.util.UUID;
-
 @Configuration
 public class ClbConfig {
   private static final Logger LOG = LoggerFactory.getLogger(ClbConfig.class);
@@ -36,19 +34,6 @@ public class ClbConfig {
   @Primary
   public LatestDatasetKeyCache latestDatasetKeyCache(SqlSessionFactory factory) {
     return new LatestDatasetKeyCacheImpl(factory);
-  }
-
-  @Bean
-  public DatasetKeys datasetKeys(
-    @Value("${datasets.iucn:19491596-35ae-4a91-9a98-85cf505f1bd3}") String iucn,
-    @Value("${datasets.citesI:2104}") Integer cites1,
-    @Value("${datasets.citesII:2094}") Integer cites2
-  ) {
-    var d = new DatasetKeys();
-    d.setIucn( iucn == null ? null : UUID.fromString(iucn) );
-    d.setCitesI(cites1);
-    d.setCitesII(cites2);
-    return d;
   }
 
   @Bean

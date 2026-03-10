@@ -27,7 +27,7 @@ import org.gbif.taxon.api.NameUsage;
 import org.gbif.taxon.api.Reference;
 import org.gbif.taxon.api.NameUsageSimple;
 import org.gbif.taxon.api.TreeUsage;
-import org.gbif.taxon.api.UsageInfo;
+import org.gbif.taxon.api.NameUsageInfo;
 import org.gbif.taxon.api.VernacularName;
 
 import java.net.URI;
@@ -35,6 +35,10 @@ import java.time.LocalDate;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
+
+
+import org.gbif.taxon.config.RelatedInfoConfig;
+
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,12 +57,14 @@ class ApiConverterTest {
 
   @Mock
   private DatasetKeyMap map;
+  @Mock
+  private RelatedInfoConfig cfg;
 
   private ApiConverter converter;
 
   @BeforeEach
   void setUp() {
-    converter = new ApiConverter(map);
+    converter = new ApiConverter(map, cfg);
   }
 
   // --- convert(NameUsageBase) tests ---
@@ -527,7 +533,7 @@ class ApiConverterTest {
     citesProp.setValue("II");
     ui.setProperties(List.of(iucnProp, citesProp));
 
-    UsageInfo info = converter.convert(ui);
+    NameUsageInfo info = converter.convert(ui);
 
     assertThat(info.getTaxon().getTaxonID()).isEqualTo("t-1");
     assertThat(info.getVernacularNames()).hasSize(1);
@@ -558,7 +564,7 @@ class ApiConverterTest {
     var ui = new life.catalogue.api.model.UsageInfo(taxon);
     // no vernacular names, synonyms, media, distributions, or properties set
 
-    UsageInfo info = converter.convert(ui);
+    NameUsageInfo info = converter.convert(ui);
 
     assertThat(info.getTaxon().getTaxonID()).isEqualTo("t-2");
     assertThat(info.getChecklistBankLink()).isNotNull();

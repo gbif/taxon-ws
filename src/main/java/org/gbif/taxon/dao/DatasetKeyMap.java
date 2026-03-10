@@ -92,7 +92,7 @@ public class DatasetKeyMap {
   public UUID toGBIF(int datasetKey) {
     var dk = clb2gbif.get(datasetKey);
     if (dk == null) {
-      throw new IllegalArgumentException("Unknown dataset key: " + datasetKey);
+      throw new IllegalStateException("Unknown dataset key: " + datasetKey);
     }
     return dk;
   }
@@ -131,7 +131,7 @@ public class DatasetKeyMap {
     }
 
     if (dk == null || dk < 0) {
-      throw new IllegalArgumentException("Unknown dataset key: " + datasetKey);
+      throw new NotFoundException(datasetKey, "Unknown dataset key: " + datasetKey);
     } else {
       // we cache the reverse mapping as mapping COL releases to the GBIF UUIDs via the db is difficult otherwise
       clb2gbif.put(dk, datasetKey);

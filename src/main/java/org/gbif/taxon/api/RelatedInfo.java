@@ -1,6 +1,7 @@
 package org.gbif.taxon.api;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -18,16 +19,12 @@ import lombok.Data;
 public class RelatedInfo {
 
   @Schema(description = "The global threat status from the IUCN redlist dataset")
-  private String threatStatus;
+  private NameUsageSimple redlist;
 
-  @Schema(description = "The global threat status from the IUCN redlist dataset")
-  private NameUsageSimple threatStatusUsage;
+  @Schema(description = "The CITES appendices the taxon appears in")
+  private final List<NameUsageSimple> cites = new ArrayList<>();
 
-  @Schema(description = "The CITES appendices the species appears in")
-  private List<String> citesAppendix;
 
-  @JsonIgnore
-  public boolean hasContent() {
-    return threatStatus != null || citesAppendix != null;
-  }
+  @Schema(description = "The GRIIS invasive species lists the taxon appears in with a country given")
+  private final List<NameUsageSimple> griis = new ArrayList<>();
 }

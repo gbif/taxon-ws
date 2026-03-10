@@ -14,7 +14,7 @@ import lombok.Data;
 
 @Data
 public class NameUsageSearchResult {
-  private NameUsageSimple usage;
+  private NameUsageSimple taxon;
   @Schema(description = "The major taxonomic group the taxon is considered in")
   private TaxGroup group;
   private List<NameUsageSimple> classification;

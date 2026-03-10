@@ -13,6 +13,7 @@
  */
 package org.gbif.taxon.resource;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import life.catalogue.api.search.NameUsageRequest;
 import life.catalogue.api.vocab.NameField;
 import life.catalogue.api.vocab.TaxGroup;
@@ -28,7 +29,7 @@ import org.gbif.nameparser.api.Rank;
 
 import org.gbif.taxon.api.NameUsageSimple;
 import org.gbif.taxon.api.RelatedInfo;
-import org.gbif.taxon.api.UsageInfo;
+import org.gbif.taxon.api.NameUsageInfo;
 import org.gbif.api.model.common.search.SearchRequest;
 import org.gbif.taxon.api.search.NameUsageSearchParameter;
 import org.gbif.taxon.api.search.NameUsageSearchRequest;
@@ -124,7 +125,7 @@ public class TaxonResource {
   }
 
   @GetMapping("/{datasetKey}/{taxonKey}/info")
-  public UsageInfo getInfo(
+  public NameUsageInfo getInfo(
     @PathVariable("datasetKey")
     @Parameter(
       description = "UUID for the dataset key",
@@ -209,6 +210,7 @@ public class TaxonResource {
   }
 
 
+  @Hidden
   @GetMapping("/{datasetKey}/{taxonKey}/relatedInfo")
   public RelatedInfo getRelatedInfo(
     @PathVariable("datasetKey")

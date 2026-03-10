@@ -4,8 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import life.catalogue.api.vocab.TaxGroup;
 import lombok.Data;
 
-import javax.validation.constraints.Null;
-
 import java.net.URI;
 import java.util.List;
 
@@ -14,7 +12,7 @@ import java.util.List;
  */
 @Data
 @Schema(description = "Comprehensive taxon usage information including all related data such as vernacular names, synonyms, media, distributions, and bibliography")
-public class UsageInfo {
+public class NameUsageInfo {
 
   @Schema(description = "The accepted taxon this info object is about")
   private NameUsage taxon;
