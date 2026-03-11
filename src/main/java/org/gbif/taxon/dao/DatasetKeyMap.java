@@ -89,10 +89,10 @@ public class DatasetKeyMap {
     }
   }
 
-  public UUID toGBIF(int datasetKey) {
+  public UUID toGBIF(int datasetKey) throws MissingGBIFKeyException {
     var dk = clb2gbif.get(datasetKey);
     if (dk == null) {
-      throw new IllegalStateException("Unknown dataset key: " + datasetKey);
+      throw new MissingGBIFKeyException(datasetKey);
     }
     return dk;
   }

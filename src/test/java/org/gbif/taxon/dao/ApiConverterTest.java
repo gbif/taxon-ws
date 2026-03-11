@@ -70,7 +70,7 @@ class ApiConverterTest {
   // --- convert(NameUsageBase) tests ---
 
   @Test
-  void convertAcceptedTaxon() {
+  void convertAcceptedTaxon() throws MissingGBIFKeyException {
     var uuid = UUID.randomUUID();
     var name = new Name();
     name.setId("name-1");
@@ -125,7 +125,7 @@ class ApiConverterTest {
   }
 
   @Test
-  void convertSynonym() {
+  void convertSynonym() throws MissingGBIFKeyException {
     var uuid = UUID.randomUUID();
     var name = new Name();
     name.setId("name-2");
@@ -164,7 +164,7 @@ class ApiConverterTest {
   }
 
   @Test
-  void convertWithNullCodeAndStatus() {
+  void convertWithNullCodeAndStatus() throws MissingGBIFKeyException {
     var uuid = UUID.randomUUID();
     var name = new Name();
     name.setId("name-3");

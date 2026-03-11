@@ -8,6 +8,7 @@ import life.catalogue.api.model.Synonym;
 import life.catalogue.api.model.Taxon;
 import life.catalogue.api.model.TaxonProperty;
 import life.catalogue.api.model.TreeNode;
+import life.catalogue.api.model.VerbatimSource;
 import life.catalogue.api.search.NameUsageRequest;
 import life.catalogue.api.search.NameUsageSearchResponse;
 import life.catalogue.api.search.NameUsageSuggestion;
@@ -51,6 +52,8 @@ public class ApiConverter {
 
   /** Reverse map from CLB search parameter to the corresponding GBIF v2 parameter. */
   private static final Map<life.catalogue.api.search.NameUsageSearchParameter, NameUsageSearchParameter> CLB_TO_GBIF_PARAM;
+  private static final UUID NULL_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+
   static {
     CLB_TO_GBIF_PARAM = new EnumMap<>(life.catalogue.api.search.NameUsageSearchParameter.class);
     for (var p : NameUsageSearchParameter.values()) {
@@ -104,15 +107,27 @@ public class ApiConverter {
     nu.setCultivarEpithet(name.getCultivarEpithet());
     nu.setReferences(nub.getLink());
     nu.setTaxonRemarks(nub.getRemarks());
-
+    // for source fields use addSource()
     return nu;
+  }
+
+  public void addSource(NameUsage nu, VerbatimSource source) {
+    // not all COL sources exist in GBIF
+    nu.setSourceID(source.getSourceId());
+    try {
+      nu.setSourceDatasetKey(map.toGBIF(source.getSourceDatasetKey()));
+    } catch (MissingGBIFKeyException e) {
+      // TODO: remove in production
+      nu.setSourceDatasetKey(NULL_UUID);
+    }
   }
 
   public NameUsageSimple convert(SimpleNameInDataset sn) {
     var su = convert((SimpleName)sn);
     // until we have CITES datasets in GBIF we can't map them
     if (cfg.isCites(sn.getDatasetKey())) {
-      su.setDatasetKey(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+      // TODO: remove in production
+      su.setDatasetKey(NULL_UUID);
     } else {
       su.setDatasetKey(map.toGBIF(sn.getDatasetKey()));
     }

@@ -1,5 +1,9 @@
 package org.gbif.taxon.dao;
 
+import life.catalogue.db.mapper.VerbatimSourceMapper;
+import lombok.SneakyThrows;
+
+
 import org.gbif.api.model.common.paging.Pageable;
 import org.gbif.api.model.common.paging.PagingResponse;
 import org.gbif.api.model.common.search.SearchRequest;
@@ -122,7 +126,17 @@ public class TaxonDao {
 
       var clbInfo = new life.catalogue.api.model.UsageInfo(usage);
       tDao.fillUsageInfo(session, clbInfo, null, true, false, true, true, true, true, false, false, true, true, false, false, false, false, false);
-      return converter.convert(clbInfo);
+      var info = converter.convert(clbInfo);
+
+      // source
+      if (usage.getVerbatimSourceKey() != null) {
+        var vsm = session.getMapper(VerbatimSourceMapper.class);
+        var source = vsm.get(DSID.of(usage.getDatasetKey(), usage.getVerbatimSourceKey()));
+        if (source != null) {
+          converter.addSource(info.getTaxon(), source);
+        }
+      }
+      return info;
     }
   }
 
@@ -131,6 +145,7 @@ public class TaxonDao {
     return tDao.childrenBreakdownPrinter(datasetKey, id, writer);
   }
 
+  @SneakyThrows
   public List<NameUsageSimple> listRelated(UUID uuid, String taxonKey,
                                            @Nullable Collection<DatasetType> datasetTypes,
                                            @Nullable Collection<UUID> datasetKeys,
