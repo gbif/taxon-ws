@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
+import life.catalogue.api.exception.NotFoundException;
 import life.catalogue.api.model.DSID;
 import life.catalogue.api.model.Dataset;
 import life.catalogue.cache.LatestDatasetKeyCache;
@@ -84,7 +85,7 @@ class DatasetKeyMapTest {
     when(datasetMapper.getKeyByGBIF(uuid)).thenReturn(null);
 
     assertThatThrownBy(() -> map.toCLB(uuid))
-      .isInstanceOf(IllegalArgumentException.class)
+      .isInstanceOf(NotFoundException.class)
       .hasMessageContaining("Unknown dataset key");
   }
 
@@ -106,8 +107,8 @@ class DatasetKeyMapTest {
     when(datasetMapper.get(999)).thenReturn(null);
 
     assertThatThrownBy(() -> map.toGBIF(999))
-      .isInstanceOf(IllegalArgumentException.class)
-      .hasMessageContaining("Unknown dataset key");
+      .isInstanceOf(MissingGBIFKeyException.class)
+      .hasMessageContaining("GBIF registry entry missing for CLB dataset 999");
   }
 
   @Test

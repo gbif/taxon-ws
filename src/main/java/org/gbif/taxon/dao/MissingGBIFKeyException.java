@@ -4,7 +4,7 @@ public class MissingGBIFKeyException extends RuntimeException {
   private final int datasetKey;
 
   public MissingGBIFKeyException(int datasetKey) {
-    super("GBIF registry entry for CLB dataset " + datasetKey);
+    super("GBIF registry entry missing for CLB dataset " + datasetKey);
     this.datasetKey = datasetKey;
   }
 
