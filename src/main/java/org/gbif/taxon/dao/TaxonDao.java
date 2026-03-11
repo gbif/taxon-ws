@@ -128,14 +128,6 @@ public class TaxonDao {
       tDao.fillUsageInfo(session, clbInfo, null, true, false, true, true, true, true, false, false, true, true, false, false, false, false, false);
       var info = converter.convert(clbInfo);
 
-      // source
-      if (usage.getVerbatimSourceKey() != null) {
-        var vsm = session.getMapper(VerbatimSourceMapper.class);
-        var source = vsm.get(DSID.of(usage.getDatasetKey(), usage.getVerbatimSourceKey()));
-        if (source != null) {
-          converter.addSource(info.getTaxon(), source);
-        }
-      }
       return info;
     }
   }

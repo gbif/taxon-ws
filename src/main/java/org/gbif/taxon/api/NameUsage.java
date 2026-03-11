@@ -73,12 +73,6 @@ public class NameUsage extends NameUsageSimple {
   @Schema(description = "The cultivar epithet for cultivated varieties", example = "Golden Sprite")
   private String cultivarEpithet;
 
-  @Schema(description = "The unique identifier of the source dataset", example = "7ddf754f-d193-4cc9-b351-99906754a03b")
-  private UUID sourceDatasetKey;
-
-  @Schema(description = "The identifier in the source dataset", example = "taxon:12345")
-  private String sourceID;
-
   @Schema(description = "Link to references or source information", example = "https://www.catalogueoflife.org/data/taxon/...")
   private URI references;
 

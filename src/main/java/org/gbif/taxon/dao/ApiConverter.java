@@ -111,17 +111,6 @@ public class ApiConverter {
     return nu;
   }
 
-  public void addSource(NameUsage nu, VerbatimSource source) {
-    // not all COL sources exist in GBIF
-    nu.setSourceID(source.getSourceId());
-    try {
-      nu.setSourceDatasetKey(map.toGBIF(source.getSourceDatasetKey()));
-    } catch (MissingGBIFKeyException e) {
-      // TODO: remove in production
-      nu.setSourceDatasetKey(NULL_UUID);
-    }
-  }
-
   public NameUsageSimple convert(SimpleNameInDataset sn) {
     var su = convert((SimpleName)sn);
     // until we have CITES datasets in GBIF we can't map them
