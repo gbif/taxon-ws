@@ -10,6 +10,7 @@ import org.gbif.nameparser.api.NameType;
 
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 

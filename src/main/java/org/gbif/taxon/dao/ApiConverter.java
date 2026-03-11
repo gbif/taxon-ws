@@ -190,21 +190,28 @@ public class ApiConverter {
   Distribution convert(life.catalogue.api.model.Distribution d) {
     var dist = new Distribution();
     if (d.getArea() != null) {
+      dist.setLocationID(d.getArea().getGlobalId());
       dist.setLocality(d.getArea().getName());
       if (d.getArea() instanceof Country c) {
         dist.setCountryCode(c.getIso2LetterCode());
       }
     }
     dist.setLifeStage(d.getLifeStage());
-    dist.setEstablishmentMeans(d.getEstablishmentMeans() != null ? d.getEstablishmentMeans().name() : null);
-    dist.setDegreeOfEstablishment(d.getDegreeOfEstablishment() != null ? d.getDegreeOfEstablishment().name() : null);
+    dist.setEstablishmentMeans(str(d.getEstablishmentMeans()));
+    dist.setDegreeOfEstablishment(str(d.getDegreeOfEstablishment()));
     dist.setPathway(d.getPathway());
-    dist.setThreatStatus(d.getThreatStatus() != null ? d.getThreatStatus().name() : null);
-    dist.setEventDate(d.getYear() != null ? String.valueOf(d.getYear()) : null);
+    dist.setThreatStatus(str(d.getThreatStatus()));
+    dist.setEventDate(str(d.getYear()));
     dist.setRemarks(d.getRemarks());
     //TODO: expand refID with citation
     dist.setSource(d.getReferenceId());
     return dist;
+  }
+  private static String str(Enum<?> e) {
+    return e != null ? e.name() : null;
+  }
+  private static String str(Object e) {
+    return e != null ? e.toString() : null;
   }
 
   Reference convert(life.catalogue.api.model.Reference r) {
@@ -339,7 +346,7 @@ public class ApiConverter {
   private NameUsageSearchResult convert(NameUsageWrapper wrapper) {
     var result = new NameUsageSearchResult();
     if (wrapper.getUsage() != null) {
-      result.setUsage(convert(wrapper.getUsage().asUsageBase()));
+      result.setTaxon(convert(wrapper.getUsage().asUsageBase()));
     }
     result.setGroup(wrapper.getGroup());
     if (wrapper.getClassification() != null) {

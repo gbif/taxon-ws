@@ -1,70 +1,60 @@
 package org.gbif.taxon.dao;
 
-import life.catalogue.api.exception.NotFoundException;
-import life.catalogue.api.exception.SynonymException;
-import life.catalogue.api.model.DSID;
-import life.catalogue.api.model.DatasetImport;
-import life.catalogue.api.model.SimpleName;
-import life.catalogue.api.model.SimpleNameInDataset;
-import life.catalogue.api.vocab.EstablishmentMeans;
-import life.catalogue.dao.DatasetImportDao;
-import life.catalogue.dao.DatasetInfoCache;
-import life.catalogue.db.mapper.DatasetImportMapper;
-import life.catalogue.db.mapper.DistributionMapper;
-import life.catalogue.db.mapper.TaxonPropertyMapper;
-import life.catalogue.es.indexing.NameUsageIndexService;
-import life.catalogue.es.search.NameUsageSearchService;
-
-
-import org.apache.ibatis.session.SqlSession;
-
-
 import org.gbif.api.model.common.paging.Pageable;
 import org.gbif.api.model.common.paging.PagingResponse;
+import org.gbif.api.model.common.search.SearchRequest;
 import org.gbif.api.model.common.search.SearchResponse;
-import org.gbif.dwc.terms.GbifTerm;
 import org.gbif.dwc.terms.IucnTerm;
 import org.gbif.taxon.api.ChecklistMetrics;
+import org.gbif.taxon.api.Distribution;
 import org.gbif.taxon.api.NameUsage;
+import org.gbif.taxon.api.NameUsageInfo;
 import org.gbif.taxon.api.NameUsageSimple;
 import org.gbif.taxon.api.RelatedInfo;
 import org.gbif.taxon.api.TreeUsage;
-import org.gbif.taxon.api.NameUsageInfo;
-import org.gbif.api.model.common.search.SearchRequest;
 import org.gbif.taxon.api.search.NameUsageSearchParameter;
 import org.gbif.taxon.api.search.NameUsageSearchRequest;
 import org.gbif.taxon.api.search.NameUsageSearchResult;
 import org.gbif.taxon.api.search.NameUsageSuggestRequest;
 import org.gbif.taxon.api.search.NameUsageSuggestResult;
+import org.gbif.taxon.config.RelatedInfoConfig;
 
 
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
-
-
-import org.gbif.taxon.config.RelatedInfoConfig;
-
-
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
+import life.catalogue.api.exception.NotFoundException;
+import life.catalogue.api.exception.SynonymException;
+import life.catalogue.api.model.DSID;
+import life.catalogue.api.model.DatasetImport;
 import life.catalogue.api.model.Page;
 import life.catalogue.api.model.ResultPage;
+import life.catalogue.api.model.SimpleName;
+import life.catalogue.api.model.SimpleNameInDataset;
 import life.catalogue.api.vocab.DatasetType;
+import life.catalogue.api.vocab.EstablishmentMeans;
+import life.catalogue.dao.DatasetImportDao;
+import life.catalogue.dao.DatasetInfoCache;
 import life.catalogue.dao.MetricsDao;
 import life.catalogue.dao.NameDao;
 import life.catalogue.dao.TreeDao;
+import life.catalogue.db.mapper.DatasetImportMapper;
+import life.catalogue.db.mapper.DistributionMapper;
 import life.catalogue.db.mapper.NameUsageMapper;
+import life.catalogue.es.indexing.NameUsageIndexService;
+import life.catalogue.es.search.NameUsageSearchService;
 import life.catalogue.img.ThumborConfig;
 import life.catalogue.img.ThumborService;
 import life.catalogue.matching.nidx.NameIndexFactory;
@@ -72,8 +62,6 @@ import life.catalogue.printer.JsonTreePrinter;
 
 @Service
 public class TaxonDao {
-  private static final Set<String> INVASIVE_VALUES = Set.of("invasive", "true", "yes");
-
   private final DatasetKeyMap map;
   private final ApiConverter converter;
   private final SqlSessionFactory factory;
@@ -161,9 +149,7 @@ public class TaxonDao {
                                                 @Nullable Collection<DatasetType> datasetTypes,
                                                 @Nullable Collection<Integer> datasetKeys,
                                                 @Nullable Collection<UUID> publisherKeys) {
-    int datasetKey = map.toCLB(uuid);
-    Set<Integer> colKeys = Set.of(map.getColKey());
-    return tDao.related(datasetKey, taxonKey, true, colKeys, null, datasetTypes, datasetKeys, publisherKeys);
+    return tDao.related(map.toCLB(uuid), taxonKey, true, Set.of(map.getColKey()), null, datasetTypes, datasetKeys, publisherKeys);
   }
 
   private static Page page(Pageable p) {
@@ -230,7 +216,7 @@ public class TaxonDao {
     final var relInfo = new RelatedInfo();
     int datasetKeyCLB = map.toCLB(datasetKey);
 
-    taxonOr404(datasetKeyCLB, taxonID);
+    var tax = taxonOr404(datasetKeyCLB, taxonID);
     // REDLIST
     if (relatedInfoConfig.getIucn() != null) {
       int datasetKeyIucn = map.toCLB(relatedInfoConfig.getIucn());
@@ -262,44 +248,27 @@ public class TaxonDao {
     if (relatedInfoConfig.getGriisPublisherKey() != null) {
       var list = tDao.related(datasetKeyCLB, taxonID, true, null, null, null, null, Set.of(relatedInfoConfig.getGriisPublisherKey()));
       if (list != null) {
+        var distributions = new ArrayList<Distribution>();
         try (var session = factory.openSession()) {
           var dm = session.getMapper(DistributionMapper.class);
-          var pm = session.getMapper(TaxonPropertyMapper.class);
           for (var rel : list) {
-            var griis = converter.convert(rel);
-            relInfo.getGriis().add(griis);
-            var introduced = new HashMap<String, Object>();
-            griis.addData("introduced", introduced);
+            UUID gbifKey = map.toGBIF(rel.getDatasetKey());
             for (var d : dm.listByTaxon(rel.toDSID(rel.getDatasetKey()))) {
               if (d.getEstablishmentMeans() == EstablishmentMeans.INTRODUCED && d.getArea() != null) {
-                putIfMissing(introduced,"country", d.getArea().getName());
-                putIfMissing(introduced,"since", d.getYear());
-                putIfMissing(introduced,"pathway", d.getPathway());
-                putIfMissing(introduced,"degreeOfEstablishment", str(d.getDegreeOfEstablishment()));
-              }
-            }
-            // isInvasive live in taxon properties
-            for (var p : pm.listByTaxon(rel.toDSID(rel.getDatasetKey()))) {
-              if (p.getProperty().equalsIgnoreCase(GbifTerm.isInvasive.prefixedName())) {
-                Boolean invasive = INVASIVE_VALUES.contains(p.getValue().toLowerCase().trim());
-                putIfMissing(introduced,"invasive", invasive);
-                break;
+                var griis = converter.convert(d);
+                griis.setDatasetKey(gbifKey);
+                griis.setTaxonID(rel.getId());
+                distributions.add(griis);
               }
             }
           }
         }
+        if (!distributions.isEmpty()) {
+          relInfo.setGriis(distributions);
+        }
       }
     }
     return relInfo;
-  }
-
-  private static void putIfMissing(Map<String, Object> map, String key, Object value) {
-    if (value != null && !map.containsKey(key)) {
-      map.put(key, value);
-    }
-  }
-  private static String str(Enum<?> val) {
-    return val == null ? null : val.name().toLowerCase();
   }
 
   private void addAppendix(RelatedInfo relInfo, Integer datasetKey, String taxonID, String appendix, Integer citesDatasetKey) {
@@ -308,6 +277,9 @@ public class TaxonDao {
       if (rel != null) {
         var cite = converter.convert(rel);
         cite.addData("citesAppendix", appendix);
+        if (relInfo.getCites() == null) {
+          relInfo.setCites(new ArrayList<>());
+        }
         relInfo.getCites().add(cite);
       }
     }

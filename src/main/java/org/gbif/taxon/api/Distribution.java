@@ -3,12 +3,20 @@ package org.gbif.taxon.api;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.util.UUID;
+
 /**
  * Geographic distribution information for a taxon.
  */
 @Data
 @Schema(description = "Geographic distribution information for a taxon")
 public class Distribution {
+
+  @Schema(description = "The identifier for the dataset", example = "7ddf754f-d193-4cc9-b351-99906754a03b")
+  private UUID datasetKey;
+
+  @Schema(description = "The unique identifier for this taxon", example = "2435099")
+  private String taxonID;
 
   @Schema(description = "The identifier for the location", example = "loc123")
   private String locationID;

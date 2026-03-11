@@ -1,13 +1,9 @@
 package org.gbif.taxon.api;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import io.swagger.v3.oas.annotations.media.Schema;
-import life.catalogue.api.vocab.TaxGroup;
 import lombok.Data;
 
 /**
@@ -22,9 +18,9 @@ public class RelatedInfo {
   private NameUsageSimple redlist;
 
   @Schema(description = "The CITES appendices the taxon appears in")
-  private final List<NameUsageSimple> cites = new ArrayList<>();
+  private List<NameUsageSimple> cites;
 
 
-  @Schema(description = "The GRIIS invasive species lists the taxon appears in with a country given")
-  private final List<NameUsageSimple> griis = new ArrayList<>();
+  @Schema(description = "The GRIIS invasive species distributions for the related species")
+  private List<Distribution> griis;
 }
