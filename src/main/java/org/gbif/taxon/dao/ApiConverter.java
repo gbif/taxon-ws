@@ -271,6 +271,14 @@ public class ApiConverter {
 
     info.setTaxon(convert(usage));
     info.setGroup(ui.getGroup());
+    // publishedIn
+    if (ui.getPublishedIn() != null) {
+      info.getTaxon().setNamePublishedIn(ui.getPublishedIn().getCitation());
+    }
+    // acceptedNameUsage
+    if (usage.isSynonym()) {
+      info.getTaxon().setAcceptedNameUsage(convert(ui.getClassification().getLast()).getLabel());
+    }
 
     // vernacularNames
     if (ui.getVernacularNames() != null) {

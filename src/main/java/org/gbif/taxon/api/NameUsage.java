@@ -31,9 +31,6 @@ public class NameUsage extends NameUsageSimple {
   @Schema(description = "The accepted name usage (for synonyms)")
   private String acceptedNameUsage;
 
-  @Schema(description = "The parent name usage in the classification")
-  private String parentNameUsage;
-
   @Schema(description = "The identifier of the original name usage (basionym)", example = "2435090")
   private String originalNameUsageID;
 
