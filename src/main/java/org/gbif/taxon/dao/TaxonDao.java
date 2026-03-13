@@ -109,15 +109,35 @@ public class TaxonDao {
       } else {
         imp = dim.current(datasetKey);
       }
-      return imp == null ? null : converter.convert(imp);
+      if (imp == null) {
+        throw NotFoundException.notFound(ChecklistMetrics.class, uuid);
+      }
+      return converter.convert(imp);
     }
   }
 
   public NameUsageSimple get(UUID uuid, String taxonKey) {
+    var key = map.toDSID(uuid, taxonKey);
     try (var session = factory.openSession()) {
       var num = session.getMapper(NameUsageMapper.class);
-      return converter.convert(num.getSimpleInDataset(map.toDSID(uuid, taxonKey)));
+      var sn = num.getSimpleInDataset(key);
+      return converter.convert(nonNull(sn, uuid, taxonKey));
     }
+  }
+
+  private static <T> T nonNull(T obj, UUID uuid, String taxonKey) {
+    if (obj == null) {
+      var msg = "Taxon " + uuid + "/" +  taxonKey + " does not exist";
+      throw new NotFoundException(msg);
+    }
+    return obj;
+  }
+
+  private static <T> T nonNull(T obj, String entity, Object key) {
+    if (obj == null) {
+      throw new NotFoundException(key, entity + " does not exist");
+    }
+    return obj;
   }
 
   public NameUsageInfo getInfo(UUID uuid, String taxonKey) {
@@ -139,6 +159,7 @@ public class TaxonDao {
 
   public TaxonBreakdown childrenBreakdown(UUID uuid, String taxonID) {
     int datasetKey = map.toCLB(uuid);
+    // this can throw NotFoundException
     var collector = tDao.childrenBreakdownCollector(datasetKey, taxonID);
     try {
       collector.print();

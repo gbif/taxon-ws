@@ -204,7 +204,7 @@ class ApiConverterTest {
     assertThat(su.getTaxonRank()).isEqualTo(Rank.SPECIES);
     assertThat(su.getTaxonomicStatus()).isEqualTo(TaxonomicStatus.ACCEPTED);
     assertThat(su.getNomenclaturalCode()).isEqualTo("ZOOLOGICAL");
-    assertThat(su.getExtinct()).isFalse();
+    assertThat(su.getExtinct()).isNull();
   }
 
   @Test
