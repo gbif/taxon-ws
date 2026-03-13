@@ -141,7 +141,7 @@ public class TaxonDao {
     int datasetKey = map.toCLB(uuid);
     var collector = tDao.childrenBreakdownCollector(datasetKey, taxonID);
     try {
-      var cnt = collector.print();
+      collector.print();
     } catch (IOException e) {
       // this should not be possible as the collector does not write to IO !!!
       // artefact of the abstract base printer class which is targeting real writers

@@ -1,24 +1,26 @@
 package org.gbif.taxon.dao;
 
-import life.catalogue.api.model.DatasetImport;
-import life.catalogue.api.model.NameUsageBase;
-import life.catalogue.api.model.SimpleName;
-import life.catalogue.api.model.SimpleNameInDataset;
-import life.catalogue.api.model.Synonym;
-import life.catalogue.api.model.Taxon;
-import life.catalogue.api.model.TaxonProperty;
-import life.catalogue.api.model.TreeNode;
-import life.catalogue.api.model.VerbatimSource;
-import life.catalogue.api.search.NameUsageRequest;
-import life.catalogue.api.search.NameUsageSearchResponse;
-import life.catalogue.api.search.NameUsageSuggestion;
-import life.catalogue.api.search.NameUsageWrapper;
-import life.catalogue.api.vocab.Country;
-
-
 import org.gbif.api.model.common.search.Facet;
+import org.gbif.api.model.common.search.SearchRequest;
 import org.gbif.api.model.common.search.SearchResponse;
-import org.gbif.taxon.api.*;
+import org.gbif.taxon.api.ChecklistMetrics;
+import org.gbif.taxon.api.Distribution;
+import org.gbif.taxon.api.MeasurementOrFact;
+import org.gbif.taxon.api.Media;
+import org.gbif.taxon.api.NameUsage;
+import org.gbif.taxon.api.NameUsageInfo;
+import org.gbif.taxon.api.NameUsageSimple;
+import org.gbif.taxon.api.Reference;
+import org.gbif.taxon.api.TreeUsage;
+import org.gbif.taxon.api.VernacularName;
+import org.gbif.taxon.api.VernacularNameSimple;
+import org.gbif.taxon.api.search.NameUsageSearchParameter;
+import org.gbif.taxon.api.search.NameUsageSearchRequest;
+import org.gbif.taxon.api.search.NameUsageSearchResult;
+import org.gbif.taxon.api.search.NameUsageSuggestRequest;
+import org.gbif.taxon.api.search.NameUsageSuggestResult;
+import org.gbif.taxon.config.RelatedInfoConfig;
+
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -30,21 +32,21 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-
-import org.gbif.api.model.common.search.SearchRequest;
-import org.gbif.taxon.api.search.NameUsageSearchParameter;
-import org.gbif.taxon.api.search.NameUsageSearchRequest;
-import org.gbif.taxon.api.search.NameUsageSearchResult;
-
-
-import org.gbif.taxon.api.search.NameUsageSuggestRequest;
-import org.gbif.taxon.api.search.NameUsageSuggestResult;
-
-
-import org.gbif.taxon.config.RelatedInfoConfig;
-
-
 import org.springframework.stereotype.Component;
+
+import life.catalogue.api.model.DatasetImport;
+import life.catalogue.api.model.NameUsageBase;
+import life.catalogue.api.model.SimpleName;
+import life.catalogue.api.model.SimpleNameInDataset;
+import life.catalogue.api.model.Synonym;
+import life.catalogue.api.model.Taxon;
+import life.catalogue.api.model.TaxonProperty;
+import life.catalogue.api.model.TreeNode;
+import life.catalogue.api.search.NameUsageRequest;
+import life.catalogue.api.search.NameUsageSearchResponse;
+import life.catalogue.api.search.NameUsageSuggestion;
+import life.catalogue.api.search.NameUsageWrapper;
+import life.catalogue.api.vocab.area.Gazetteer;
 
 @Component
 public class ApiConverter {
@@ -196,8 +198,8 @@ public class ApiConverter {
     if (d.getArea() != null) {
       dist.setLocationID(d.getArea().getGlobalId());
       dist.setLocality(d.getArea().getName());
-      if (d.getArea() instanceof Country c) {
-        dist.setCountryCode(c.getIso2LetterCode());
+      if (d.getArea().getGazetteer() == Gazetteer.ISO && d.getArea().getId() != null && d.getArea().getId().length() >= 2) {
+        dist.setCountryCode(d.getArea().getId().substring(0, 2));
       }
     }
     dist.setLifeStage(d.getLifeStage());
