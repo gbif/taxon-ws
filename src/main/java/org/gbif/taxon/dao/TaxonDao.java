@@ -1,6 +1,8 @@
 package org.gbif.taxon.dao;
 
+import life.catalogue.db.mapper.TaxonMetricsMapper;
 import life.catalogue.db.mapper.VerbatimSourceMapper;
+import life.catalogue.printer.JsonTreeCollector;
 import lombok.SneakyThrows;
 
 
@@ -15,6 +17,7 @@ import org.gbif.taxon.api.NameUsage;
 import org.gbif.taxon.api.NameUsageInfo;
 import org.gbif.taxon.api.NameUsageSimple;
 import org.gbif.taxon.api.RelatedInfo;
+import org.gbif.taxon.api.TaxonBreakdown;
 import org.gbif.taxon.api.TreeUsage;
 import org.gbif.taxon.api.search.NameUsageSearchParameter;
 import org.gbif.taxon.api.search.NameUsageSearchRequest;
@@ -24,6 +27,8 @@ import org.gbif.taxon.api.search.NameUsageSuggestResult;
 import org.gbif.taxon.config.RelatedInfoConfig;
 
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -132,9 +137,53 @@ public class TaxonDao {
     }
   }
 
-  public JsonTreePrinter childrenBreakdownPrinter(UUID uuid, String id, Writer writer) {
+  public TaxonBreakdown childrenBreakdown(UUID uuid, String taxonID) {
     int datasetKey = map.toCLB(uuid);
-    return tDao.childrenBreakdownPrinter(datasetKey, id, writer);
+    var collector = tDao.childrenBreakdownCollector(datasetKey, taxonID);
+    try {
+      var cnt = collector.print();
+    } catch (IOException e) {
+      // this should not be possible as the collector does not write to IO !!!
+      // artefact of the abstract base printer class which is targeting real writers
+      throw new RuntimeException(e);
+    }
+
+    TaxonBreakdown breakdown = new TaxonBreakdown();
+    breakdown.setTaxonID(taxonID);
+    breakdown.setTaxonRank(collector.getTaxon().getRank());
+    breakdown.setScientificName(collector.getTaxon().getName());
+    breakdown.setSpecies(countSpecies(datasetKey, taxonID));
+    breakdown.setBreakdown(new ArrayList<>(collector.getRoot().size()));
+    for (var n : collector.getRoot()) {
+      var tb = tb(n);
+      breakdown.getBreakdown().add(tb);
+      if (!n.children.isEmpty()) {
+        tb.setBreakdown(new ArrayList<>(n.children.size()));
+        for (var n2 : n.children) {
+          var tb2 = tb(n2);
+          tb.getBreakdown().add(tb2);
+        }
+      }
+    }
+    return breakdown;
+  }
+
+  private int countSpecies(int datasetKey, String taxonID) {
+    try (SqlSession session = factory.openSession()) {
+      var tm = session.getMapper(TaxonMetricsMapper.class);
+      var m = tm.get(DSID.of(datasetKey, taxonID));
+      if (m != null) return m.getSpeciesCount();
+    }
+    return -1;
+  }
+
+  private static TaxonBreakdown tb(JsonTreeCollector.TreeName tn) {
+    TaxonBreakdown tb = new TaxonBreakdown();
+    tb.setTaxonID(tn.name.getId());
+    tb.setTaxonRank(tn.name.getRank());
+    tb.setScientificName(tn.name.getName());
+    tb.setSpecies(tn.count);
+    return tb;
   }
 
   @SneakyThrows

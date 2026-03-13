@@ -31,6 +31,7 @@ import org.gbif.taxon.api.NameUsageSimple;
 import org.gbif.taxon.api.RelatedInfo;
 import org.gbif.taxon.api.NameUsageInfo;
 import org.gbif.api.model.common.search.SearchRequest;
+import org.gbif.taxon.api.TaxonBreakdown;
 import org.gbif.taxon.api.search.NameUsageSearchParameter;
 import org.gbif.taxon.api.search.NameUsageSearchRequest;
 import org.gbif.taxon.api.search.NameUsageSearchResult;
@@ -55,7 +56,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -143,7 +143,7 @@ public class TaxonResource {
   }
 
   @GetMapping("/{datasetKey}/{taxonKey}/breakdown")
-  public StreamingResponseBody breakdown(
+  public TaxonBreakdown breakdown(
       @PathVariable("datasetKey")
       @Parameter(
         description = "UUID for the dataset key",
@@ -157,15 +157,7 @@ public class TaxonResource {
       )
       String taxonKey
     ) {
-
-    return os -> {
-      try (Writer writer = UTF8IoUtils.writerFromStream(os);
-           JsonTreePrinter printer = dao.childrenBreakdownPrinter(datasetKey, taxonKey, writer)
-      ) {
-        printer.print();
-        writer.flush();
-      }
-    };
+    return dao.childrenBreakdown(datasetKey, taxonKey);
   }
 
 

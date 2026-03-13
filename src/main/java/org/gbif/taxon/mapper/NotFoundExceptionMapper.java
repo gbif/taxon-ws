@@ -16,7 +16,7 @@ public class NotFoundExceptionMapper {
   public ResponseEntity handleNotException(NotFoundException e) {
     return ResponseEntity
       .status(HttpStatus.NOT_FOUND)
-      .contentType(MediaType.APPLICATION_JSON)
+      .contentType(MediaType.TEXT_PLAIN)
       .body(e.getMessage());
   }
 }
