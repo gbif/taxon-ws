@@ -23,6 +23,9 @@ public class NameUsageInfo {
   @Schema(description = "List of synonyms and nomenclatural combinations for the taxon")
   private List<NameUsageSimple> synonyms;
 
+  @Schema(description = "List of synonyms and nomenclatural combinations for the taxon")
+  private Synonymy synonymsAlt;
+
   @Schema(description = "List of parent taxa starting with the xxx")
   private List<NameUsageSimple> classification;
 

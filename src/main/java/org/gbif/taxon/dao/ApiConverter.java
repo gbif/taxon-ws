@@ -19,6 +19,7 @@ import org.gbif.taxon.api.NameUsage;
 import org.gbif.taxon.api.NameUsageInfo;
 import org.gbif.taxon.api.NameUsageSimple;
 import org.gbif.taxon.api.Reference;
+import org.gbif.taxon.api.Synonymy;
 import org.gbif.taxon.api.TreeUsage;
 import org.gbif.taxon.api.VernacularName;
 import org.gbif.taxon.api.VernacularNameSimple;
@@ -287,6 +288,14 @@ public class ApiConverter {
           .map(this::convert)
           .collect(Collectors.toList())
       );
+      Synonymy syn = new Synonymy();
+      syn.setHomotypic(convert(ui.getSynonyms().getHomotypic()));
+      syn.setMisapplied(convert(ui.getSynonyms().getMisapplied()));
+      syn.setHeterotypic(ui.getSynonyms().getHeterotypicGroups().stream()
+        .map(this::convert)
+        .collect(Collectors.toList())
+      );
+      info.setSynonymsAlt(syn);
     }
 
     // media
@@ -341,6 +350,10 @@ public class ApiConverter {
     }
 
     return info;
+  }
+
+  private List<NameUsageSimple> convert(List<Synonym> syns) {
+    return syns == null ? null : syns.stream().map(this::convert).collect(Collectors.toList());
   }
 
   public SearchResponse<NameUsageSearchResult, NameUsageSearchParameter> convert(NameUsageSearchResponse resp) {
