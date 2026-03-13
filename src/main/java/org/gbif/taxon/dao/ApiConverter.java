@@ -1,10 +1,8 @@
 package org.gbif.taxon.dao;
 
-import life.catalogue.api.vocab.Issue;
 import life.catalogue.parser.AreaParser;
 
 
-import life.catalogue.parser.LanguageParser;
 import life.catalogue.parser.SafeParser;
 
 
@@ -137,6 +135,14 @@ public class ApiConverter {
     return su;
   }
 
+  /**
+   * Only to be used for converting the synonym as all the synonyms point to the same taxon and parentID is very redundant.
+   */
+  private NameUsageSimple convert(Synonym s) {
+    s.setParentId(null);
+    return convert(new SimpleName(s));
+  }
+
   public NameUsageSimple convert(SimpleName sn) {
     var su = new NameUsageSimple();
 
@@ -151,10 +157,14 @@ public class ApiConverter {
     su.setTaxonRank(sn.getRank());
     su.setTaxonomicStatus(sn.getStatus());
     su.setNomenclaturalCode(sn.getCode() != null ? sn.getCode().name() : null);
-    su.setExtinct(sn.isExtinct());
+    su.setExtinct(isTrue(sn.isExtinct()));
     su.setLabel(sn.getLabelHtml());
 
     return su;
+  }
+
+  private static Boolean isTrue(boolean b) {
+    return b ? true : null;
   }
 
   TreeUsage convertTree(TreeNode tn) {
@@ -282,9 +292,8 @@ public class ApiConverter {
 
     // synonyms
     if (ui.getSynonyms() != null) {
-      info.setSynonyms(
+      info.setSynonymsFlat(
         ui.getSynonyms().all().stream()
-          .map(SimpleName::new)
           .map(this::convert)
           .collect(Collectors.toList())
       );
@@ -295,7 +304,7 @@ public class ApiConverter {
         .map(this::convert)
         .collect(Collectors.toList())
       );
-      info.setSynonymsAlt(syn);
+      info.setSynonyms(syn);
     }
 
     // media

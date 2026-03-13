@@ -537,7 +537,7 @@ class ApiConverterTest {
     assertThat(info.getVernacularNames().get(0).getVernacularName()).isEqualTo("Silver Fir");
     assertThat(info.getMedia()).hasSize(1);
     assertThat(info.getDistributions()).hasSize(1);
-    assertThat(info.getSynonyms()).hasSize(1);
+    assertThat(info.getSynonymsFlat()).hasSize(1);
     assertThat(info.getBibliography()).hasSize(1);
     assertThat(info.getChecklistBankLink()).isNotNull();
     assertThat(info.getChecklistBankLink().toString()).contains("dataset/101/taxon/t-1");

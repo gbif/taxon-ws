@@ -21,10 +21,10 @@ public class NameUsageInfo {
   private TaxGroup group;
 
   @Schema(description = "List of synonyms and nomenclatural combinations for the taxon")
-  private List<NameUsageSimple> synonyms;
+  private List<NameUsageSimple> synonymsFlat;
 
   @Schema(description = "List of synonyms and nomenclatural combinations for the taxon")
-  private Synonymy synonymsAlt;
+  private Synonymy synonyms;
 
   @Schema(description = "List of parent taxa starting with the xxx")
   private List<NameUsageSimple> classification;
