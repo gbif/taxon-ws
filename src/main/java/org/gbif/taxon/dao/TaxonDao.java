@@ -116,7 +116,7 @@ public class TaxonDao {
   public NameUsageSimple get(UUID uuid, String taxonKey) {
     try (var session = factory.openSession()) {
       var num = session.getMapper(NameUsageMapper.class);
-      return converter.convert(num.getSimple(map.toDSID(uuid, taxonKey)));
+      return converter.convert(num.getSimpleInDataset(map.toDSID(uuid, taxonKey)));
     }
   }
 

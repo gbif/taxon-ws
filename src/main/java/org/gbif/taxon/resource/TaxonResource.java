@@ -13,24 +13,17 @@
  */
 package org.gbif.taxon.resource;
 
-import io.swagger.v3.oas.annotations.Hidden;
-import life.catalogue.api.search.NameUsageRequest;
-import life.catalogue.api.vocab.NameField;
-import life.catalogue.api.vocab.TaxGroup;
-
-
 import org.gbif.api.documentation.CommonParameters;
 import org.gbif.api.model.common.paging.Pageable;
 import org.gbif.api.model.common.search.FacetedSearchRequest;
+import org.gbif.api.model.common.search.SearchRequest;
 import org.gbif.api.model.common.search.SearchResponse;
-import org.gbif.nameparser.api.NomCode;
 import org.gbif.nameparser.api.NameType;
+import org.gbif.nameparser.api.NomCode;
 import org.gbif.nameparser.api.Rank;
-
+import org.gbif.taxon.api.NameUsageInfo;
 import org.gbif.taxon.api.NameUsageSimple;
 import org.gbif.taxon.api.RelatedInfo;
-import org.gbif.taxon.api.NameUsageInfo;
-import org.gbif.api.model.common.search.SearchRequest;
 import org.gbif.taxon.api.TaxonBreakdown;
 import org.gbif.taxon.api.search.NameUsageSearchParameter;
 import org.gbif.taxon.api.search.NameUsageSearchRequest;
@@ -40,7 +33,6 @@ import org.gbif.taxon.api.search.NameUsageSuggestResult;
 import org.gbif.taxon.dao.TaxonDao;
 
 
-import java.io.Writer;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -57,6 +49,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -69,14 +62,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import life.catalogue.api.search.NameUsageRequest;
 import life.catalogue.api.vocab.DatasetType;
 import life.catalogue.api.vocab.Issue;
-import life.catalogue.api.vocab.Origin;
+import life.catalogue.api.vocab.NameField;
 import life.catalogue.api.vocab.NomStatus;
+import life.catalogue.api.vocab.Origin;
+import life.catalogue.api.vocab.TaxGroup;
 import life.catalogue.api.vocab.TaxonomicStatus;
-
-import life.catalogue.common.io.UTF8IoUtils;
-import life.catalogue.printer.JsonTreePrinter;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.METHOD;
