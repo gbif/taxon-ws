@@ -1,5 +1,13 @@
 package org.gbif.taxon.dao;
 
+import life.catalogue.api.vocab.Issue;
+import life.catalogue.parser.AreaParser;
+
+
+import life.catalogue.parser.LanguageParser;
+import life.catalogue.parser.SafeParser;
+
+
 import org.gbif.api.model.common.search.Facet;
 import org.gbif.api.model.common.search.SearchRequest;
 import org.gbif.api.model.common.search.SearchResponse;
@@ -200,6 +208,13 @@ public class ApiConverter {
       dist.setLocality(d.getArea().getName());
       if (d.getArea().getGazetteer() == Gazetteer.ISO && d.getArea().getId() != null && d.getArea().getId().length() >= 2) {
         dist.setCountryCode(d.getArea().getId().substring(0, 2));
+      }
+      // generate a locality from the area code if missing
+      if (dist.getLocality() == null && dist.getLocationID() != null && d.getArea().getGazetteer() != Gazetteer.TEXT) {
+        var parsed = SafeParser.parse(AreaParser.PARSER, dist.getLocationID()).orNull();
+        if (parsed != null) {
+          dist.setLocality(parsed.getName());
+        }
       }
     }
     dist.setLifeStage(d.getLifeStage());
