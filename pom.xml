@@ -212,6 +212,11 @@
     </dependency>
     <dependency>
       <groupId>org.catalogueoflife</groupId>
+      <artifactId>vocab</artifactId>
+      <version>${clb.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.catalogueoflife</groupId>
       <artifactId>api</artifactId>
       <version>${clb.version}</version>
     </dependency>

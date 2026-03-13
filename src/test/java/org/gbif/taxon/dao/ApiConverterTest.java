@@ -1,5 +1,30 @@
 package org.gbif.taxon.dao;
 
+import org.gbif.nameparser.api.NomCode;
+import org.gbif.nameparser.api.Rank;
+import org.gbif.taxon.api.Distribution;
+import org.gbif.taxon.api.Media;
+import org.gbif.taxon.api.NameUsage;
+import org.gbif.taxon.api.NameUsageInfo;
+import org.gbif.taxon.api.NameUsageSimple;
+import org.gbif.taxon.api.Reference;
+import org.gbif.taxon.api.TreeUsage;
+import org.gbif.taxon.api.VernacularName;
+import org.gbif.taxon.config.RelatedInfoConfig;
+
+
+import java.net.URI;
+import java.time.LocalDate;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.UUID;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import life.catalogue.api.model.CslData;
 import life.catalogue.api.model.Name;
 import life.catalogue.api.model.SimpleName;
@@ -8,7 +33,7 @@ import life.catalogue.api.model.Synonymy;
 import life.catalogue.api.model.Taxon;
 import life.catalogue.api.model.TaxonProperty;
 import life.catalogue.api.model.TreeNode;
-import life.catalogue.api.vocab.Country;
+import life.catalogue.api.vocab.area.Country;
 import life.catalogue.api.vocab.DegreeOfEstablishment;
 import life.catalogue.api.vocab.Environment;
 import life.catalogue.api.vocab.EstablishmentMeans;
@@ -17,36 +42,8 @@ import life.catalogue.api.vocab.MediaType;
 import life.catalogue.api.vocab.NomStatus;
 import life.catalogue.api.vocab.Origin;
 import life.catalogue.api.vocab.Sex;
-import life.catalogue.api.vocab.ThreatStatus;
-
-import org.gbif.nameparser.api.NomCode;
-import org.gbif.nameparser.api.Rank;
-import org.gbif.taxon.api.Distribution;
-import org.gbif.taxon.api.Media;
-import org.gbif.taxon.api.NameUsage;
-import org.gbif.taxon.api.Reference;
-import org.gbif.taxon.api.NameUsageSimple;
-import org.gbif.taxon.api.TreeUsage;
-import org.gbif.taxon.api.NameUsageInfo;
-import org.gbif.taxon.api.VernacularName;
-
-import java.net.URI;
-import java.time.LocalDate;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.UUID;
-
-
-import org.gbif.taxon.config.RelatedInfoConfig;
-
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import life.catalogue.api.vocab.TaxonomicStatus;
+import life.catalogue.api.vocab.ThreatStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -372,7 +369,7 @@ class ApiConverterTest {
   @Test
   void convertDistributionWithCountryArea() {
     var d = new life.catalogue.api.model.Distribution();
-    d.setArea(Country.CANADA);
+    d.copyArea(Country.CANADA);
     d.setLifeStage("adult");
     d.setEstablishmentMeans(EstablishmentMeans.NATIVE);
     d.setDegreeOfEstablishment(DegreeOfEstablishment.ESTABLISHED);
@@ -396,11 +393,11 @@ class ApiConverterTest {
 
   @Test
   void convertDistributionNonCountryArea() {
-    var area = mock(life.catalogue.api.vocab.Area.class);
+    var area = mock(life.catalogue.api.vocab.area.Area.class);
     when(area.getName()).thenReturn("Some Region");
 
     var d = new life.catalogue.api.model.Distribution();
-    d.setArea(area);
+    d.copyArea(area);
 
     Distribution dist = converter.convert(d);
 
@@ -421,7 +418,7 @@ class ApiConverterTest {
   @Test
   void convertDistributionNullEnums() {
     var d = new life.catalogue.api.model.Distribution();
-    d.setArea(Country.BRAZIL);
+    d.copyArea(Country.BRAZIL);
 
     Distribution dist = converter.convert(d);
 
@@ -500,7 +497,7 @@ class ApiConverterTest {
 
     // distributions
     var d = new life.catalogue.api.model.Distribution();
-    d.setArea(Country.GERMANY);
+    d.copyArea(Country.GERMANY);
     ui.setDistributions(List.of(d));
 
     // synonyms
