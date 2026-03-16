@@ -72,6 +72,7 @@ public class DatasetResource {
   @DeleteMapping("/flush")
   public boolean flush() throws IOException {
     keyMap.flush();
+    dao.flushCache();
     return true;
   }
 

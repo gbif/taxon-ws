@@ -1,11 +1,5 @@
 package org.gbif.taxon.dao;
 
-import life.catalogue.db.mapper.TaxonMetricsMapper;
-import life.catalogue.db.mapper.VerbatimSourceMapper;
-import life.catalogue.printer.JsonTreeCollector;
-import lombok.SneakyThrows;
-
-
 import org.gbif.api.model.common.paging.Pageable;
 import org.gbif.api.model.common.paging.PagingResponse;
 import org.gbif.api.model.common.search.SearchRequest;
@@ -28,8 +22,7 @@ import org.gbif.taxon.config.RelatedInfoConfig;
 
 
 import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -37,11 +30,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.stereotype.Service;
+
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 
 import javax.annotation.Nullable;
 import life.catalogue.api.exception.NotFoundException;
@@ -60,14 +57,17 @@ import life.catalogue.dao.MetricsDao;
 import life.catalogue.dao.NameDao;
 import life.catalogue.dao.TreeDao;
 import life.catalogue.db.mapper.DatasetImportMapper;
+import life.catalogue.db.mapper.DatasetMapper;
 import life.catalogue.db.mapper.DistributionMapper;
 import life.catalogue.db.mapper.NameUsageMapper;
+import life.catalogue.db.mapper.TaxonMetricsMapper;
 import life.catalogue.es.indexing.NameUsageIndexService;
 import life.catalogue.es.search.NameUsageSearchService;
 import life.catalogue.img.ThumborConfig;
 import life.catalogue.img.ThumborService;
 import life.catalogue.matching.nidx.NameIndexFactory;
-import life.catalogue.printer.JsonTreePrinter;
+import life.catalogue.printer.JsonTreeCollector;
+import lombok.SneakyThrows;
 
 @Service
 public class TaxonDao {
@@ -80,6 +80,30 @@ public class TaxonDao {
   private final life.catalogue.es.suggest.NameUsageSuggestionService suggestionService;
   private final life.catalogue.es.search.NameUsageSearchService searchService;
   private final RelatedInfoConfig relatedInfoConfig;
+  private final Pattern countryCodePattern = Pattern.compile("country_([A-Z]+)", Pattern.CASE_INSENSITIVE);
+  private final LoadingCache<Integer, String> countryCode = Caffeine.newBuilder()
+    .expireAfterWrite(Duration.ofDays(7))
+    .build(this::lookupDatasetCountry);
+
+  private String lookupDatasetCountry(Integer datasetKey) {
+    try (var session = factory.openSession()) {
+      var dm = session.getMapper(DatasetMapper.class);
+      var d = dm.get(datasetKey);
+      if (d != null && d.getKeyword() != null) {
+        for (var kw : d.getKeyword()) {
+          var m = countryCodePattern.matcher(kw);
+          if (m.find()) {
+            return m.group(1).toUpperCase();
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  public void flushCache() {
+    countryCode.invalidateAll();
+  }
 
   public TaxonDao(DatasetKeyMap map, ApiConverter converter, SqlSessionFactory factory, RelatedInfoConfig relatedInfoConfig,
                   NameUsageSearchService searchService,
@@ -335,6 +359,8 @@ public class TaxonDao {
                 var griis = converter.convert(d);
                 griis.setDatasetKey(gbifKey);
                 griis.setTaxonID(rel.getId());
+                // add additional country codes from dataset keyword metadata
+                griis.setCountryCode(countryCode.get(rel.getDatasetKey()));
                 distributions.add(griis);
               }
             }
