@@ -300,11 +300,6 @@ public class ApiConverter {
 
     // synonyms
     if (ui.getSynonyms() != null) {
-      info.setSynonymsFlat(
-        ui.getSynonyms().all().stream()
-          .map(this::convert)
-          .collect(Collectors.toList())
-      );
       Synonymy syn = new Synonymy();
       syn.setHomotypic(convert(ui.getSynonyms().getHomotypic()));
       syn.setMisapplied(convert(ui.getSynonyms().getMisapplied()));

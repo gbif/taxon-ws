@@ -511,7 +511,7 @@ class ApiConverterTest {
     syn.setStatus(TaxonomicStatus.SYNONYM);
     syn.setOrigin(Origin.SOURCE);
     var synonymy = new Synonymy();
-    synonymy.getHeterotypic().add(syn);
+    synonymy.getHeterotypicGroups().add(List.of(syn));
     ui.setSynonyms(synonymy);
 
     // references
@@ -537,7 +537,7 @@ class ApiConverterTest {
     assertThat(info.getVernacularNames().get(0).getVernacularName()).isEqualTo("Silver Fir");
     assertThat(info.getMedia()).hasSize(1);
     assertThat(info.getDistributions()).hasSize(1);
-    assertThat(info.getSynonymsFlat()).hasSize(1);
+    assertThat(info.getSynonyms().size()).isEqualTo(1);
     assertThat(info.getBibliography()).hasSize(1);
     assertThat(info.getChecklistBankLink()).isNotNull();
     assertThat(info.getChecklistBankLink().toString()).contains("dataset/101/taxon/t-1");

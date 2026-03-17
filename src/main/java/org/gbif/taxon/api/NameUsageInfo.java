@@ -1,11 +1,11 @@
 package org.gbif.taxon.api;
 
+import java.net.URI;
+import java.util.List;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import life.catalogue.api.vocab.TaxGroup;
 import lombok.Data;
-
-import java.net.URI;
-import java.util.List;
 
 /**
  * Comprehensive taxon usage information including all related data.
@@ -19,9 +19,6 @@ public class NameUsageInfo {
 
   @Schema(description = "The major taxonomic group the taxon is considered in")
   private TaxGroup group;
-
-  @Schema(description = "List of synonyms and nomenclatural combinations for the taxon")
-  private List<NameUsageSimple> synonymsFlat;
 
   @Schema(description = "List of synonyms and nomenclatural combinations for the taxon")
   private Synonymy synonyms;
