@@ -236,14 +236,17 @@ public class TaxonDao {
                                            @Nullable Collection<DatasetType> datasetTypes,
                                            @Nullable Collection<UUID> datasetKeys,
                                            @Nullable Collection<UUID> publisherKeys) {
+    final int dkey = map.toCLB(uuid);
     Set<Integer> datasetIntKeys = new HashSet<>();;
     if (datasetKeys != null) {
       for (UUID key : datasetKeys) {
         datasetIntKeys.add(map.toCLB(key));
       }
     }
-    return listRelatedCLB(uuid, taxonKey, datasetTypes, datasetIntKeys, publisherKeys)
-      .stream().map(converter::convert).toList();
+    return listRelatedCLB(uuid, taxonKey, datasetTypes, datasetIntKeys, publisherKeys).stream()
+      .filter(u -> u.getDatasetKey() != dkey)
+      .map(converter::convert)
+      .toList();
   }
 
   private List<SimpleNameInDataset> listRelatedCLB(UUID uuid, String taxonKey,
