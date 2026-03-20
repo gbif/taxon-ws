@@ -1,9 +1,14 @@
 package org.gbif.taxon.dao;
 
+import life.catalogue.api.model.TaxonProperty;
+import life.catalogue.db.mapper.TaxonPropertyMapper;
+
+
 import org.gbif.api.model.common.paging.Pageable;
 import org.gbif.api.model.common.paging.PagingResponse;
 import org.gbif.api.model.common.search.SearchRequest;
 import org.gbif.api.model.common.search.SearchResponse;
+import org.gbif.dwc.terms.GbifTerm;
 import org.gbif.dwc.terms.IucnTerm;
 import org.gbif.taxon.api.ChecklistMetrics;
 import org.gbif.taxon.api.Distribution;
@@ -71,6 +76,7 @@ import lombok.SneakyThrows;
 
 @Service
 public class TaxonDao {
+  private final static Set<String> INVASIVE_TRUE_VALUES = Set.of("yes", "true", "1", "invasive", "isinvasive");
   private final DatasetKeyMap map;
   private final ApiConverter converter;
   private final SqlSessionFactory factory;
@@ -355,15 +361,30 @@ public class TaxonDao {
         var distributions = new ArrayList<Distribution>();
         try (var session = factory.openSession()) {
           var dm = session.getMapper(DistributionMapper.class);
+          var tpm = session.getMapper(TaxonPropertyMapper.class);
           for (var rel : list) {
             UUID gbifKey = map.toGBIF(rel.getDatasetKey());
-            for (var d : dm.listByTaxon(rel.toDSID(rel.getDatasetKey()))) {
+            var taxKey = rel.toDSID(rel.getDatasetKey());
+            // lookup isInvasive from taxon properties first for the taxon.
+            // this works because the dataset is restricted to one country only
+            var props = tpm.listByTaxon(taxKey);
+            Boolean invasive = null;
+            if (props != null) {
+              TaxonProperty invasiveTP = props.stream()
+                .filter(tp -> tp.getProperty().equalsIgnoreCase(GbifTerm.isInvasive.name()))
+                .findFirst().orElse(null);
+              if (invasiveTP != null && invasiveTP.getValue() != null && INVASIVE_TRUE_VALUES.contains(invasiveTP.getValue().trim().toLowerCase())) {
+                invasive = true;
+              }
+            }
+            for (var d : dm.listByTaxon(taxKey)) {
               if (d.getEstablishmentMeans() == EstablishmentMeans.INTRODUCED && d.getArea() != null) {
                 var griis = converter.convert(d);
                 griis.setDatasetKey(gbifKey);
                 griis.setTaxonID(rel.getId());
                 // add additional country codes from dataset keyword metadata
                 griis.setCountryCode(countryCode.get(rel.getDatasetKey()));
+                griis.setIsInvasive(invasive);
                 distributions.add(griis);
               }
             }
