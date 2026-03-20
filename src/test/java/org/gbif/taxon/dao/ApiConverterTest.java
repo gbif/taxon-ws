@@ -97,7 +97,7 @@ class ApiConverterTest {
 
     when(map.toGBIF(101)).thenReturn(uuid);
 
-    NameUsage nu = converter.convert(taxon);
+    NameUsage nu = converter.convert(taxon, null);
 
     assertThat(nu.getTaxonID()).isEqualTo("t-1");
     assertThat(nu.getParentNameUsageID()).isEqualTo("p-1");
@@ -151,7 +151,7 @@ class ApiConverterTest {
 
     when(map.toGBIF(101)).thenReturn(uuid);
 
-    NameUsage nu = converter.convert(synonym);
+    NameUsage nu = converter.convert(synonym, null);
 
     assertThat(nu.getTaxonID()).isEqualTo("s-1");
     assertThat(nu.getAcceptedNameUsageID()).isEqualTo("t-1");
@@ -178,7 +178,7 @@ class ApiConverterTest {
 
     when(map.toGBIF(101)).thenReturn(uuid);
 
-    NameUsage nu = converter.convert(taxon);
+    NameUsage nu = converter.convert(taxon, null);
 
     assertThat(nu.getNomenclaturalCode()).isNull();
     assertThat(nu.getNomenclaturalStatus()).isNull();

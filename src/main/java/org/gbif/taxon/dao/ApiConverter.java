@@ -1,5 +1,6 @@
 package org.gbif.taxon.dao;
 
+import life.catalogue.api.vocab.Issue;
 import life.catalogue.parser.AreaParser;
 
 
@@ -54,6 +55,7 @@ import life.catalogue.api.search.NameUsageSearchResponse;
 import life.catalogue.api.search.NameUsageSuggestion;
 import life.catalogue.api.search.NameUsageWrapper;
 import life.catalogue.api.vocab.area.Gazetteer;
+import javax.annotation.Nullable;
 
 @Component
 public class ApiConverter {
@@ -78,7 +80,7 @@ public class ApiConverter {
     this.cfg = cfg;
   }
 
-  NameUsage convert(NameUsageBase nub) {
+  NameUsage convert(NameUsageBase nub, @Nullable Set<Issue> issues) {
     var nu = new NameUsage();
     var name = nub.getName();
 
@@ -116,7 +118,9 @@ public class ApiConverter {
     nu.setCultivarEpithet(name.getCultivarEpithet());
     nu.setReferences(nub.getLink());
     nu.setTaxonRemarks(nub.getRemarks());
-    // for source fields use addSource()
+    if (issues != null && !issues.isEmpty()) {
+      nu.setIssues(issues.stream().map(Issue::name).collect(Collectors.toList()));
+    }
     return nu;
   }
 
@@ -269,7 +273,7 @@ public class ApiConverter {
     var info = new NameUsageInfo();
     var usage = ui.getUsage();
 
-    info.setTaxon(convert(usage));
+    info.setTaxon(convert(usage, ui.getIssues()));
     info.setGroup(ui.getGroup());
     // publishedIn
     if (ui.getPublishedIn() != null) {
@@ -392,7 +396,7 @@ public class ApiConverter {
   private NameUsageSearchResult convert(NameUsageWrapper wrapper) {
     var result = new NameUsageSearchResult();
     if (wrapper.getUsage() != null) {
-      result.setTaxon(convert(wrapper.getUsage().asUsageBase()));
+      result.setTaxon(convert(wrapper.getUsage().asUsageBase(), null));
     }
     result.setGroup(wrapper.getGroup());
     if (wrapper.getClassification() != null) {

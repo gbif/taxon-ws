@@ -74,7 +74,7 @@ class ApiConverterIT {
     // when trying to look up the dataset key. This validates the converter is
     // properly wired by Spring and fails at the expected point.
     try {
-      NameUsage nu = converter.convert(taxon);
+      NameUsage nu = converter.convert(taxon, null);
       assertThat(nu.getTaxonID()).isEqualTo("t-it-1");
       assertThat(nu.getScientificName()).isEqualTo("Quercus robur");
       assertThat(nu.getGenericName()).isEqualTo("Quercus");
