@@ -13,6 +13,9 @@
  */
 package org.gbif.taxon.resource;
 
+import life.catalogue.api.vocab.Environment;
+
+
 import org.gbif.api.documentation.CommonParameters;
 import org.gbif.api.model.common.paging.Pageable;
 import org.gbif.api.model.common.search.FacetedSearchRequest;
@@ -294,6 +297,12 @@ public class TaxonResource {
   @Parameters(
     value = {
       @Parameter(
+        name = "taxonID",
+        description = "Filters by any of the higher Linnean rank keys. Note this is within the respective checklist " +
+          "and not searching NUB keys across all checklists.",
+        in = ParameterIn.QUERY
+      ),
+      @Parameter(
         name = "datasetKey",
         description = "A UUID of a checklist dataset.",
         schema = @Schema(implementation = UUID.class),
@@ -304,12 +313,6 @@ public class TaxonResource {
         name = "rank",
         description = "Filters by taxonomic rank.",
         schema = @Schema(implementation = Rank.class),
-        in = ParameterIn.QUERY
-      ),
-      @Parameter(
-        name = "taxonID",
-        description = "Filters by any of the higher Linnean rank keys. Note this is within the respective checklist " +
-          "and not searching NUB keys across all checklists.",
         in = ParameterIn.QUERY
       ),
       @Parameter(
@@ -325,9 +328,15 @@ public class TaxonResource {
         in = ParameterIn.QUERY
       ),
       @Parameter(
-        name = "nameType",
-        description = "Filters by the name type as given in our https://api.gbif.org/v1/enumeration/basic/NameType[NameType enum].",
-        schema = @Schema(implementation = NameType.class),
+        name = "environment",
+        description = "Filters by environment values.",
+        schema = @Schema(implementation = Environment.class),
+        in = ParameterIn.QUERY
+      ),
+      @Parameter(
+        name = "group",
+        description = "Filters for name usages with a specific taxonomic group.",
+        schema = @Schema(implementation = TaxGroup.class),
         in = ParameterIn.QUERY
       ),
       @Parameter(
@@ -337,21 +346,9 @@ public class TaxonResource {
         in = ParameterIn.QUERY
       ),
       @Parameter(
-        name = "nomStatus",
-        description = "Filters by the nomenclatural status as given in our https://api.gbif.org/v1/enumeration/basic/NomenclaturalStatus[Nomenclatural Status enum].",
-        schema = @Schema(implementation = NomStatus.class),
-        in = ParameterIn.QUERY
-      ),
-      @Parameter(
-        name = "origin",
-        description = "Filters for name usages with a specific origin.",
-        schema = @Schema(implementation = Origin.class),
-        in = ParameterIn.QUERY
-      ),
-      @Parameter(
-        name = "group",
-        description = "Filters for name usages with a specific taxonomic group.",
-        schema = @Schema(implementation = TaxGroup.class),
+        name = "nameType",
+        description = "Filters by the name type as given in our https://api.gbif.org/v1/enumeration/basic/NameType[NameType enum].",
+        schema = @Schema(implementation = NameType.class),
         in = ParameterIn.QUERY
       ),
       @Parameter(
@@ -367,14 +364,14 @@ public class TaxonResource {
         in = ParameterIn.QUERY
       ),
       @Parameter(
-        name = "field",
-        description = "Filters for name usages with a specific field of the parsed name to be present.",
-        schema = @Schema(implementation = NameField.class),
+        name = "origin",
+        description = "Filters for name usages with a specific origin.",
+        schema = @Schema(implementation = Origin.class),
         in = ParameterIn.QUERY
       ),
       @Parameter(
         name = "issue",
-        description = "A specific indexing issue as defined in our https://api.gbif.org/v1/enumeration/basic/NameUsageIssue[NameUsageIssue enum].",
+        description = "A specific indexing issue as defined in ChecklistBanks https://api.checklistbank.org/vocab/issue[Issue enum].",
         schema = @Schema(implementation = Issue.class),
         in = ParameterIn.QUERY
       )

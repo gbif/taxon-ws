@@ -22,21 +22,21 @@ import life.catalogue.api.vocab.TaxonomicStatus;
   as = NameUsageSearchParameter.class
 )
 public enum NameUsageSearchParameter implements SearchParameter {
-  DATASET_KEY(UUID.class, life.catalogue.api.search.NameUsageSearchParameter.DATASET_KEY),
-  RANK(Rank.class, life.catalogue.api.search.NameUsageSearchParameter.RANK),
   /**
    * A taxonID that searches on the entire classification of a Taxon or its Synonyms. E.g. searching by the taxonID for Coleoptera should
    * return all name usages within that beetle order, including synonyms.
    */
   TAXON_ID(String.class, life.catalogue.api.search.NameUsageSearchParameter.TAXON_ID),
+  DATASET_KEY(UUID.class, life.catalogue.api.search.NameUsageSearchParameter.DATASET_KEY),
+  RANK(Rank.class, life.catalogue.api.search.NameUsageSearchParameter.RANK),
   STATUS(TaxonomicStatus.class, life.catalogue.api.search.NameUsageSearchParameter.STATUS),
   EXTINCT(Boolean.class, life.catalogue.api.search.NameUsageSearchParameter.EXTINCT),
   ENVIRONMENT(Environment.class, life.catalogue.api.search.NameUsageSearchParameter.ENVIRONMENT),
   GROUP(TaxGroup.class, life.catalogue.api.search.NameUsageSearchParameter.GROUP),
-  NOM_CODE(NomCode.class, life.catalogue.api.search.NameUsageSearchParameter.NOM_CODE),
+  CODE(NomCode.class, life.catalogue.api.search.NameUsageSearchParameter.NOM_CODE),
   NAME_TYPE(NameType.class, life.catalogue.api.search.NameUsageSearchParameter.NAME_TYPE),
-  AUTHORSHIP(String.class, life.catalogue.api.search.NameUsageSearchParameter.AUTHORSHIP),
-  AUTHORSHIP_YEAR(String.class, life.catalogue.api.search.NameUsageSearchParameter.AUTHORSHIP_YEAR),
+  AUTHOR(String.class, life.catalogue.api.search.NameUsageSearchParameter.AUTHORSHIP),
+  YEAR(String.class, life.catalogue.api.search.NameUsageSearchParameter.AUTHORSHIP_YEAR),
   ISSUE(Issue.class, life.catalogue.api.search.NameUsageSearchParameter.ISSUE),
   ORIGIN(Origin.class, life.catalogue.api.search.NameUsageSearchParameter.ORIGIN);
 
