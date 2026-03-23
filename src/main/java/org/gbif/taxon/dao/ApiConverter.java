@@ -443,6 +443,14 @@ public class ApiConverter {
         .map(f -> ((NameUsageSearchRequest.NameUsageQueryField) f).clbValue)
         .collect(Collectors.toSet()));
     }
+    if (request.getFacets() != null && !request.getFacets().isEmpty()) {
+      req.setFacets(request.getFacets().stream()
+        .map(NameUsageSearchParameter::toClb)
+        .collect(Collectors.toSet()));
+    }
+    req.setFacetMinCount(request.getFacetMinCount());
+    req.setFacetLimit(request.getFacetLimit());
+    req.setFacetOffset(request.getFacetOffset());
     return req;
   }
 
