@@ -28,13 +28,13 @@ public class NameUsage extends NameUsageSimple {
   @Schema(description = "The identifier for the scientific name", example = "50123456")
   private String scientificNameID;
 
-  @Schema(description = "The accepted name usage (for synonyms)")
+  @Schema(description = "The accepted name usage (for synonyms)", example = "Abies alba Mill.")
   private String acceptedNameUsage;
 
   @Schema(description = "The identifier of the original name usage (basionym)", example = "2435090")
   private String originalNameUsageID;
 
-  @Schema(description = "The original name usage (basionym)")
+  @Schema(description = "The original name usage (basionym)", example = "Pinus alba Mill.")
   private String originalNameUsage;
 
   @Schema(description = "The taxon concept reference", example = "Smith 2020")
@@ -73,7 +73,8 @@ public class NameUsage extends NameUsageSimple {
   @Schema(description = "Link to references or source information", example = "https://www.catalogueoflife.org/data/taxon/...")
   private URI references;
 
-  @Schema(description = "List of data quality issues using ChecklistBank issue vocabulary")
+  @Schema(description = "List of data quality issues using ChecklistBank issue vocabulary",
+    example = "[\"PUBLISHED_BEFORE_1753\", \"BASIONYM_ID_INVALID\"]")
   private List<String> issues;
 
   @Schema(description = "Remarks or notes about the taxon", example = "Common in mountainous regions of Europe")

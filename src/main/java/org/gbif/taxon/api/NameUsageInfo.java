@@ -17,13 +17,13 @@ public class NameUsageInfo {
   @Schema(description = "The accepted taxon this info object is about")
   private NameUsage taxon;
 
-  @Schema(description = "The major taxonomic group the taxon is considered in")
+  @Schema(description = "The major taxonomic group the taxon is considered in", example = "Gymnosperms")
   private TaxGroup group;
 
   @Schema(description = "List of synonyms and nomenclatural combinations for the taxon")
   private Synonymy synonyms;
 
-  @Schema(description = "List of parent taxa starting with the xxx")
+  @Schema(description = "Ordered list of parent taxa from the root of the classification down to the direct parent of this taxon")
   private List<NameUsageSimple> classification;
 
   @Schema(description = "List of vernacular (common) names for the taxon")
@@ -45,6 +45,7 @@ public class NameUsageInfo {
     example = "https://www.checklistbank.org/dataset/3/taxon/2435099")
   private URI checklistBankLink;
 
-  @Schema(description = "Environments where the taxon occurs (marine, freshwater, terrestrial, brackish)")
+  @Schema(description = "Environments where the taxon occurs (marine, freshwater, terrestrial, brackish)",
+    example = "[\"terrestrial\", \"freshwater\"]")
   private List<String> environment;
 }

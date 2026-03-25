@@ -339,7 +339,7 @@ public class TaxonDao {
           for (var d : dists) {
             if (d.getArea().getName().equalsIgnoreCase("Global") && d.getThreatStatus() != null) {
               var red = converter.convert(iucn);
-              red.addData(IucnTerm.threatStatus.name(), d.getThreatStatus().name());
+              red.setThreatStatus(d.getThreatStatus().name());
               relInfo.setRedlist(red);
               break;
             }
@@ -403,7 +403,7 @@ public class TaxonDao {
       var rel = findSingleRelated(datasetKey, taxonID, citesDatasetKey);
       if (rel != null) {
         var cite = converter.convert(rel);
-        cite.addData("citesAppendix", appendix);
+        cite.setCitesAppendix(appendix);
         if (relInfo.getCites() == null) {
           relInfo.setCites(new ArrayList<>());
         }

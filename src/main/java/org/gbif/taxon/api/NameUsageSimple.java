@@ -54,15 +54,24 @@ public class NameUsageSimple {
   @Schema(description = "A link to a webpage for this name on the original, external site", example = "https://www.speciesplus.net/#/taxon_concepts/10836")
   private String link;
 
-  @JsonAnyGetter
-  @Schema(description = "Extension data to be rendered as additional properties")
-  private final Map<String, Object> data = new HashMap<>();
-
-  public void addData(String key, Object value) {
-    data.put(key, value);
-  }
-
   @Schema(description = "HTML formatted name with authorship and extinct dagger if applicable",
     example = "<i>Abies alba</i> Mill.")
   private String label;
+
+  // the following are only present in specific lists when used in RelatedInfo
+  @Schema(description = "The IUCN Red List threat status for this taxon. " +
+    "Only populated when this usage appears in a RelatedInfo.redlist context. " +
+    "Values follow IUCN Red List categories: EX (Extinct), EW (Extinct in the Wild), " +
+    "CR (Critically Endangered), EN (Endangered), VU (Vulnerable), NT (Near Threatened), " +
+    "LC (Least Concern), DD (Data Deficient), NE (Not Evaluated).",
+    example = "LC")
+  private String threatStatus;
+
+  @Schema(description = "The CITES appendix under which this taxon is listed. " +
+    "Only populated when this usage appears in a RelatedInfo.cites context. " +
+    "Appendix I: species threatened with extinction; " +
+    "Appendix II: species not necessarily threatened but requiring trade controls; " +
+    "Appendix III: species protected in at least one country.",
+    example = "II")
+  private String citesAppendix;
 }
