@@ -13,10 +13,10 @@
  */
 package org.gbif.taxon.resource;
 
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.info.Info;
-import io.swagger.v3.oas.annotations.servers.Server;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 
@@ -31,20 +31,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.UUID;
 
-@OpenAPIDefinition(
-    info =
-        @Info(
-            title = "Checklist API",
-            version = "v2",
-            description = """
-                tbd
-                """,
-            termsOfService = "https://www.gbif.org/terms"),
-    servers = {
-      @Server(url = "https://api.gbif.org/v2/", description = "Production"),
-      @Server(url = "https://api.gbif-uat.org/v2/", description = "User testing")
-    })
-@Tag(name = "Checklist", description = "Checklist dataset indexed by ChecklistBank for GBIF")
+@Tag(name = "Checklist", description = "Checklist dataset operations — import metrics and cache management")
 @RequestMapping(value = "dataset", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
 public class DatasetResource {
@@ -57,6 +44,15 @@ public class DatasetResource {
     this.keyMap = keyMap;
   }
 
+  @Operation(
+    operationId = "getDatasetMetrics",
+    summary = "Get import metrics for a checklist dataset",
+    description = "Returns counts and statistics from the latest successful import of the given checklist dataset, " +
+      "including record counts by type (taxa, synonyms, vernacular names, distributions, media, references) " +
+      "and breakdowns by rank, nomenclatural code, name type, taxonomic status, and origin."
+  )
+  @ApiResponse(responseCode = "200", description = "Dataset metrics")
+  @ApiResponse(responseCode = "404", description = "Dataset not found")
   @GetMapping("/{datasetKey}/metrics")
   public ChecklistMetrics get(
       @PathVariable("datasetKey")
@@ -69,6 +65,13 @@ public class DatasetResource {
     return dao.metrics(datasetKey);
   }
 
+  @Hidden
+  @Operation(
+    operationId = "flushDatasetCache",
+    summary = "Flush the dataset key map cache",
+    description = "Clears the internal dataset key map cache and the DAO cache. Admin/internal use only."
+  )
+  @ApiResponse(responseCode = "200", description = "Cache flushed successfully")
   @DeleteMapping("/flush")
   public boolean flush() throws IOException {
     keyMap.flush();

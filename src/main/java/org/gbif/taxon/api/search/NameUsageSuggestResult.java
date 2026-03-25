@@ -26,14 +26,17 @@ import org.gbif.nameparser.api.Rank;
  * This class contains additional attributes that are required for displaying/providing textual information.
  */
 @Data
+@Schema(description = "A single result from a name usage prefix suggestion search")
 public class NameUsageSuggestResult {
 
+  @Schema(description = "The unique identifier for this taxon within the dataset", example = "CXA")
   private String taxonID;
 
   @Schema(description = "The identifier for the scientific name", example = "50123456")
   private String scientificNameID;
 
   // The name matching the search phrase: an accepted name/synonym/bare name
+  @Schema(description = "The scientific name matching the search prefix", example = "Abies alba")
   private String scientificName;
 
   @Schema(description = "The taxonomic rank of the suggested name", example = "SPECIES")
@@ -48,15 +51,18 @@ public class NameUsageSuggestResult {
   @Schema(description = "The identifier of the accepted taxon (for synonyms)", example = "2435098")
   private String acceptedNameUsageID;
 
-  @Schema(description = "The accepted name (for synonyms)")
+  @Schema(description = "The accepted name (for synonyms)", example = "Abies alba Mill.")
   private String acceptedNameUsage;
 
+  @Schema(description = "The major taxonomic group the taxon belongs to", example = "Gymnosperms")
   private TaxGroup group;
 
   // The classification context to report in the suggestion hint.
   // For species this is the first taxon above genus level, mostly the family.
+  @Schema(description = "Classification context shown as a hint, typically the family or order name", example = "Pinaceae")
   private String context;
 
+  @Schema(description = "Relevance score of this suggestion", example = "1.23")
   private Double score;
 
 }

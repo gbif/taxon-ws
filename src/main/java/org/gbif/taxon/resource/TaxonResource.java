@@ -83,7 +83,10 @@ import static java.lang.annotation.ElementType.METHOD;
             title = "Species API",
             version = "v2",
             description = """
-                This API powers the [Species v2 resources](https://www.gbif.org/resource/search?contentType=species) on GBIF.org.","
+                This API provides access to species (name usage) data indexed by ChecklistBank for GBIF.
+                It exposes taxonomic name usages from registered checklist datasets including scientific names,
+                synonymy, vernacular names, geographic distributions, media, bibliographic references, and
+                measurements or facts. Taxon keys are scoped to individual datasets and are not global identifiers.
                 """,
             termsOfService = "https://www.gbif.org/terms"),
     servers = {
@@ -102,6 +105,14 @@ public class TaxonResource {
     this.dao = taxonDao;
   }
 
+  @Operation(
+    operationId = "getTaxon",
+    summary = "Get a single taxon name usage",
+    description = "Returns the simplified name usage for the given taxon key within a dataset, " +
+      "including its scientific name, rank, taxonomic status, and classification identifiers."
+  )
+  @ApiResponse(responseCode = "200", description = "Taxon name usage")
+  @ApiResponse(responseCode = "404", description = "Taxon not found")
   @GetMapping("/{datasetKey}/{taxonKey}")
   public NameUsageSimple get(
       @PathVariable("datasetKey")
@@ -120,6 +131,15 @@ public class TaxonResource {
     return dao.get(datasetKey, taxonKey);
   }
 
+  @Operation(
+    operationId = "getTaxonInfo",
+    summary = "Get full taxon information",
+    description = "Returns the comprehensive name usage information for the given taxon, aggregating all related data: " +
+      "synonymy (homotypic, heterotypic, misapplied), classification, vernacular names, " +
+      "geographic distributions, media, bibliographic references, and measurements or facts."
+  )
+  @ApiResponse(responseCode = "200", description = "Full taxon information")
+  @ApiResponse(responseCode = "404", description = "Taxon not found")
   @GetMapping("/{datasetKey}/{taxonKey}/info")
   public NameUsageInfo getInfo(
     @PathVariable("datasetKey")
@@ -138,6 +158,14 @@ public class TaxonResource {
     return dao.getInfo(datasetKey, taxonKey);
   }
 
+  @Operation(
+    operationId = "getTaxonBreakdown",
+    summary = "Get hierarchical species count breakdown",
+    description = "Returns a hierarchical breakdown of the direct children of the given taxon, " +
+      "showing the number of accepted species within each child group."
+  )
+  @ApiResponse(responseCode = "200", description = "Taxonomic breakdown")
+  @ApiResponse(responseCode = "404", description = "Taxon not found")
   @GetMapping("/{datasetKey}/{taxonKey}/breakdown")
   public TaxonBreakdown breakdown(
       @PathVariable("datasetKey")
@@ -156,7 +184,14 @@ public class TaxonResource {
     return dao.childrenBreakdown(datasetKey, taxonKey);
   }
 
-
+  @Operation(
+    operationId = "getRelatedUsages",
+    summary = "Get name usages for this taxon from other datasets",
+    description = "Returns name usages matching this taxon from other checklist datasets registered in ChecklistBank. " +
+      "Results can be filtered by dataset type, specific dataset keys, or publisher keys."
+  )
+  @ApiResponse(responseCode = "200", description = "Related name usages")
+  @ApiResponse(responseCode = "404", description = "Taxon not found")
   @GetMapping("/{datasetKey}/{taxonKey}/related")
   public List<NameUsageSimple> getRelated(
     @PathVariable("datasetKey")
@@ -386,13 +421,13 @@ public class TaxonResource {
     value = {
       @Parameter(
         name = "sortBy",
-        description = "Filters for name usages with a specific field of the parsed name to be present.",
+        description = "Determines the sort order of results. Defaults to RELEVANCE.",
         schema = @Schema(implementation = NameUsageRequest.SortBy.class),
         in = ParameterIn.QUERY
       ),
       @Parameter(
         name = "reverse",
-        description = "Filters for name usages with a specific field of the parsed name to be present.",
+        description = "If true, reverses the sort order.",
         schema = @Schema(implementation = Boolean.class),
         in = ParameterIn.QUERY
       )
@@ -407,17 +442,14 @@ public class TaxonResource {
   @Parameters(
     value = {
       @Parameter(
-        name = "datasetKey",
-        schema = @Schema(implementation = NameUsageRequest.SearchType.class),
-        in = ParameterIn.QUERY
-      ),
-      @Parameter(
         name = "searchType",
+        description = "The type of search to perform (e.g. PREFIX or WHOLE_WORDS).",
         schema = @Schema(implementation = NameUsageRequest.SearchType.class),
         in = ParameterIn.QUERY
       ),
       @Parameter(
         name = "content",
+        description = "Restricts full-text search to specific fields. Defaults to scientific name and authorship fields.",
         schema = @Schema(implementation = NameUsageRequest.SearchContent.class),
         in = ParameterIn.QUERY
       )
