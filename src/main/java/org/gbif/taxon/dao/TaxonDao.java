@@ -292,7 +292,7 @@ public class TaxonDao {
     }
     return resp(resp, converter::convertTree);
   }
-  
+
   private void throwIfNotFound(DSID<String> dsid) {
     try (SqlSession session = factory.openSession()) {
       boolean exists = session.getMapper(NameUsageMapper.class).exists(dsid);

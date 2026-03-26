@@ -109,7 +109,6 @@ class ApiConverterTest {
     assertThat(nu.getNomenclaturalCode()).isEqualTo("BOTANICAL");
     assertThat(nu.getExtinct()).isTrue();
     assertThat(nu.getDatasetKey()).isEqualTo(uuid);
-    assertThat(nu.getScientificNameID()).isEqualTo("name-1");
     assertThat(nu.getAcceptedNameUsage()).isNull();
     assertThat(nu.getNameAccordingTo()).isEqualTo("Author 2020");
     assertThat(nu.getNamePhrase()).isEqualTo("sensu lato");

@@ -115,7 +115,6 @@ public class ApiConverter {
     copy(nub, nu);
 
     // NameUsage-specific fields
-    nu.setScientificNameID(name.getId());
     if (nub instanceof Synonym syn && syn.getAccepted() != null) {
       nu.setAcceptedNameUsage(syn.getAccepted().getLabel());
     }
