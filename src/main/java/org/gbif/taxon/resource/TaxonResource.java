@@ -91,7 +91,7 @@ import static java.lang.annotation.ElementType.METHOD;
             termsOfService = "https://www.gbif.org/terms"),
     servers = {
       @Server(url = "https://api.gbif.org/v2/", description = "Production"),
-      @Server(url = "https://api.gbif-uat.org/v2/", description = "User testing")
+      @Server(url = "https://api.gbif-test.org/v2/", description = "Test")
     })
 @Tag(name = "Species", description = "Species indexed by ChecklistBank for GBIF")
 @RequestMapping(value = "taxon", produces = MediaType.APPLICATION_JSON_VALUE)
