@@ -134,7 +134,7 @@ public class ApiConverter {
       su.setDatasetKey(map.toGBIF(sn.getDatasetKey()));
     }
     if (sn.getLink() != null) {
-      su.setLink(sn.getLink().toString());
+      su.setReferences(sn.getLink());
     }
     return su;
   }

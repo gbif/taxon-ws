@@ -70,9 +70,6 @@ public class NameUsage extends NameUsageSimple {
   @Schema(description = "The cultivar epithet for cultivated varieties", example = "Golden Sprite")
   private String cultivarEpithet;
 
-  @Schema(description = "Link to references or source information", example = "https://www.catalogueoflife.org/data/taxon/...")
-  private URI references;
-
   @Schema(description = "List of data quality issues using ChecklistBank issue vocabulary",
     example = "[\"PUBLISHED_BEFORE_1753\", \"BASIONYM_ID_INVALID\"]")
   private List<String> issues;

@@ -10,6 +10,7 @@ import lombok.Data;
 import org.gbif.nameparser.api.Rank;
 
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -52,7 +53,7 @@ public class NameUsageSimple {
   private Boolean extinct;
 
   @Schema(description = "A link to a webpage for this name on the original, external site", example = "https://www.speciesplus.net/#/taxon_concepts/10836")
-  private String link;
+  private URI references;
 
   @Schema(description = "HTML formatted name with authorship and extinct dagger if applicable",
     example = "<i>Abies alba</i> Mill.")
