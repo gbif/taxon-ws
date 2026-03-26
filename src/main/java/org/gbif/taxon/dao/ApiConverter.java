@@ -80,26 +80,37 @@ public class ApiConverter {
     this.cfg = cfg;
   }
 
+  private void copy(NameUsageBase from, NameUsageSimple to) {
+    var name = from.getName();
+    to.setTaxonID(from.getId());
+    if (from.getStatus().isSynonym()) {
+      to.setAcceptedNameUsageID(from.getParentId());
+    } else {
+      to.setParentNameUsageID(from.getParentId());
+    }
+    to.setScientificName(name.getScientificName());
+    to.setScientificNameAuthorship(name.getAuthorship());
+    to.setTaxonRank(name.getRank());
+    to.setTaxonomicStatus(from.getStatus());
+    to.setNomenclaturalCode(name.getCode() != null ? name.getCode().name() : null);
+    if (from instanceof Taxon tax) {
+      to.setExtinct(tax.isExtinct());
+    }
+    to.setLabel(from.getLabelHtml());
+  }
+
+  NameUsageSimple convert(NameUsageBase nub) {
+    var sn = new NameUsageSimple();
+    copy(nub, sn);
+    return sn;
+  }
+
   NameUsage convert(NameUsageBase nub, @Nullable Set<Issue> issues) {
     var nu = new NameUsage();
     var name = nub.getName();
 
     // SimpleUsage fields
-    nu.setTaxonID(nub.getId());
-    if (nub.getStatus().isSynonym()) {
-      nu.setAcceptedNameUsageID(nub.getParentId());
-    } else {
-      nu.setParentNameUsageID(nub.getParentId());
-    }
-    nu.setScientificName(name.getScientificName());
-    nu.setScientificNameAuthorship(name.getAuthorship());
-    nu.setTaxonRank(name.getRank());
-    nu.setTaxonomicStatus(nub.getStatus());
-    nu.setNomenclaturalCode(name.getCode() != null ? name.getCode().name() : null);
-    if (nub instanceof Taxon tax) {
-      nu.setExtinct(tax.isExtinct());
-    }
-    nu.setLabel(nub.getLabelHtml());
+    copy(nub, nu);
 
     // NameUsage-specific fields
     nu.setDatasetKey(map.toGBIF(nub.getDatasetKey()));
@@ -396,7 +407,7 @@ public class ApiConverter {
   private NameUsageSearchResult convert(NameUsageWrapper wrapper) {
     var result = new NameUsageSearchResult();
     if (wrapper.getUsage() != null) {
-      result.setTaxon(convert(wrapper.getUsage().asUsageBase(), null));
+      result.setTaxon(convert(wrapper.getUsage().asUsageBase()));
     }
     result.setGroup(wrapper.getGroup());
     if (wrapper.getClassification() != null) {
