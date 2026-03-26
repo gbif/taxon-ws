@@ -82,6 +82,7 @@ public class ApiConverter {
 
   private void copy(NameUsageBase from, NameUsageSimple to) {
     var name = from.getName();
+    to.setDatasetKey(map.toGBIF(from.getDatasetKey()));
     to.setTaxonID(from.getId());
     if (from.getStatus().isSynonym()) {
       to.setAcceptedNameUsageID(from.getParentId());
@@ -93,6 +94,7 @@ public class ApiConverter {
     to.setTaxonRank(name.getRank());
     to.setTaxonomicStatus(from.getStatus());
     to.setNomenclaturalCode(name.getCode() != null ? name.getCode().name() : null);
+    to.setReferences(from.getLink());
     if (from instanceof Taxon tax) {
       to.setExtinct(tax.isExtinct());
     }
@@ -113,7 +115,6 @@ public class ApiConverter {
     copy(nub, nu);
 
     // NameUsage-specific fields
-    nu.setDatasetKey(map.toGBIF(nub.getDatasetKey()));
     nu.setScientificNameID(name.getId());
     if (nub instanceof Synonym syn && syn.getAccepted() != null) {
       nu.setAcceptedNameUsage(syn.getAccepted().getLabel());
