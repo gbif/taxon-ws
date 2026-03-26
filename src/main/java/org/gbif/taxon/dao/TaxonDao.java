@@ -163,13 +163,6 @@ public class TaxonDao {
     return obj;
   }
 
-  private static <T> T nonNull(T obj, String entity, Object key) {
-    if (obj == null) {
-      throw new NotFoundException(key, entity + " does not exist");
-    }
-    return obj;
-  }
-
   public NameUsageInfo getInfo(UUID uuid, String taxonKey) {
     var dsid = map.toDSID(uuid, taxonKey);
     try (var session = factory.openSession()) {
@@ -283,7 +276,9 @@ public class TaxonDao {
   public List<TreeUsage> classification(UUID uuid, String taxonKey) {
     var dsid = map.toDSID(uuid, taxonKey);
     var nodes = treeDao.classification(dsid, -1, true, false, null, null);
-    if (nodes == null || nodes.size() <= 1) return List.of();
+    if (nodes == null || nodes.size() <= 1) {
+      throw new NotFoundException(taxonKey, "No classification found for taxon " + taxonKey);
+    }
     return nodes.stream()
       .map(converter::convertTree)
       .collect(Collectors.toList());
@@ -292,9 +287,20 @@ public class TaxonDao {
   public PagingResponse<TreeUsage> children(UUID uuid, String taxonKey, Pageable page) {
     var dsid = map.toDSID(uuid, taxonKey);
     var resp = treeDao.children(dsid, -1, false, true, null, page(page));
+    if (resp == null || resp.getResult().isEmpty()) {
+      throwIfNotFound(dsid);
+    }
     return resp(resp, converter::convertTree);
   }
-
+  
+  private void throwIfNotFound(DSID<String> dsid) {
+    try (SqlSession session = factory.openSession()) {
+      boolean exists = session.getMapper(NameUsageMapper.class).exists(dsid);
+      if (!exists) {
+        throw new NotFoundException(dsid.getId(), "Taxon not found: " + dsid.getId());
+      }
+    }
+  }
   public SearchResponse<NameUsageSearchResult, NameUsageSearchParameter> search(NameUsageSearchRequest request) {
     return converter.convert(searchService.search(converter.convert(request), page(request)));
   }
