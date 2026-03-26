@@ -265,10 +265,6 @@ public class TaxonResource {
   @CommonParameters.QParameter
   @Pageable.OffsetLimitParameters
   @FacetedSearchRequest.FacetParameters
-  @Parameter(
-    name = "request",
-    hidden = true
-  )
   @ApiResponse(responseCode = "200", description = "Name usages found")
   @GetMapping("/search/{datasetKey}")
   public SearchResponse<NameUsageSearchResult, NameUsageSearchParameter> search(
@@ -278,7 +274,7 @@ public class TaxonResource {
       example = "83a00190-7038-3970-a7e8-5e5563c40e37"
     )
     UUID datasetKey,
-    NameUsageSearchRequest request
+    @Parameter(hidden = true) NameUsageSearchRequest request
   ) {
     setDatasetKey(request, datasetKey);
     return dao.search(request);
@@ -304,10 +300,6 @@ public class TaxonResource {
   @CommonParameters.QParameter
   @Pageable.OffsetLimitParameters
   @FacetedSearchRequest.FacetParameters
-  @Parameter(
-    name = "request",
-    hidden = true
-  )
   @ApiResponse(responseCode = "200", description = "Name usages found")
   @GetMapping("/suggest/{datasetKey}")
   public List<NameUsageSuggestResult> suggest(
@@ -317,7 +309,7 @@ public class TaxonResource {
       example = "83a00190-7038-3970-a7e8-5e5563c40e37"
     )
     UUID datasetKey,
-    NameUsageSuggestRequest request
+    @Parameter(hidden = true) NameUsageSuggestRequest request
   ) {
     setDatasetKey(request, datasetKey);
     return dao.suggest(request);
