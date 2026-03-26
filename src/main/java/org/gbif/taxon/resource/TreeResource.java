@@ -51,7 +51,6 @@ public class TreeResource {
   )
   @ApiResponse(responseCode = "200", description = "Root taxa")
   @Pageable.OffsetLimitParameters
-  @Parameter(name = "page", hidden = true)
   @GetMapping("/{datasetKey}")
   public PagingResponse<TreeUsage> root(
     @PathVariable("datasetKey")
@@ -60,7 +59,7 @@ public class TreeResource {
       example = "83a00190-7038-3970-a7e8-5e5563c40e37"
     )
     UUID datasetKey,
-    Pageable page
+    @Parameter(hidden = true) Pageable page
   ) {
     return dao.root(datasetKey, page);
   }
@@ -100,7 +99,6 @@ public class TreeResource {
   @ApiResponse(responseCode = "200", description = "Child taxa")
   @ApiResponse(responseCode = "404", description = "Taxon not found")
   @Pageable.OffsetLimitParameters
-  @Parameter(name = "page", hidden = true)
   @GetMapping("/{datasetKey}/{taxonKey}/children")
   public PagingResponse<TreeUsage> children(
     @PathVariable("datasetKey")
@@ -115,7 +113,7 @@ public class TreeResource {
       example = "CXA"
     )
     String taxonKey,
-    Pageable page
+    @Parameter(hidden = true) Pageable page
   ) {
     return dao.children(datasetKey, taxonKey, page);
   }
