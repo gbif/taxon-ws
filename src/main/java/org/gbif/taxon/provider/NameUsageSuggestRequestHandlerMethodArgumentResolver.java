@@ -3,7 +3,6 @@ package org.gbif.taxon.provider;
 import org.gbif.taxon.api.search.NameUsageSearchParameter;
 import org.gbif.taxon.api.search.NameUsageSuggestRequest;
 import org.gbif.ws.server.provider.SearchRequestProvider;
-
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;

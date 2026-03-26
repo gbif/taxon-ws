@@ -1,23 +1,9 @@
 package org.gbif.taxon.dao;
 
-import org.gbif.api.model.Constants;
-
-
-import java.io.IOException;
-import java.time.Duration;
-import java.util.UUID;
-
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.annotations.VisibleForTesting;
-
 import life.catalogue.api.exception.NotFoundException;
 import life.catalogue.api.model.DSID;
 import life.catalogue.api.vocab.DatasetOrigin;
@@ -25,6 +11,16 @@ import life.catalogue.api.vocab.Datasets;
 import life.catalogue.cache.LatestDatasetKeyCache;
 import life.catalogue.dao.DatasetInfoCache;
 import life.catalogue.db.mapper.DatasetMapper;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.gbif.api.model.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.util.UUID;
 
 @Component
 public class DatasetKeyMap {

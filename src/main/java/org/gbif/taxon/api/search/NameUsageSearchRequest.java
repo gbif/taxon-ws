@@ -4,8 +4,6 @@ import io.swagger.v3.oas.annotations.Hidden;
 import life.catalogue.api.search.NameUsageRequest;
 import lombok.Getter;
 import lombok.Setter;
-
-
 import org.gbif.api.model.common.search.FacetedSearchRequest;
 
 public class NameUsageSearchRequest extends FacetedSearchRequest<NameUsageSearchParameter> {

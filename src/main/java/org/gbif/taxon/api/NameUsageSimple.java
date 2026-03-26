@@ -1,18 +1,10 @@
 package org.gbif.taxon.api;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import life.catalogue.api.vocab.TaxonomicStatus;
 import lombok.Data;
 
-
-import org.gbif.nameparser.api.Rank;
-
-
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -42,10 +34,6 @@ public class NameUsageSimple extends ClassificationUsage {
 
   @Schema(description = "A link to a webpage for this name on the original, external site", example = "https://www.speciesplus.net/#/taxon_concepts/10836")
   private URI references;
-
-  @Schema(description = "HTML formatted name with authorship and extinct dagger if applicable",
-    example = "<i>Abies alba</i> Mill.")
-  private String label;
 
   // the following are only present in specific lists when used in RelatedInfo
   @Schema(description = "The IUCN Red List threat status for this taxon. " +

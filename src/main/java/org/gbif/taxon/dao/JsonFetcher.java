@@ -1,9 +1,8 @@
 package org.gbif.taxon.dao;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 @Service
 public class JsonFetcher {

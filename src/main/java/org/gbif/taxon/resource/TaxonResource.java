@@ -13,9 +13,17 @@
  */
 package org.gbif.taxon.resource;
 
-import life.catalogue.api.vocab.Environment;
-
-
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.enums.Explode;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.servers.Server;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import life.catalogue.api.search.NameUsageRequest;
+import life.catalogue.api.vocab.*;
 import org.gbif.api.documentation.CommonParameters;
 import org.gbif.api.model.common.paging.Pageable;
 import org.gbif.api.model.common.search.FacetedSearchRequest;
@@ -28,13 +36,12 @@ import org.gbif.taxon.api.NameUsageInfo;
 import org.gbif.taxon.api.NameUsageSimple;
 import org.gbif.taxon.api.RelatedInfo;
 import org.gbif.taxon.api.TaxonBreakdown;
-import org.gbif.taxon.api.search.NameUsageSearchParameter;
-import org.gbif.taxon.api.search.NameUsageSearchRequest;
-import org.gbif.taxon.api.search.NameUsageSearchResult;
-import org.gbif.taxon.api.search.NameUsageSuggestRequest;
-import org.gbif.taxon.api.search.NameUsageSuggestResult;
+import org.gbif.taxon.api.search.*;
 import org.gbif.taxon.dao.TaxonDao;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -42,37 +49,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.List;
 import java.util.UUID;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import io.swagger.v3.oas.annotations.Hidden;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.enums.Explode;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.info.Info;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.servers.Server;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import life.catalogue.api.search.NameUsageRequest;
-import life.catalogue.api.vocab.DatasetType;
-import life.catalogue.api.vocab.Issue;
-import life.catalogue.api.vocab.NameField;
-import life.catalogue.api.vocab.NomStatus;
-import life.catalogue.api.vocab.Origin;
-import life.catalogue.api.vocab.TaxGroup;
-import life.catalogue.api.vocab.TaxonomicStatus;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.METHOD;

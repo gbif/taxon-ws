@@ -1,11 +1,11 @@
 package org.gbif.taxon.api;
 
-import java.net.URI;
-import java.util.List;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import life.catalogue.api.vocab.TaxGroup;
 import lombok.Data;
+
+import java.net.URI;
+import java.util.List;
 
 /**
  * Comprehensive taxon usage information including all related data.

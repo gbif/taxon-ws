@@ -1,50 +1,32 @@
 package org.gbif.taxon.dao;
 
-import life.catalogue.api.vocab.Issue;
-import life.catalogue.parser.AreaParser;
-
-
-import life.catalogue.parser.SafeParser;
-
-
-import org.gbif.api.model.common.search.Facet;
-import org.gbif.api.model.common.search.SearchRequest;
-import org.gbif.api.model.common.search.SearchResponse;
-import org.gbif.taxon.api.*;
-import org.gbif.taxon.api.search.NameUsageSearchParameter;
-import org.gbif.taxon.api.search.NameUsageSearchRequest;
-import org.gbif.taxon.api.search.NameUsageSearchResult;
-import org.gbif.taxon.api.search.NameUsageSuggestRequest;
-import org.gbif.taxon.api.search.NameUsageSuggestResult;
-import org.gbif.taxon.config.RelatedInfoConfig;
-
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Component;
-
-import life.catalogue.api.model.DatasetImport;
-import life.catalogue.api.model.NameUsageBase;
-import life.catalogue.api.model.SimpleName;
-import life.catalogue.api.model.SimpleNameInDataset;
-import life.catalogue.api.model.Synonym;
-import life.catalogue.api.model.Taxon;
-import life.catalogue.api.model.TaxonProperty;
-import life.catalogue.api.model.TreeNode;
+import life.catalogue.api.model.*;
 import life.catalogue.api.search.NameUsageRequest;
 import life.catalogue.api.search.NameUsageSearchResponse;
 import life.catalogue.api.search.NameUsageSuggestion;
 import life.catalogue.api.search.NameUsageWrapper;
+import life.catalogue.api.vocab.Issue;
 import life.catalogue.api.vocab.area.Gazetteer;
+import life.catalogue.parser.AreaParser;
+import life.catalogue.parser.SafeParser;
+import org.gbif.api.model.common.search.Facet;
+import org.gbif.api.model.common.search.SearchRequest;
+import org.gbif.api.model.common.search.SearchResponse;
+import org.gbif.taxon.api.*;
+import org.gbif.taxon.api.Distribution;
+import org.gbif.taxon.api.Media;
+import org.gbif.taxon.api.NameUsage;
+import org.gbif.taxon.api.Reference;
+import org.gbif.taxon.api.Synonymy;
+import org.gbif.taxon.api.VernacularName;
+import org.gbif.taxon.api.search.*;
+import org.gbif.taxon.config.RelatedInfoConfig;
+import org.springframework.stereotype.Component;
+
 import javax.annotation.Nullable;
+import java.net.URI;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class ApiConverter {
@@ -152,6 +134,7 @@ public class ApiConverter {
     to.setScientificName(from.getName());
     to.setScientificNameAuthorship(from.getAuthorship());
     to.setTaxonRank(from.getRank());
+    to.setLabel(from.getLabelHtml());
   }
 
   public ClassificationUsage convert2classification(SimpleName sn) {
@@ -171,7 +154,6 @@ public class ApiConverter {
     su.setTaxonomicStatus(sn.getStatus());
     su.setNomenclaturalCode(str(sn.getCode()));
     su.setExtinct(isTrue(sn.isExtinct()));
-    su.setLabel(sn.getLabelHtml());
 
     return su;
   }

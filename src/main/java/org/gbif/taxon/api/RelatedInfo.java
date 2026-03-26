@@ -1,9 +1,9 @@
 package org.gbif.taxon.api;
 
-import java.util.List;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * Various information about a taxon that is not coming from the dataset directly,

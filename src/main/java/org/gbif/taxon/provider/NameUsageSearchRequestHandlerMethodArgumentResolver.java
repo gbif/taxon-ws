@@ -5,18 +5,16 @@ import org.gbif.taxon.api.search.NameUsageSearchParameter;
 import org.gbif.taxon.api.search.NameUsageSearchRequest;
 import org.gbif.taxon.api.search.NameUsageSearchRequest.NameUsageQueryField;
 import org.gbif.ws.server.provider.FacetedSearchRequestProvider;
-
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Resolves {@link NameUsageSearchRequest} from HTTP query parameters.

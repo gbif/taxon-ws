@@ -1,21 +1,13 @@
 package org.gbif.taxon.api.search;
 
-import life.catalogue.api.vocab.TaxGroup;
-
-
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import life.catalogue.api.vocab.*;
 import org.gbif.api.model.common.search.SearchParameter;
 import org.gbif.nameparser.api.NameType;
 import org.gbif.nameparser.api.NomCode;
 import org.gbif.nameparser.api.Rank;
 
 import java.util.UUID;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
-import life.catalogue.api.vocab.Environment;
-import life.catalogue.api.vocab.Issue;
-import life.catalogue.api.vocab.Origin;
-import life.catalogue.api.vocab.TaxonomicStatus;
 
 
 @JsonDeserialize(

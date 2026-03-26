@@ -1,20 +1,14 @@
 package org.gbif.taxon.api;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import life.catalogue.api.vocab.*;
+import lombok.Data;
 import org.gbif.nameparser.api.NameType;
 import org.gbif.nameparser.api.NomCode;
 import org.gbif.nameparser.api.Rank;
 
-
 import java.time.LocalDateTime;
 import java.util.Map;
-
-import io.swagger.v3.oas.annotations.media.Schema;
-import life.catalogue.api.vocab.DataFormat;
-import life.catalogue.api.vocab.DatasetOrigin;
-import life.catalogue.api.vocab.ImportState;
-import life.catalogue.api.vocab.Origin;
-import life.catalogue.api.vocab.TaxonomicStatus;
-import lombok.Data;
 
 @Data
 @Schema(description = "Metrics and import statistics for a checklist dataset")

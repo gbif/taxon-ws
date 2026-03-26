@@ -2,10 +2,7 @@ package org.gbif.taxon.api;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-
-
 import org.gbif.nameparser.api.Rank;
-
 
 import java.util.List;
 

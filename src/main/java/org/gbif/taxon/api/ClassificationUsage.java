@@ -1,12 +1,8 @@
 package org.gbif.taxon.api;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import life.catalogue.api.vocab.TaxonomicStatus;
 import lombok.Data;
 import org.gbif.nameparser.api.Rank;
-
-import java.net.URI;
-import java.util.UUID;
 
 /**
  * Extremely simple taxon usage containing only the name and taxonID.

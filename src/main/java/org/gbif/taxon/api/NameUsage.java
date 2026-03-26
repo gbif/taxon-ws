@@ -4,13 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import life.catalogue.api.vocab.TaxGroup;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-
 import org.gbif.nameparser.api.NameType;
 
-
-import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 

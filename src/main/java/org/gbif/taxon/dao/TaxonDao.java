@@ -1,71 +1,14 @@
 package org.gbif.taxon.dao;
 
-import life.catalogue.api.model.TaxonProperty;
-import life.catalogue.db.mapper.TaxonPropertyMapper;
-
-
-import org.gbif.api.model.common.paging.Pageable;
-import org.gbif.api.model.common.paging.PagingResponse;
-import org.gbif.api.model.common.search.SearchRequest;
-import org.gbif.api.model.common.search.SearchResponse;
-import org.gbif.dwc.terms.GbifTerm;
-import org.gbif.dwc.terms.IucnTerm;
-import org.gbif.taxon.api.ChecklistMetrics;
-import org.gbif.taxon.api.Distribution;
-import org.gbif.taxon.api.NameUsage;
-import org.gbif.taxon.api.NameUsageInfo;
-import org.gbif.taxon.api.NameUsageSimple;
-import org.gbif.taxon.api.RelatedInfo;
-import org.gbif.taxon.api.TaxonBreakdown;
-import org.gbif.taxon.api.TreeUsage;
-import org.gbif.taxon.api.search.NameUsageSearchParameter;
-import org.gbif.taxon.api.search.NameUsageSearchRequest;
-import org.gbif.taxon.api.search.NameUsageSearchResult;
-import org.gbif.taxon.api.search.NameUsageSuggestRequest;
-import org.gbif.taxon.api.search.NameUsageSuggestResult;
-import org.gbif.taxon.config.RelatedInfoConfig;
-
-
-import java.io.IOException;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.springframework.stereotype.Service;
-
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-
-import javax.annotation.Nullable;
 import life.catalogue.api.exception.NotFoundException;
 import life.catalogue.api.exception.SynonymException;
-import life.catalogue.api.model.DSID;
-import life.catalogue.api.model.DatasetImport;
-import life.catalogue.api.model.Page;
-import life.catalogue.api.model.ResultPage;
-import life.catalogue.api.model.SimpleName;
-import life.catalogue.api.model.SimpleNameInDataset;
+import life.catalogue.api.model.*;
 import life.catalogue.api.vocab.DatasetType;
 import life.catalogue.api.vocab.EstablishmentMeans;
-import life.catalogue.dao.DatasetImportDao;
-import life.catalogue.dao.DatasetInfoCache;
-import life.catalogue.dao.MetricsDao;
-import life.catalogue.dao.NameDao;
-import life.catalogue.dao.TreeDao;
-import life.catalogue.db.mapper.DatasetImportMapper;
-import life.catalogue.db.mapper.DatasetMapper;
-import life.catalogue.db.mapper.DistributionMapper;
-import life.catalogue.db.mapper.NameUsageMapper;
-import life.catalogue.db.mapper.TaxonMetricsMapper;
+import life.catalogue.dao.*;
+import life.catalogue.db.mapper.*;
 import life.catalogue.es.indexing.NameUsageIndexService;
 import life.catalogue.es.search.NameUsageSearchService;
 import life.catalogue.img.ThumborConfig;
@@ -73,6 +16,27 @@ import life.catalogue.img.ThumborService;
 import life.catalogue.matching.nidx.NameIndexFactory;
 import life.catalogue.printer.JsonTreeCollector;
 import lombok.SneakyThrows;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.gbif.api.model.common.paging.Pageable;
+import org.gbif.api.model.common.paging.PagingResponse;
+import org.gbif.api.model.common.search.SearchRequest;
+import org.gbif.api.model.common.search.SearchResponse;
+import org.gbif.dwc.terms.GbifTerm;
+import org.gbif.taxon.api.*;
+import org.gbif.taxon.api.Distribution;
+import org.gbif.taxon.api.NameUsage;
+import org.gbif.taxon.api.search.*;
+import org.gbif.taxon.config.RelatedInfoConfig;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.time.Duration;
+import java.util.*;
+import java.util.function.Function;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 public class TaxonDao {

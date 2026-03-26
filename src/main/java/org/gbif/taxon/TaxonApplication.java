@@ -15,13 +15,9 @@
 package org.gbif.taxon;
 
 import com.zaxxer.hikari.HikariDataSource;
-
 import life.catalogue.dao.DatasetInfoCache;
 import life.catalogue.db.MybatisFactory;
-
 import org.apache.ibatis.session.SqlSessionFactory;
-
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.autoconfigure.elasticsearch.ElasticsearchRestHealthContributorAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
