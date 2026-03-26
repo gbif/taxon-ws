@@ -197,7 +197,8 @@ public class TaxonResource {
     @PathVariable("datasetKey")
     @Parameter(
       description = "UUID for the dataset key",
-      example = "83a00190-7038-3970-a7e8-5e5563c40e37"
+      example = "83a00190-7038-3970-a7e8-5e5563c40e37",
+      in = ParameterIn.PATH
     )
     UUID datasetKey,
     @PathVariable("taxonKey")
@@ -327,13 +328,6 @@ public class TaxonResource {
         name = "taxonID",
         description = "Filters by any of the higher Linnean rank keys. Note this is within the respective checklist " +
           "and not searching NUB keys across all checklists.",
-        in = ParameterIn.QUERY
-      ),
-      @Parameter(
-        name = "datasetKey",
-        description = "A UUID of a checklist dataset.",
-        schema = @Schema(implementation = UUID.class),
-        example = "d7dddbf4-2cf0-4f39-9b2a-bb099caae36c",
         in = ParameterIn.QUERY
       ),
       @Parameter(
