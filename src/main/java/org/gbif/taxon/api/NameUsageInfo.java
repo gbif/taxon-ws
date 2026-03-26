@@ -24,7 +24,7 @@ public class NameUsageInfo {
   private Synonymy synonyms;
 
   @Schema(description = "Ordered list of parent taxa from the root of the classification down to the direct parent of this taxon")
-  private List<NameUsageSimple> classification;
+  private List<ClassificationUsage> classification;
 
   @Schema(description = "List of vernacular (common) names for the taxon")
   private List<VernacularName> vernacularNames;

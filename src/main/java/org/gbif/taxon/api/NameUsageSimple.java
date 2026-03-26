@@ -20,28 +20,16 @@ import java.util.UUID;
  */
 @Data
 @Schema(description = "Simplified taxon usage containing core taxonomic information")
-public class NameUsageSimple {
+public class NameUsageSimple extends ClassificationUsage {
 
   @Schema(description = "The identifier for the dataset", example = "7ddf754f-d193-4cc9-b351-99906754a03b")
   private UUID datasetKey;
-
-  @Schema(description = "The unique identifier for this taxon", example = "2435099")
-  private String taxonID;
 
   @Schema(description = "The identifier of the accepted taxon (for synonyms)", example = "2435098")
   private String acceptedNameUsageID;
 
   @Schema(description = "The identifier of the parent taxon in the classification", example = "2435001")
   private String parentNameUsageID;
-
-  @Schema(description = "The scientific name without authorship", example = "Abies alba")
-  private String scientificName;
-
-  @Schema(description = "The authorship information for the scientific name", example = "Mill.")
-  private String scientificNameAuthorship;
-
-  @Schema(description = "The taxonomic rank of the taxon", example = "SPECIES")
-  private Rank taxonRank;
 
   @Schema(description = "The taxonomic status of the taxon (e.g., accepted, synonym)", example = "accepted")
   private TaxonomicStatus taxonomicStatus;

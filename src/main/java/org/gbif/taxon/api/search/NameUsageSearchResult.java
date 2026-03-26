@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import life.catalogue.api.vocab.TaxGroup;
 
 
+import org.gbif.taxon.api.ClassificationUsage;
 import org.gbif.taxon.api.NameUsageSimple;
 import org.gbif.taxon.api.VernacularNameSimple;
 
@@ -23,7 +24,7 @@ public class NameUsageSearchResult {
   private TaxGroup group;
 
   @Schema(description = "Ordered list of parent taxa from root to the direct parent of the matched taxon")
-  private List<NameUsageSimple> classification;
+  private List<ClassificationUsage> classification;
 
   @Schema(description = "Vernacular names that matched the search query")
   private List<VernacularNameSimple> vernacularNames;

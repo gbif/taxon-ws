@@ -10,18 +10,7 @@ import life.catalogue.parser.SafeParser;
 import org.gbif.api.model.common.search.Facet;
 import org.gbif.api.model.common.search.SearchRequest;
 import org.gbif.api.model.common.search.SearchResponse;
-import org.gbif.taxon.api.ChecklistMetrics;
-import org.gbif.taxon.api.Distribution;
-import org.gbif.taxon.api.MeasurementOrFact;
-import org.gbif.taxon.api.Media;
-import org.gbif.taxon.api.NameUsage;
-import org.gbif.taxon.api.NameUsageInfo;
-import org.gbif.taxon.api.NameUsageSimple;
-import org.gbif.taxon.api.Reference;
-import org.gbif.taxon.api.Synonymy;
-import org.gbif.taxon.api.TreeUsage;
-import org.gbif.taxon.api.VernacularName;
-import org.gbif.taxon.api.VernacularNameSimple;
+import org.gbif.taxon.api.*;
 import org.gbif.taxon.api.search.NameUsageSearchParameter;
 import org.gbif.taxon.api.search.NameUsageSearchRequest;
 import org.gbif.taxon.api.search.NameUsageSearchResult;
@@ -93,7 +82,7 @@ public class ApiConverter {
     to.setScientificNameAuthorship(name.getAuthorship());
     to.setTaxonRank(name.getRank());
     to.setTaxonomicStatus(from.getStatus());
-    to.setNomenclaturalCode(name.getCode() != null ? name.getCode().name() : null);
+    to.setNomenclaturalCode(str(name.getCode()));
     to.setReferences(from.getLink());
     if (from instanceof Taxon tax) {
       to.setExtinct(tax.isExtinct());
@@ -120,7 +109,7 @@ public class ApiConverter {
     }
     nu.setNameAccordingTo(nub.getAccordingTo());
     nu.setNamePhrase(nub.getNamePhrase());
-    nu.setNomenclaturalStatus(name.getNomStatus() != null ? name.getNomStatus().name() : null);
+    nu.setNomenclaturalStatus(str(name.getNomStatus()));
     nu.setNameType(name.getType());
     nu.setGenericName(name.getGenus());
     nu.setInfragenericEpithet(name.getInfragenericEpithet());
@@ -158,20 +147,29 @@ public class ApiConverter {
     return convert(new SimpleName(s));
   }
 
+  private static void copy(SimpleName from, ClassificationUsage to) {
+    to.setTaxonID(from.getId());
+    to.setScientificName(from.getName());
+    to.setScientificNameAuthorship(from.getAuthorship());
+    to.setTaxonRank(from.getRank());
+  }
+
+  public ClassificationUsage convert2classification(SimpleName sn) {
+    var su = new ClassificationUsage();
+    copy(sn, su);
+    return su;
+  }
+
   public NameUsageSimple convert(SimpleName sn) {
     var su = new NameUsageSimple();
-
-    su.setTaxonID(sn.getId());
+    copy(sn, su);
     if (sn.getStatus() != null && sn.getStatus().isSynonym()) {
       su.setAcceptedNameUsageID(sn.getParentId());
     } else {
       su.setParentNameUsageID(sn.getParentId());
     }
-    su.setScientificName(sn.getName());
-    su.setScientificNameAuthorship(sn.getAuthorship());
-    su.setTaxonRank(sn.getRank());
     su.setTaxonomicStatus(sn.getStatus());
-    su.setNomenclaturalCode(sn.getCode() != null ? sn.getCode().name() : null);
+    su.setNomenclaturalCode(str(sn.getCode()));
     su.setExtinct(isTrue(sn.isExtinct()));
     su.setLabel(sn.getLabelHtml());
 
@@ -205,11 +203,11 @@ public class ApiConverter {
   Media convert(life.catalogue.api.model.Media m) {
     var media = new Media();
     media.setIdentifier(m.getUrl() != null ? m.getUrl().toString() : null);
-    media.setType(m.getType() != null ? m.getType().name() : null);
+    media.setType(str(m.getType()));
     media.setTitle(m.getTitle());
     media.setCreated(m.getCaptured() != null ? m.getCaptured().toString() : null);
     media.setCreator(m.getCapturedBy());
-    media.setLicense(m.getLicense() != null ? m.getLicense().name() : null);
+    media.setLicense(str(m.getLicense()));
     media.setReferences(m.getLink());
     media.setRemarks(m.getRemarks());
     return media;
@@ -221,7 +219,7 @@ public class ApiConverter {
     v.setLanguage(vn.getLanguage());
     v.setLocality(vn.getArea());
     v.setCountryCode(vn.getCountry() != null ? vn.getCountry().getIso2LetterCode() : null);
-    v.setSex(vn.getSex() != null ? vn.getSex().name() : null);
+    v.setSex(str(vn.getSex()));
     v.setPreferredName(vn.isPreferred());
     v.setRemarks(vn.getRemarks());
     return v;
@@ -308,7 +306,7 @@ public class ApiConverter {
     if (ui.getClassification() != null) {
       info.setClassification(
         ui.getClassification().stream()
-          .map(this::convert)
+          .map(this::convert2classification)
           .collect(Collectors.toList())
       );
     }
@@ -412,7 +410,9 @@ public class ApiConverter {
     result.setGroup(wrapper.getGroup());
     if (wrapper.getClassification() != null) {
       result.setClassification(
-        wrapper.getClassification().stream().map(this::convert).collect(Collectors.toList())
+        wrapper.getClassification().stream()
+            .map(this::convert2classification)
+            .collect(Collectors.toList())
       );
     }
     if (wrapper.getVernacularNames() != null) {
@@ -435,7 +435,7 @@ public class ApiConverter {
     result.setScientificName(suggest.getMatch());
     result.setTaxonRank(suggest.getRank());
     result.setTaxonomicStatus(suggest.getStatus());
-    result.setNomenclaturalCode(suggest.getNomCode() != null ? suggest.getNomCode().name() : null);
+    result.setNomenclaturalCode(str(suggest.getNomCode()));
     result.setAcceptedNameUsageID(suggest.getAcceptedUsageId());
     result.setAcceptedNameUsage(suggest.getAcceptedName());
     result.setGroup(suggest.getGroup());
