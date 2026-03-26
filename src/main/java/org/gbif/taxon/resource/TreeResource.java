@@ -56,7 +56,7 @@ public class TreeResource {
     @PathVariable("datasetKey")
     @Parameter(
       description = "UUID for the dataset key",
-      example = "83a00190-7038-3970-a7e8-5e5563c40e37"
+      example = "2d59e5db-57ad-41ff-97d6-11f5fb264527"
     )
     UUID datasetKey,
     @Parameter(hidden = true) Pageable page
@@ -77,7 +77,7 @@ public class TreeResource {
     @PathVariable("datasetKey")
     @Parameter(
       description = "UUID for the dataset key",
-      example = "83a00190-7038-3970-a7e8-5e5563c40e37"
+      example = "2d59e5db-57ad-41ff-97d6-11f5fb264527"
     )
     UUID datasetKey,
     @PathVariable("taxonKey")
@@ -104,7 +104,7 @@ public class TreeResource {
     @PathVariable("datasetKey")
     @Parameter(
       description = "UUID for the dataset key",
-      example = "83a00190-7038-3970-a7e8-5e5563c40e37"
+      example = "2d59e5db-57ad-41ff-97d6-11f5fb264527"
     )
     UUID datasetKey,
     @PathVariable("taxonKey")

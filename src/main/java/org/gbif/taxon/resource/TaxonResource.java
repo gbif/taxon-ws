@@ -118,7 +118,7 @@ public class TaxonResource {
       @PathVariable("datasetKey")
       @Parameter(
           description = "UUID for the dataset key",
-          example = "83a00190-7038-3970-a7e8-5e5563c40e37"
+          example = "2d59e5db-57ad-41ff-97d6-11f5fb264527"
       )
       UUID datasetKey,
       @PathVariable("taxonKey")
@@ -145,7 +145,7 @@ public class TaxonResource {
     @PathVariable("datasetKey")
     @Parameter(
       description = "UUID for the dataset key",
-      example = "83a00190-7038-3970-a7e8-5e5563c40e37"
+      example = "2d59e5db-57ad-41ff-97d6-11f5fb264527"
     )
     UUID datasetKey,
     @PathVariable("taxonKey")
@@ -171,7 +171,7 @@ public class TaxonResource {
       @PathVariable("datasetKey")
       @Parameter(
         description = "UUID for the dataset key",
-        example = "83a00190-7038-3970-a7e8-5e5563c40e37"
+        example = "2d59e5db-57ad-41ff-97d6-11f5fb264527"
       )
       UUID datasetKey,
       @PathVariable("taxonKey")
@@ -197,7 +197,7 @@ public class TaxonResource {
     @PathVariable("datasetKey")
     @Parameter(
       description = "UUID for the dataset key",
-      example = "83a00190-7038-3970-a7e8-5e5563c40e37",
+      example = "2d59e5db-57ad-41ff-97d6-11f5fb264527",
       in = ParameterIn.PATH
     )
     UUID datasetKey,
@@ -217,7 +217,7 @@ public class TaxonResource {
     @RequestParam(name = "datasetKey", required = false)
     @Parameter(
       description = "Optional dataset key filter, repeatable: e.g. " +
-        "`?datasetKey=7ddf754f-d193-4cc9-b351-99906754a03b&datasetKey=83a00190-7038-3970-a7e8-5e5563c40e37`",
+        "`?datasetKey=7ddf754f-d193-4cc9-b351-99906754a03b&datasetKey=2d59e5db-57ad-41ff-97d6-11f5fb264527`",
       explode = Explode.TRUE,
       array = @ArraySchema(schema = @Schema(type = "uuid"))
     )
@@ -240,7 +240,7 @@ public class TaxonResource {
     @PathVariable("datasetKey")
     @Parameter(
       description = "UUID for the dataset key",
-      example = "83a00190-7038-3970-a7e8-5e5563c40e37"
+      example = "2d59e5db-57ad-41ff-97d6-11f5fb264527"
     )
     UUID datasetKey,
     @PathVariable("taxonKey")
@@ -272,7 +272,7 @@ public class TaxonResource {
     @PathVariable("datasetKey")
     @Parameter(
       description = "UUID for the dataset key",
-      example = "83a00190-7038-3970-a7e8-5e5563c40e37"
+      example = "2d59e5db-57ad-41ff-97d6-11f5fb264527"
     )
     UUID datasetKey,
     @Parameter(hidden = true) NameUsageSearchRequest request
@@ -307,7 +307,7 @@ public class TaxonResource {
     @PathVariable("datasetKey")
     @Parameter(
       description = "UUID for the dataset key",
-      example = "83a00190-7038-3970-a7e8-5e5563c40e37"
+      example = "2d59e5db-57ad-41ff-97d6-11f5fb264527"
     )
     UUID datasetKey,
     @Parameter(hidden = true) NameUsageSuggestRequest request
