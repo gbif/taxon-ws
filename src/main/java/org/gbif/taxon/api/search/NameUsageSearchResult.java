@@ -10,7 +10,7 @@ import org.gbif.taxon.api.VernacularNameSimple;
 import java.util.List;
 
 @Data
-@Schema(description = "A single result from a name usage full-text search, including the matched taxon, its classification, and matching vernacular names")
+@Schema(description = "A single result from a name usage full-text search, including the matched taxon, it's classification, and matching vernacular names")
 public class NameUsageSearchResult {
 
   @Schema(description = "The matched taxon name usage")

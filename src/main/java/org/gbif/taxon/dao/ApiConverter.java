@@ -393,6 +393,8 @@ public class ApiConverter {
     if (wrapper.getClassification() != null) {
       result.setClassification(
         wrapper.getClassification().stream()
+            .filter(u -> u.getStatus() == null || !u.getStatus().isSynonym())
+            .filter(u -> !Objects.equals(wrapper.getId(), u.getId()))
             .map(this::convert2classification)
             .collect(Collectors.toList())
       );
