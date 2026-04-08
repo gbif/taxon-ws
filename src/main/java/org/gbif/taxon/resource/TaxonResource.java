@@ -136,9 +136,9 @@ public class TaxonResource {
 
   @Operation(
     operationId = "getTaxonBreakdown",
-    summary = "Get hierarchical species count breakdown",
-    description = "Returns a hierarchical breakdown of the direct children of the given taxon, " +
-      "showing the number of accepted species within each child group."
+    summary = "Get descendant species count breakdown",
+    description = "Returns a breakdown by all descendant taxa sharing the highest major Linnean rank, " +
+      "counting the number of accepted species within each group."
   )
   @ApiResponse(responseCode = "200", description = "Taxonomic breakdown")
   @ApiResponse(responseCode = "404", description = "Taxon not found")

@@ -25,7 +25,7 @@ public class TaxonBreakdown {
   @Schema(description = "The number of accepted species within this taxon", example = "250")
   private int species;
 
-  @Schema(description = "Nested breakdown of child taxa within this taxon")
+  @Schema(description = "Nested breakdown by all descendant taxa sharing the highest major Linnean rank")
   private List<TaxonBreakdown> breakdown;
 
 }
