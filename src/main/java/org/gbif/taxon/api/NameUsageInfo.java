@@ -35,7 +35,7 @@ public class NameUsageInfo {
   @Schema(description = "Distribution information for the taxon")
   private List<Distribution> distributions;
 
-  @Schema(description = "Bibliographic references related to the taxon, keyed by their identifier")
+  @Schema(description = "Bibliographic references related to the taxon, keyed by their identifier. A lookup for referenceIDs found in taxon, distributions or vernacular names.")
   private List<Reference> bibliography;
 
   @Schema(description = "Measurements or facts about the taxon")
@@ -43,7 +43,7 @@ public class NameUsageInfo {
 
   @Schema(description = "Link to the taxon page on ChecklistBank",
     example = "https://www.checklistbank.org/dataset/3/taxon/2435099")
-  private URI checklistBankLink;
+  private URI checklistbankURL;
 
   @Schema(description = "Environments where the taxon occurs (marine, freshwater, terrestrial, brackish)",
     example = "[\"terrestrial\", \"freshwater\"]")

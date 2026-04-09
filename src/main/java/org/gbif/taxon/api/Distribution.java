@@ -69,9 +69,9 @@ public class Distribution {
     example = "2020-06-15")
   private String eventDate;
 
-  @Schema(description = "Bibliographic citation referencing the source of this distribution record",
-    example = "National Flora Database")
-  private String source;
+  @Schema(description = "Identifier for the bibliographic reference which is the source of this distribution record",
+    example = "R5678")
+  private String referenceID;
 
   @Schema(description = "Additional remarks or notes about this distribution record (dwc:occurrenceRemarks)",
     example = "Common in mountain forests above 1000m elevation")

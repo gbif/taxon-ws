@@ -32,8 +32,8 @@ public class NameUsage extends NameUsageSimple {
   @Schema(description = "The taxon concept reference", example = "Smith 2020")
   private String nameAccordingTo;
 
-  @Schema(description = "The publication where the name was first published", example = "Flora Europaea Vol. 1")
-  private String namePublishedIn;
+  @Schema(description = "The bibliographic reference identifier for the publication where the name was first published", example = "Greuter1998")
+  private String namePublishedInID;
 
   @Schema(description = "An optional phrase appended to the name", example = "sensu lato")
   private String namePhrase;

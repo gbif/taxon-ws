@@ -24,6 +24,10 @@ public class Reference {
     example = "Smith, J. & Jones, A. (2020). New Species of Abies. Journal of Botany, 45(2), 123-145.")
   private String citation;
 
+  @Schema(description = "A link to the publication",
+      example = "Smith, J. & Jones, A. (2020). New Species of Abies. Journal of Botany, 45(2), 123-145.")
+  private String url;
+
   @Schema(description = "Taxon-specific annotation or notes about how this reference relates to the taxon (dwc:taxonRemarks)",
     example = "Original description of the species")
   private String remarks;

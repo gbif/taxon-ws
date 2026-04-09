@@ -538,8 +538,8 @@ class ApiConverterTest {
     assertThat(info.getDistributions()).hasSize(1);
     assertThat(info.getSynonyms().size()).isEqualTo(1);
     assertThat(info.getBibliography()).hasSize(1);
-    assertThat(info.getChecklistBankLink()).isNotNull();
-    assertThat(info.getChecklistBankLink().toString()).contains("dataset/101/taxon/t-1");
+    assertThat(info.getChecklistbankURL()).isNotNull();
+    assertThat(info.getChecklistbankURL().toString()).contains("dataset/101/taxon/t-1");
     assertThat(info.getEnvironment()).containsExactlyInAnyOrder("TERRESTRIAL", "FRESHWATER");
   }
 
@@ -563,7 +563,7 @@ class ApiConverterTest {
     NameUsageInfo info = converter.convert(ui);
 
     assertThat(info.getTaxon().getTaxonID()).isEqualTo("t-2");
-    assertThat(info.getChecklistBankLink()).isNotNull();
+    assertThat(info.getChecklistbankURL()).isNotNull();
   }
 
 }

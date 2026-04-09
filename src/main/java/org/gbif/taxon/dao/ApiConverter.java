@@ -6,6 +6,7 @@ import life.catalogue.api.search.NameUsageSearchResponse;
 import life.catalogue.api.search.NameUsageSuggestion;
 import life.catalogue.api.search.NameUsageWrapper;
 import life.catalogue.api.vocab.Issue;
+import life.catalogue.api.vocab.NomRelType;
 import life.catalogue.api.vocab.area.Gazetteer;
 import life.catalogue.parser.AreaParser;
 import life.catalogue.parser.SafeParser;
@@ -203,6 +204,7 @@ public class ApiConverter {
     v.setCountryCode(vn.getCountry() != null ? vn.getCountry().getIso2LetterCode() : null);
     v.setSex(str(vn.getSex()));
     v.setPreferredName(vn.isPreferred());
+    v.setReferenceID(vn.getReferenceId());
     v.setRemarks(vn.getRemarks());
     return v;
   }
@@ -230,8 +232,7 @@ public class ApiConverter {
     dist.setThreatStatus(str(d.getThreatStatus()));
     dist.setEventDate(str(d.getYear()));
     dist.setRemarks(d.getRemarks());
-    //TODO: expand refID with citation
-    dist.setSource(d.getReferenceId());
+    dist.setReferenceID(d.getReferenceId());
     return dist;
   }
   private static String str(Enum<?> e) {
@@ -248,6 +249,9 @@ public class ApiConverter {
       ref.setDoi(r.getCsl().getDOI());
     }
     ref.setCitation(r.getCitation());
+    if (r.getCsl() != null) {
+      ref.setUrl(r.getCsl().getURL());
+    }
     ref.setRemarks(r.getRemarks());
     return ref;
   }
@@ -266,10 +270,6 @@ public class ApiConverter {
 
     info.setTaxon(convert(usage, ui.getIssues()));
     info.setGroup(ui.getGroup());
-    // publishedIn
-    if (ui.getPublishedIn() != null) {
-      info.getTaxon().setNamePublishedIn(ui.getPublishedIn().getCitation());
-    }
     // acceptedNameUsage
     if (usage.isSynonym()) {
       info.getTaxon().setAcceptedNameUsage(convert(ui.getClassification().getLast()).getLabel());
@@ -291,6 +291,18 @@ public class ApiConverter {
           .map(this::convert2classification)
           .collect(Collectors.toList())
       );
+    }
+
+    // basionym
+    if (ui.getNameRelations() != null) {
+      ui.getNameRelations().stream().filter(rel -> rel.getType()== NomRelType.BASIONYM).findFirst().ifPresent(rel -> {
+        info.getTaxon().setOriginalNameUsageID(rel.getRelatedUsageId());
+        if (ui.getSynonyms() != null) {
+          ui.getSynonyms().getHomotypic().stream()
+              .filter(s -> Objects.equals(s.getId(), rel.getRelatedUsageId()))
+              .findFirst().ifPresent(s -> info.getTaxon().setOriginalNameUsage(s.getLabel()));
+        }
+      });
     }
 
     // synonyms
@@ -332,7 +344,19 @@ public class ApiConverter {
       );
     }
 
-    // bibliography
+    // publishedIn
+    if (ui.getPublishedIn() != null) {
+      var pubIn = ui.getPublishedIn();
+      info.getTaxon().setNamePublishedInID(pubIn.getId());
+      // make sure it's part of the references
+      if (ui.getReferences() == null) {
+        ui.setReferences(new HashMap<>());
+      }
+      if (!ui.getReferences().containsKey(pubIn.getId())) {
+        ui.getReferences().put(pubIn.getId(), pubIn);
+      }
+    }
+    // references
     if (ui.getReferences() != null) {
       info.setBibliography(
         ui.getReferences().values()
@@ -343,7 +367,7 @@ public class ApiConverter {
     }
 
     // checklistBankLink
-    info.setChecklistBankLink(
+    info.setChecklistbankURL(
       URI.create(CLB_BASE_URL + usage.getDatasetKey() + "/taxon/" + usage.getId())
     );
 

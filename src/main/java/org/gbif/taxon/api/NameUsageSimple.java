@@ -32,7 +32,7 @@ public class NameUsageSimple extends ClassificationUsage {
   @Schema(description = "Indicates whether the taxon is extinct", example = "false")
   private Boolean extinct;
 
-  @Schema(description = "A link to a webpage for this name on the original, external site", example = "https://www.speciesplus.net/#/taxon_concepts/10836")
+  @Schema(description = "A link to a webpage for this name on the original, external site (dc:references)", example = "https://www.speciesplus.net/#/taxon_concepts/10836")
   private URI references;
 
   // the following are only present in specific lists when used in RelatedInfo

@@ -33,9 +33,9 @@ public class VernacularName extends VernacularNameSimple {
     example = "true")
   private Boolean preferredName;
 
-  @Schema(description = "Bibliographic citation referencing the source of this vernacular name",
-    example = "Flora of Germany, 3rd edition")
-  private String source;
+  @Schema(description = "Identifier for the bibliographic reference which is the source of this vernacular name",
+    example = "23456")
+  private String referenceID;
 
   @Schema(description = "Additional context or notes qualifying the usage of this vernacular name (dwc:taxonRemarks)",
     example = "Commonly used in forestry contexts")
