@@ -240,7 +240,7 @@ public class TaxonDao {
   public List<TreeUsage> classification(UUID uuid, String taxonKey) {
     var dsid = map.toDSID(uuid, taxonKey);
     var nodes = treeDao.classification(dsid, -1, true, false, null, null);
-    if (nodes == null || nodes.size() <= 1) {
+    if (nodes == null || nodes.isEmpty()) {
       throw new NotFoundException(taxonKey, "No classification found for taxon " + taxonKey);
     }
     return nodes.stream()
