@@ -31,6 +31,7 @@ import org.gbif.taxon.config.RelatedInfoConfig;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
+import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
@@ -47,6 +48,7 @@ public class TaxonDao {
   private final TreeDao treeDao;
   private final DatasetImportDao diDao;
   private final life.catalogue.dao.TaxonDao tDao;
+  private final life.catalogue.dao.NameUsageDao nuDao;
   private final life.catalogue.es.suggest.NameUsageSuggestionService suggestionService;
   private final life.catalogue.es.search.NameUsageSearchService searchService;
   private final RelatedInfoConfig relatedInfoConfig;
@@ -87,9 +89,10 @@ public class TaxonDao {
     MetricsDao mdao = new MetricsDao(factory);
     NameDao ndao = new NameDao(factory, indexService, NameIndexFactory.passThru(), null);
     this.tDao = new life.catalogue.dao.TaxonDao(factory, ndao, mdao, new ThumborService(new ThumborConfig()), indexService, null, null);
+    this.nuDao = new NameUsageDao(factory, indexService);
     this.searchService = searchService;
     this.suggestionService = suggestionService;
-    this.diDao = new DatasetImportDao(factory, null);
+    this.diDao = new DatasetImportDao(factory, (File) null);
   }
 
   public ChecklistMetrics metrics(UUID uuid) {
@@ -216,7 +219,7 @@ public class TaxonDao {
                                                 @Nullable Collection<DatasetType> datasetTypes,
                                                 @Nullable Collection<Integer> datasetKeys,
                                                 @Nullable Collection<UUID> publisherKeys) {
-    return tDao.related(map.toCLB(uuid), taxonKey, true, Set.of(map.getColKey()), null, datasetTypes, datasetKeys, publisherKeys);
+    return nuDao.related(map.toCLB(uuid), taxonKey, true, Set.of(map.getColKey()), null, datasetTypes, datasetKeys, publisherKeys);
   }
 
   private static Page page(Pageable p) {
@@ -326,7 +329,7 @@ public class TaxonDao {
     // GRIIS
     // https://github.com/gbif/portal16/issues/883#issuecomment-784536216
     if (relatedInfoConfig.getGriisPublisherKey() != null) {
-      var list = tDao.related(datasetKeyCLB, taxonID, true, null, null, null, null, Set.of(relatedInfoConfig.getGriisPublisherKey()));
+      var list = nuDao.related(datasetKeyCLB, taxonID, true, null, null, null, null, Set.of(relatedInfoConfig.getGriisPublisherKey()));
       if (list != null) {
         var distributions = new ArrayList<Distribution>();
         try (var session = factory.openSession()) {
@@ -383,7 +386,7 @@ public class TaxonDao {
   }
 
   private SimpleNameInDataset findSingleRelated(Integer datasetKey, String taxonKey, Integer targetDatasetKey) {
-    var list = tDao.related(datasetKey, taxonKey, false, null, null, null, Set.of(targetDatasetKey), null);
+    var list = nuDao.related(datasetKey, taxonKey, false, null, null, null, Set.of(targetDatasetKey), null);
     if (list != null && !list.isEmpty()) {
       return list.getFirst();
     }
