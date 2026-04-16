@@ -417,9 +417,4 @@ public class TaxonResource {
     }
   )
   @interface SearchParameters{}
-
-  interface FacetParams extends FacetedSearchRequest.FacetParameters {
-
-  }
-
 }
