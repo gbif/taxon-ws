@@ -1,5 +1,6 @@
 package org.gbif.taxon.dao;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import life.catalogue.api.model.*;
 import life.catalogue.api.search.NameUsageRequest;
 import life.catalogue.api.search.NameUsageSearchResponse;
@@ -10,6 +11,8 @@ import life.catalogue.api.vocab.NomRelType;
 import life.catalogue.api.vocab.area.Gazetteer;
 import life.catalogue.parser.AreaParser;
 import life.catalogue.parser.SafeParser;
+import lombok.Getter;
+import lombok.Setter;
 import org.gbif.api.model.common.search.Facet;
 import org.gbif.api.model.common.search.SearchRequest;
 import org.gbif.api.model.common.search.SearchResponse;
@@ -458,6 +461,7 @@ public class ApiConverter {
     copyCommon(request, req);
     if (request.getSortBy() != null) {
       req.setSortBy(request.getSortBy());
+      req.setReverse(request.isReverse());
     }
     if (request.getQFields() != null && !request.getQFields().isEmpty()) {
       req.setContent(request.getQFields().stream()

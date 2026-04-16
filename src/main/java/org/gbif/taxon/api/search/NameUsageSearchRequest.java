@@ -11,6 +11,9 @@ public class NameUsageSearchRequest extends FacetedSearchRequest<NameUsageSearch
   @Hidden @Getter @Setter
   private NameUsageRequest.SortBy sortBy;
 
+  @Hidden @Getter @Setter
+  private boolean reverse;
+
   public enum NameUsageQueryField implements QueryField {
     SCIENTIFIC(NameUsageRequest.SearchContent.SCIENTIFIC_NAME),
     AUTHORSHIP(NameUsageRequest.SearchContent.AUTHORSHIP),
