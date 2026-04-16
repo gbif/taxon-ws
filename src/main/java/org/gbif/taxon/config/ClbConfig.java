@@ -12,8 +12,10 @@ import life.catalogue.es.search.NameUsageSearchServiceEs;
 import life.catalogue.es.suggest.NameUsageSuggestionService;
 import life.catalogue.es.suggest.NameUsageSuggestionServiceEs;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.gbif.taxon.resource.TaxonResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -24,6 +26,20 @@ import org.springframework.context.annotation.Primary;
 @Configuration
 public class ClbConfig {
   private static final Logger LOG = LoggerFactory.getLogger(ClbConfig.class);
+
+  /**
+   * Remove the facetMultiselect parameter from the search endpoint openapi description.
+   */
+  @Bean
+  public OperationCustomizer removeFacetMultiselect() {
+    return (operation, handlerMethod) -> {
+      if (handlerMethod.getBeanType().equals(TaxonResource.class)) {
+        operation.getParameters().removeIf(p ->
+            "facetMultiselect".equals(p.getName()));
+      }
+      return operation;
+    };
+  }
 
   @Bean
   @Primary
