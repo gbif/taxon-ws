@@ -456,6 +456,9 @@ public class ApiConverter {
   public life.catalogue.api.search.NameUsageSearchRequest convert(NameUsageSearchRequest request) {
     var req = new life.catalogue.api.search.NameUsageSearchRequest();
     copyCommon(request, req);
+    if (request.getSortBy() != null) {
+      req.setSortBy(request.getSortBy());
+    }
     if (request.getQFields() != null && !request.getQFields().isEmpty()) {
       req.setContent(request.getQFields().stream()
         .filter(f -> f instanceof NameUsageSearchRequest.NameUsageQueryField)

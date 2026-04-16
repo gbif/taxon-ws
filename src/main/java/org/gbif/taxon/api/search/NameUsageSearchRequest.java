@@ -7,6 +7,10 @@ import lombok.Setter;
 import org.gbif.api.model.common.search.FacetedSearchRequest;
 
 public class NameUsageSearchRequest extends FacetedSearchRequest<NameUsageSearchParameter> {
+
+  @Hidden @Getter @Setter
+  private NameUsageRequest.SortBy sortBy;
+
   public enum NameUsageQueryField implements QueryField {
     SCIENTIFIC(NameUsageRequest.SearchContent.SCIENTIFIC_NAME),
     AUTHORSHIP(NameUsageRequest.SearchContent.AUTHORSHIP),
@@ -18,9 +22,6 @@ public class NameUsageSearchRequest extends FacetedSearchRequest<NameUsageSearch
       this.clbValue = clbValue;
     }
   }
-
-  @Hidden @Getter @Setter
-  private NameUsageRequest.SearchType searchType;
 
   @Override
   public void setHighlight(boolean highlight) {
