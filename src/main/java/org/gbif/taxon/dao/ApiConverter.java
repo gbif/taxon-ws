@@ -1,6 +1,5 @@
 package org.gbif.taxon.dao;
 
-import io.swagger.v3.oas.annotations.Hidden;
 import life.catalogue.api.model.*;
 import life.catalogue.api.search.NameUsageRequest;
 import life.catalogue.api.search.NameUsageSearchResponse;
@@ -11,8 +10,6 @@ import life.catalogue.api.vocab.NomRelType;
 import life.catalogue.api.vocab.area.Gazetteer;
 import life.catalogue.parser.AreaParser;
 import life.catalogue.parser.SafeParser;
-import lombok.Getter;
-import lombok.Setter;
 import org.gbif.api.model.common.search.Facet;
 import org.gbif.api.model.common.search.SearchRequest;
 import org.gbif.api.model.common.search.SearchResponse;

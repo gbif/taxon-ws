@@ -1,5 +1,6 @@
 package org.gbif.taxon.provider;
 
+import life.catalogue.api.search.NameUsageRequest;
 import org.gbif.api.model.common.search.SearchRequest;
 import org.gbif.taxon.api.search.NameUsageSearchParameter;
 import org.gbif.taxon.api.search.NameUsageSearchRequest;
@@ -13,6 +14,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -61,6 +63,20 @@ public class NameUsageSearchRequestHandlerMethodArgumentResolver
           })
           .collect(Collectors.toSet());
       req.setQFields(qFields);
+    }
+    Map<String, String[]> params = webRequest.getParameterMap();
+    String sortBy = getFirstIgnoringCase("sortBy", params);
+    if (sortBy != null) {
+      try {
+        req.setSortBy(NameUsageRequest.SortBy.valueOf(sortBy.toUpperCase()));
+      } catch (IllegalArgumentException e) {
+        throw new IllegalArgumentException("Unknown sortBy value: " + sortBy +
+            ". Valid values are: " + Arrays.toString(NameUsageRequest.SortBy.values()));
+      }
+    }
+    String reverse = getFirstIgnoringCase("reverse", params);
+    if (reverse != null) {
+      req.setReverse("true".equalsIgnoreCase(reverse.trim()));
     }
     return req;
   }

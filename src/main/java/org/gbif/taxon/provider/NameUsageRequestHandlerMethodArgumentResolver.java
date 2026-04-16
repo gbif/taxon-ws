@@ -15,8 +15,7 @@ class NameUsageRequestHandlerMethodArgumentResolver {
   static final Set<String> STANDARD_PARAMS = Set.of(
       "Q", "OFFSET", "LIMIT", "QFIELD",
       "SORTBY", "REVERSE",
-      "FACET", "FACETMINCOUNT", "FACETLIMIT", "FACETOFFSET", "FACETMULTISELECT",
-      "SEARCHTYPE", "CONTENT"
+      "FACET", "FACETMINCOUNT", "FACETLIMIT", "FACETOFFSET", "FACETMULTISELECT"
   );
 
   /** Normalized names of all known {@link NameUsageSearchParameter} values. */
