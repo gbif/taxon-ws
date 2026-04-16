@@ -468,6 +468,8 @@ public class ApiConverter {
         .filter(f -> f instanceof NameUsageSearchRequest.NameUsageQueryField)
         .map(f -> ((NameUsageSearchRequest.NameUsageQueryField) f).clbValue)
         .collect(Collectors.toSet()));
+    } else {
+      req.setContent(Set.of(NameUsageRequest.SearchContent.SCIENTIFIC_NAME));
     }
     if (request.getFacets() != null && !request.getFacets().isEmpty()) {
       req.setFacets(request.getFacets().stream()

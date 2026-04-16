@@ -405,13 +405,13 @@ public class TaxonResource {
     value = {
       @Parameter(
         name = "searchType",
-        description = "The type of search to perform (e.g. PREFIX or WHOLE_WORDS).",
-        schema = @Schema(implementation = NameUsageRequest.SearchType.class),
+        description = "The type of search to perform (e.g. FUZZY or WORDS).",
+        schema = @Schema(implementation = NameUsageSearchRequest.SearchType.class),
         in = ParameterIn.QUERY
       ),
       @Parameter(
         name = "content",
-        description = "Restricts full-text search to specific fields. Defaults to scientific name and authorship fields.",
+        description = "Restricts full-text search to specific fields. Defaults to scientific name only.",
         schema = @Schema(implementation = NameUsageRequest.SearchContent.class),
         in = ParameterIn.QUERY
       )
