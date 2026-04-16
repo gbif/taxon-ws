@@ -4,8 +4,9 @@ import life.catalogue.api.search.NameUsageRequest;
 import org.gbif.api.model.common.search.SearchRequest;
 import org.gbif.taxon.api.search.NameUsageSearchParameter;
 import org.gbif.taxon.api.search.NameUsageSearchRequest;
-import org.gbif.taxon.api.search.NameUsageSearchRequest.NameUsageQueryField;
+import org.gbif.taxon.api.search.NameUsageSearchRequest.SearchContent;
 import org.gbif.ws.server.provider.FacetedSearchRequestProvider;
+import org.gbif.ws.util.CommonWsUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -43,28 +44,14 @@ public class NameUsageSearchRequestHandlerMethodArgumentResolver
   }
 
   /**
-   * Overrides the parent to re-parse {@code qField} using {@link NameUsageQueryField}.
+   * Overrides the parent to re-parse {@code qField} using {@link SearchContent}.
    * The base {@link FacetedSearchRequestProvider} hardcodes the old GBIF v1
    * {@code NameUsageQueryField} class and silently drops unrecognized values.
    */
   @Override
   protected NameUsageSearchRequest getSearchRequest(WebRequest webRequest, NameUsageSearchRequest request) {
-    var req = super.getSearchRequest(webRequest, request);
-    String[] qFieldValues = webRequest.getParameterValues("qField");
-    if (qFieldValues != null) {
-      Set<SearchRequest.QueryField> qFields = Arrays.stream(qFieldValues)
-          .map(v -> {
-            try {
-              return NameUsageQueryField.valueOf(v.toUpperCase());
-            } catch (IllegalArgumentException e) {
-              throw new IllegalArgumentException("Unknown qField value: " + v +
-                  ". Valid values are: " + Arrays.toString(NameUsageQueryField.values()));
-            }
-          })
-          .collect(Collectors.toSet());
-      req.setQFields(qFields);
-    }
-    Map<String, String[]> params = webRequest.getParameterMap();
+    final var req = super.getSearchRequest(webRequest, request);
+    final Map<String, String[]> params = webRequest.getParameterMap();
     String sortBy = getFirstIgnoringCase("sortBy", params);
     if (sortBy != null) {
       try {
@@ -85,6 +72,20 @@ public class NameUsageSearchRequestHandlerMethodArgumentResolver
       } catch (IllegalArgumentException e) {
         throw new IllegalArgumentException("Unknown searchType value: " + sortBy +
             ". Valid values are: " + Arrays.toString(NameUsageRequest.SearchType.values()));
+      }
+    }
+
+    String[] searchContent = params.get("searchContent");
+    if (searchContent != null && searchContent.length > 0) {
+      try {
+        req.setSearchContent(
+            Arrays.stream(searchContent)
+                .map(sc -> NameUsageSearchRequest.SearchContent.valueOf(sc.toUpperCase()))
+                .collect(Collectors.toSet())
+        );
+      } catch (IllegalArgumentException e) {
+        throw new IllegalArgumentException("Unknown searchContent value: " + sortBy +
+            ". Valid values are: " + Arrays.toString(NameUsageSearchRequest.SearchContent.values()));
       }
     }
     return req;

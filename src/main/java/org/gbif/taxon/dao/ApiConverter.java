@@ -463,10 +463,9 @@ public class ApiConverter {
     if (request.getSearchType() != null) {
       req.setSearchType(request.getSearchType().clbValue);
     }
-    if (request.getQFields() != null && !request.getQFields().isEmpty()) {
-      req.setContent(request.getQFields().stream()
-        .filter(f -> f instanceof NameUsageSearchRequest.NameUsageQueryField)
-        .map(f -> ((NameUsageSearchRequest.NameUsageQueryField) f).clbValue)
+    if (request.getSearchContent() != null && !request.getSearchContent().isEmpty()) {
+      req.setContent(request.getSearchContent().stream()
+        .map(sc -> sc.clbValue)
         .collect(Collectors.toSet()));
     } else {
       req.setContent(Set.of(NameUsageRequest.SearchContent.SCIENTIFIC_NAME));

@@ -13,7 +13,7 @@ class NameUsageRequestHandlerMethodArgumentResolver {
 
   /** Standard paging and search params accepted in addition to {@link NameUsageSearchParameter} values. */
   static final Set<String> STANDARD_PARAMS = Set.of(
-      "Q", "OFFSET", "LIMIT", "QFIELD", "SEARCHTYPE",
+      "Q", "OFFSET", "LIMIT", "QFIELD", "SEARCHTYPE", "SEARCHCONTENT",
       "SORTBY", "REVERSE",
       "FACET", "FACETMINCOUNT", "FACETLIMIT", "FACETOFFSET", "FACETMULTISELECT"
   );

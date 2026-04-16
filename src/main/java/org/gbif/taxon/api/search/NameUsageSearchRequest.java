@@ -6,10 +6,15 @@ import lombok.Getter;
 import lombok.Setter;
 import org.gbif.api.model.common.search.FacetedSearchRequest;
 
+import java.util.Set;
+
 public class NameUsageSearchRequest extends FacetedSearchRequest<NameUsageSearchParameter> {
 
   @Hidden @Getter @Setter
   private SearchType searchType;
+
+  @Hidden @Getter @Setter
+  private Set<SearchContent> searchContent;
 
   @Hidden @Getter @Setter
   private NameUsageRequest.SortBy sortBy;
@@ -17,19 +22,19 @@ public class NameUsageSearchRequest extends FacetedSearchRequest<NameUsageSearch
   @Hidden @Getter @Setter
   private boolean reverse;
 
-  public enum NameUsageQueryField implements QueryField {
+  public enum SearchContent {
     SCIENTIFIC(NameUsageRequest.SearchContent.SCIENTIFIC_NAME),
     AUTHORSHIP(NameUsageRequest.SearchContent.AUTHORSHIP),
     VERNACULAR(NameUsageRequest.SearchContent.VERNACULAR_NAME);
 
     public final NameUsageRequest.SearchContent clbValue;
 
-    NameUsageQueryField(NameUsageRequest.SearchContent clbValue) {
+    SearchContent(NameUsageRequest.SearchContent clbValue) {
       this.clbValue = clbValue;
     }
   }
 
-  public static enum SearchType {
+  public enum SearchType {
     WORDS(NameUsageRequest.SearchType.WHOLE_WORDS),
     EXACT(NameUsageRequest.SearchType.EXACT),
     FUZZY(NameUsageRequest.SearchType.FUZZY);
