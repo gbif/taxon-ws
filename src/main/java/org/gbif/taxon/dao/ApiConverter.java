@@ -460,6 +460,9 @@ public class ApiConverter {
       req.setSortBy(request.getSortBy());
       req.setReverse(request.isReverse());
     }
+    if (request.getSearchType() != null) {
+      req.setSearchType(request.getSearchType().clbValue);
+    }
     if (request.getQFields() != null && !request.getQFields().isEmpty()) {
       req.setContent(request.getQFields().stream()
         .filter(f -> f instanceof NameUsageSearchRequest.NameUsageQueryField)

@@ -9,6 +9,9 @@ import org.gbif.api.model.common.search.FacetedSearchRequest;
 public class NameUsageSearchRequest extends FacetedSearchRequest<NameUsageSearchParameter> {
 
   @Hidden @Getter @Setter
+  private SearchType searchType;
+
+  @Hidden @Getter @Setter
   private NameUsageRequest.SortBy sortBy;
 
   @Hidden @Getter @Setter
@@ -22,6 +25,18 @@ public class NameUsageSearchRequest extends FacetedSearchRequest<NameUsageSearch
     public final NameUsageRequest.SearchContent clbValue;
 
     NameUsageQueryField(NameUsageRequest.SearchContent clbValue) {
+      this.clbValue = clbValue;
+    }
+  }
+
+  public static enum SearchType {
+    WORDS(NameUsageRequest.SearchType.WHOLE_WORDS),
+    EXACT(NameUsageRequest.SearchType.EXACT),
+    FUZZY(NameUsageRequest.SearchType.FUZZY);
+
+    public final NameUsageRequest.SearchType clbValue;
+
+    SearchType(NameUsageRequest.SearchType clbValue) {
       this.clbValue = clbValue;
     }
   }

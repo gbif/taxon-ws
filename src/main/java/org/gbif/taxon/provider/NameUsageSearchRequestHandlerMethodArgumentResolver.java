@@ -78,6 +78,15 @@ public class NameUsageSearchRequestHandlerMethodArgumentResolver
     if (reverse != null) {
       req.setReverse("true".equalsIgnoreCase(reverse.trim()));
     }
+    String searchType = getFirstIgnoringCase("searchType", params);
+    if (searchType != null) {
+      try {
+        req.setSearchType(NameUsageSearchRequest.SearchType.valueOf(searchType.toUpperCase()));
+      } catch (IllegalArgumentException e) {
+        throw new IllegalArgumentException("Unknown searchType value: " + sortBy +
+            ". Valid values are: " + Arrays.toString(NameUsageRequest.SearchType.values()));
+      }
+    }
     return req;
   }
 }
