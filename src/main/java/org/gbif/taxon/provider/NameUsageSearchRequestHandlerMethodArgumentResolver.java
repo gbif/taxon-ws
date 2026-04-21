@@ -1,12 +1,10 @@
 package org.gbif.taxon.provider;
 
 import life.catalogue.api.search.NameUsageRequest;
-import org.gbif.api.model.common.search.SearchRequest;
 import org.gbif.taxon.api.search.NameUsageSearchParameter;
 import org.gbif.taxon.api.search.NameUsageSearchRequest;
 import org.gbif.taxon.api.search.NameUsageSearchRequest.SearchContent;
 import org.gbif.ws.server.provider.FacetedSearchRequestProvider;
-import org.gbif.ws.util.CommonWsUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -16,7 +14,6 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**

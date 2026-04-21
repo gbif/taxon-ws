@@ -484,6 +484,7 @@ public class ApiConverter {
   public life.catalogue.api.search.NameUsageSuggestRequest convert(NameUsageSuggestRequest request) {
     var req = new life.catalogue.api.search.NameUsageSuggestRequest();
     copyCommon(request, req);
+    req.setLimit(request.getLimit());
     return req;
   }
 

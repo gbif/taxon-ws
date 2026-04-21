@@ -26,7 +26,7 @@ public class NameUsageSimple extends ClassificationUsage {
   @Schema(description = "The taxonomic status of the taxon (e.g., accepted, synonym)", example = "accepted")
   private TaxonomicStatus taxonomicStatus;
 
-  @Schema(description = "The nomenclatural code governing the taxon name", example = "ICNAFP")
+  @Schema(description = "The nomenclatural code governing the taxon name", example = "BOTANICAL")
   private String nomenclaturalCode;
 
   @Schema(description = "Indicates whether the taxon is extinct", example = "false")

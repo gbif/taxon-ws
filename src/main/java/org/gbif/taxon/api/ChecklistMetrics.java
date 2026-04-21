@@ -68,8 +68,8 @@ public class ChecklistMetrics {
   @Schema(description = "Number of vernacular (common) name records in the dataset", example = "9000")
   private Integer vernacularCount;
 
-  @Schema(description = "Count of names grouped by nomenclatural code (e.g. ICZN, ICNAFP)",
-    example = "{\"ICNAFP\": 42000, \"ICZN\": 13000}")
+  @Schema(description = "Count of names grouped by nomenclatural code (e.g. ZOOLOGICAL, BOTANICAL)",
+    example = "{\"BOTANICAL\": 42000, \"ZOOLOGICAL\": 13000}")
   private Map<NomCode, Integer> namesByCodeCount;
 
   @Schema(description = "Count of names grouped by taxonomic rank (e.g. SPECIES, GENUS, FAMILY)",

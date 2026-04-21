@@ -313,7 +313,7 @@ public class TaxonResource {
       ),
       @Parameter(
         name = "taxonomicStatus",
-        description = "Filters by the taxonomic status as given in our https://api.gbif.org/v1/enumeration/basic/TaxonomicStatus[TaxonomicStatus enum].",
+        description = "Filters by the taxonomic status.",
         schema = @Schema(implementation = TaxonomicStatus.class),
         in = ParameterIn.QUERY
       ),
@@ -343,7 +343,7 @@ public class TaxonResource {
       ),
       @Parameter(
         name = "nameType",
-        description = "Filters by the name type as given in our https://api.gbif.org/v1/enumeration/basic/NameType[NameType enum].",
+        description = "Filters by the name type.",
         schema = @Schema(implementation = NameType.class),
         in = ParameterIn.QUERY
       ),
@@ -367,7 +367,7 @@ public class TaxonResource {
       ),
       @Parameter(
         name = "issue",
-        description = "A specific indexing issue as defined in ChecklistBanks https://api.checklistbank.org/vocab/issue[Issue enum].",
+        description = "A specific indexing issue as defined in ChecklistBanks Issue enum: https://api.checklistbank.org/vocab/issue.",
         schema = @Schema(implementation = Issue.class),
         in = ParameterIn.QUERY
       )

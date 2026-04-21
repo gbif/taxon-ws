@@ -11,8 +11,8 @@ import lombok.Data;
 @Schema(description = "A bibliographic reference or citation for a taxon")
 public class Reference {
 
-  @Schema(description = "An identifier for the reference such as a DOI, ISBN, ISSN, or URI (dc:identifier)",
-    example = "https://doi.org/10.1234/example.doi")
+  @Schema(description = "An identifier for the reference in the dataset",
+    example = "Smith2020")
   private String referenceID;
 
   @Schema(description = "The Digital Object Identifier (DOI) for the reference",
@@ -25,7 +25,7 @@ public class Reference {
   private String citation;
 
   @Schema(description = "A link to the publication",
-      example = "Smith, J. & Jones, A. (2020). New Species of Abies. Journal of Botany, 45(2), 123-145.")
+      example = "https://www.biodiversitylibrary.org/page/52334711#page/531/mode/1up")
   private String url;
 
   @Schema(description = "Taxon-specific annotation or notes about how this reference relates to the taxon (dwc:taxonRemarks)",
