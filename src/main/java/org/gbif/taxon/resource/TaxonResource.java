@@ -306,13 +306,13 @@ public class TaxonResource {
         in = ParameterIn.QUERY
       ),
       @Parameter(
-        name = "rank",
+        name = "taxonRank",
         description = "Filters by taxonomic rank.",
         schema = @Schema(implementation = Rank.class),
         in = ParameterIn.QUERY
       ),
       @Parameter(
-        name = "status",
+        name = "taxonomicStatus",
         description = "Filters by the taxonomic status as given in our https://api.gbif.org/v1/enumeration/basic/TaxonomicStatus[TaxonomicStatus enum].",
         schema = @Schema(implementation = TaxonomicStatus.class),
         in = ParameterIn.QUERY
@@ -336,7 +336,7 @@ public class TaxonResource {
         in = ParameterIn.QUERY
       ),
       @Parameter(
-        name = "code",
+        name = "nomenclaturalCode",
         description = "Filters by the nomenclatural code.",
         schema = @Schema(implementation = NomCode.class),
         in = ParameterIn.QUERY
