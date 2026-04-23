@@ -66,7 +66,7 @@ public class ChecklistMetrics {
   private Integer typeMaterialCount;
 
   @Schema(description = "Number of vernacular (common) name records in the dataset", example = "9000")
-  private Integer vernacularCount;
+  private Integer vernacularNameCount;
 
   @Schema(description = "Count of names grouped by nomenclatural code (e.g. ZOOLOGICAL, BOTANICAL)",
     example = "{\"BOTANICAL\": 42000, \"ZOOLOGICAL\": 13000}")

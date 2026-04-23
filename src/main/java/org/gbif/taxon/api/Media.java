@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.net.URI;
+import java.time.LocalDate;
 
 /**
  * Media (images, videos, sounds, etc.) associated with a taxon.
@@ -26,10 +27,8 @@ public class Media {
   @Schema(description = "The title or caption for the media item (dc:title)", example = "Abies alba cone and needles")
   private String title;
 
-  @Schema(description = "The date and time the media item was created (dc:created). " +
-    "ISO 8601 format recommended.",
-    example = "2020-06-15")
-  private String created;
+  @Schema(description = "The date the media item was created (dc:created) in ISO 8601 format.", example = "2020-06-15")
+  private LocalDate created;
 
   @Schema(description = "The person or organisation that created the media item (dc:creator)", example = "John Smith")
   private String creator;

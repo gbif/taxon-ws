@@ -13,6 +13,6 @@ public class VernacularNameSimple {
   @Schema(description = "The vernacular (common) name", example = "Silver Fir")
   private String vernacularName;
 
-  @Schema(description = "The language of the vernacular name (ISO 639 code)", example = "en")
+  @Schema(description = "The language of the vernacular name (ISO 639-2 code)", example = "eng")
   private String language;
 }

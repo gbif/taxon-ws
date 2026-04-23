@@ -188,7 +188,7 @@ public class ApiConverter {
     media.setIdentifier(m.getUrl() != null ? m.getUrl().toString() : null);
     media.setType(str(m.getType()));
     media.setTitle(m.getTitle());
-    media.setCreated(m.getCaptured() != null ? m.getCaptured().toString() : null);
+    media.setCreated(m.getCaptured());
     media.setCreator(m.getCapturedBy());
     media.setLicense(str(m.getLicense()));
     media.setReferences(m.getLink());
@@ -538,7 +538,7 @@ public class ApiConverter {
     metrics.setTaxonCount(imp.getTaxonCount());
     metrics.setTreatmentCount(imp.getTreatmentCount());
     metrics.setTypeMaterialCount(imp.getTypeMaterialCount());
-    metrics.setVernacularCount(imp.getVernacularCount());
+    metrics.setVernacularNameCount(imp.getVernacularCount());
 
     metrics.setNamesByCodeCount(imp.getNamesByCodeCount());
     metrics.setNamesByRankCount(imp.getNamesByRankCount());
