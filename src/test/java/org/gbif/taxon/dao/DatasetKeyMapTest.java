@@ -60,7 +60,7 @@ class DatasetKeyMapTest {
     {"mainIndex": {"clbDatasetKey": 1234}}
     """, JsonNode.class);
     when(jsonFetcher.fetchJson(any())).thenReturn(json);
-    map = new DatasetKeyMap(factory, cache, jsonFetcher, "this is ignored");
+    map = new DatasetKeyMap(factory, cache, jsonFetcher, "this is ignored", null);
   }
 
   @Test

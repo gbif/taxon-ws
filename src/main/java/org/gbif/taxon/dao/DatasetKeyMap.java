@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.UUID;
@@ -30,16 +31,19 @@ public class DatasetKeyMap {
   private final LatestDatasetKeyCache cache;
   private final JsonFetcher  jsonFetcher;
   private final String matchingMetadata;
+  private final boolean fixedColKey;
   private int colkey; // we load the COL key eagerly and keep it also outside of the expiring coffeine cache
 
   public DatasetKeyMap(SqlSessionFactory factory, LatestDatasetKeyCache cache, JsonFetcher  jsonFetcher,
-                       @Value("${matching.url}") String matchingMetadata
+                       @Value("${matching.url}") String matchingMetadata, @Nullable @Value("${colKey}") Integer fixedColKey
   ) throws IOException {
     this.factory = factory;
     this.cache = cache;
     this.jsonFetcher = jsonFetcher;
     this.matchingMetadata = matchingMetadata;
-    colkey = retrieveCurrentColXRKey();
+    this.fixedColKey = fixedColKey != null;
+    colkey = this.fixedColKey ? fixedColKey : retrieveCurrentColXRKey();
+    LOG.info("Using COL XR key {}", colkey);
   }
 
   private final LoadingCache<UUID, Integer> gbif2clb = Caffeine.newBuilder()
@@ -95,7 +99,7 @@ public class DatasetKeyMap {
 
   @VisibleForTesting
   protected int retrieveCurrentColXRKey() {
-    int key = 0;
+    int key;
     try {
       JsonNode json = jsonFetcher.fetchJson(matchingMetadata);
       key = json
@@ -141,7 +145,9 @@ public class DatasetKeyMap {
 
   public void flush() throws IOException {
     LOG.info("Flushing dataset key map. Current COL key: " + colkey);
-    colkey = retrieveCurrentColXRKey();
+    if (!fixedColKey) {
+      colkey = retrieveCurrentColXRKey();
+    }
     gbif2clb.invalidateAll();
     clb2gbif.invalidateAll();
     cache.clear();
