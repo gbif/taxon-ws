@@ -2,6 +2,8 @@ package org.gbif.taxon.config;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.zaxxer.hikari.HikariDataSource;
+import freemarker.cache.ClassTemplateLoader;
+import freemarker.cache.TemplateLoader;
 import life.catalogue.cache.LatestDatasetKeyCache;
 import life.catalogue.cache.LatestDatasetKeyCacheImpl;
 import life.catalogue.config.EsConfig;
@@ -12,6 +14,7 @@ import life.catalogue.es.search.NameUsageSearchServiceEs;
 import life.catalogue.es.suggest.NameUsageSuggestionService;
 import life.catalogue.es.suggest.NameUsageSuggestionServiceEs;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.gbif.taxon.resource.SitemapResource;
 import org.gbif.taxon.resource.TaxonResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,6 +86,24 @@ public class ClbConfig {
   @Primary
   public NameUsageSuggestionService nameUsageSuggestionService(EsConfig cfg, ElasticsearchClient client) {
     return new NameUsageSuggestionServiceEs(resolveIndexName(cfg), client);
+  }
+
+  /**
+   * Provides a freemarker template loader.
+   * It is configured to access the utf8 templates folder on the classpath, i.e.
+   * /src/resources/templates
+   */
+  @Bean
+  @Primary
+  public freemarker.template.Configuration provideFreemarker() {
+    // load templates from classpath by prefixing /templates
+    TemplateLoader tl = new ClassTemplateLoader(SitemapResource.class, "/templates");
+
+    freemarker.template.Configuration fm = new freemarker.template.Configuration(freemarker.template.Configuration.VERSION_2_3_34);
+    fm.setDefaultEncoding("utf8");
+    fm.setTemplateLoader(tl);
+
+    return fm;
   }
 
   private static String resolveIndexName(EsConfig cfg) {
