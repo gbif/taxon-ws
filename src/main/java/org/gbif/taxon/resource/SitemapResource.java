@@ -22,6 +22,7 @@ import life.catalogue.api.model.Page;
 import life.catalogue.db.mapper.NameUsageMapper;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.gbif.taxon.config.SitemapConfig;
 import org.gbif.taxon.dao.DatasetKeyMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,12 +58,12 @@ public class SitemapResource {
   private final String apiUrl;
 
   public SitemapResource(SqlSessionFactory factory, DatasetKeyMap keyMap, Configuration freemarker,
-                         @Value("${sitemap.portal}") String portalUrl, @Value("${sitemap.api}") String apiUrl) {
+                         SitemapConfig cfg) {
     this.freemarker = freemarker;
     this.factory = factory;
     this.colKey = keyMap.getColKey();
-    this.portalTaxonUrl = assertTrailingSlash(portalUrl) + "taxon/";
-    this.apiUrl = assertTrailingSlash(apiUrl);
+    this.portalTaxonUrl = assertTrailingSlash(cfg.getPortal()) + "taxon/";
+    this.apiUrl = assertTrailingSlash(cfg.getApi());
   }
 
   private static String assertTrailingSlash(String url) {

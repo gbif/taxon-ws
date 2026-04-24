@@ -13,6 +13,7 @@ import life.catalogue.db.mapper.DatasetMapper;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.gbif.taxon.config.ColConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,7 +61,7 @@ class DatasetKeyMapTest {
     {"mainIndex": {"clbDatasetKey": 1234}}
     """, JsonNode.class);
     when(jsonFetcher.fetchJson(any())).thenReturn(json);
-    map = new DatasetKeyMap(factory, cache, jsonFetcher, "this is ignored", null);
+    map = new DatasetKeyMap(factory, cache, jsonFetcher, new ColConfig());
   }
 
   @Test

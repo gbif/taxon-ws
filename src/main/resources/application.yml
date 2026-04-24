@@ -26,8 +26,8 @@ datasource:
     minimumIdle: 1
     idleTimeout: 120000
     connectionTimeout: 30000
-matching:
-  url: https://api.gbif.org/v2/species/match/metadata?checklistKey=7ddf754f-d193-4cc9-b351-99906754a03b
+col:
+  matchingUrl: https://api.gbif.org/v2/species/match/metadata?checklistKey=7ddf754f-d193-4cc9-b351-99906754a03b
 sitemap:
   api: https://api.gbif.org/
   portal: https://www.gbif.org/

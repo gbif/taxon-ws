@@ -11,8 +11,10 @@ import life.catalogue.api.vocab.Datasets;
 import life.catalogue.cache.LatestDatasetKeyCache;
 import life.catalogue.dao.DatasetInfoCache;
 import life.catalogue.db.mapper.DatasetMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.gbif.api.model.Constants;
+import org.gbif.taxon.config.ColConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,23 +28,22 @@ import java.util.UUID;
 @Component
 public class DatasetKeyMap {
   private static final Logger LOG = LoggerFactory.getLogger(DatasetKeyMap.class);
-  public static final UUID COL_BR_DATASET_KEY = UUID.fromString("e007cc4a-8704-449d-8829-bb209d26d6c8");
   private final SqlSessionFactory factory;
   private final LatestDatasetKeyCache cache;
   private final JsonFetcher  jsonFetcher;
   private final String matchingMetadata;
+  private final ColConfig cfg;
   private final boolean fixedColKey;
   private int colkey; // we load the COL key eagerly and keep it also outside of the expiring coffeine cache
 
-  public DatasetKeyMap(SqlSessionFactory factory, LatestDatasetKeyCache cache, JsonFetcher  jsonFetcher,
-                       @Value("${matching.url}") String matchingMetadata, @Nullable @Value("${colKey}") Integer fixedColKey
-  ) throws IOException {
+  public DatasetKeyMap(SqlSessionFactory factory, LatestDatasetKeyCache cache, JsonFetcher  jsonFetcher, ColConfig cfg) throws IOException {
+    this.cfg = cfg;
     this.factory = factory;
     this.cache = cache;
     this.jsonFetcher = jsonFetcher;
-    this.matchingMetadata = matchingMetadata;
-    this.fixedColKey = fixedColKey != null;
-    colkey = this.fixedColKey ? fixedColKey : retrieveCurrentColXRKey();
+    this.matchingMetadata = cfg.getMatchingUrl();
+    this.fixedColKey = cfg.getDatasetKey() != null;
+    colkey = this.fixedColKey ? cfg.getDatasetKey() : retrieveCurrentColXRKey();
     LOG.info("Using COL XR key {}", colkey);
   }
 
@@ -74,7 +75,7 @@ public class DatasetKeyMap {
           try {
             var info = DatasetInfoCache.CACHE.info(datasetKey, true);
             if (info != null && info.sourceKey != null && info.sourceKey == Datasets.COL) {
-              key = info.origin == DatasetOrigin.XRELEASE ? Constants.COL_DATASET_KEY : COL_BR_DATASET_KEY;
+              key = info.origin == DatasetOrigin.XRELEASE ? cfg.getExtendedRelease() : cfg.getBaseRelease();
             }
           } catch (NotFoundException e) {
             return null;
@@ -99,6 +100,9 @@ public class DatasetKeyMap {
 
   @VisibleForTesting
   protected int retrieveCurrentColXRKey() {
+    if (StringUtils.isBlank(matchingMetadata)) {
+      throw new IllegalStateException("Missing matching URL configuration. Please configure 'col.matchingUrl'");
+    }
     int key;
     try {
       JsonNode json = jsonFetcher.fetchJson(matchingMetadata);
@@ -121,9 +125,9 @@ public class DatasetKeyMap {
 
   public int toCLB(UUID datasetKey) {
     Integer dk;
-    if (Constants.COL_DATASET_KEY.equals(datasetKey)) {
+    if (cfg.getExtendedRelease().equals(datasetKey)) {
       dk = colkey;
-    } else if (COL_BR_DATASET_KEY.equals(datasetKey)) {
+    } else if (cfg.getBaseRelease().equals(datasetKey)) {
       // we map the base release to the latest published version
       dk = cache.getLatestRelease(Datasets.COL, false);
     } else {
