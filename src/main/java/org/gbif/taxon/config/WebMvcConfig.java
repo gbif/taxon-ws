@@ -16,29 +16,64 @@ package org.gbif.taxon.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.apache.tomcat.util.buf.EncodedSolidusHandling;
 import org.gbif.taxon.provider.NameUsageSearchRequestHandlerMethodArgumentResolver;
 import org.gbif.taxon.provider.NameUsageSuggestRequestHandlerMethodArgumentResolver;
 import org.gbif.ws.json.JacksonJsonObjectMapperProvider;
 import org.gbif.ws.server.provider.CountryHandlerMethodArgumentResolver;
 import org.gbif.ws.server.provider.PageableHandlerMethodArgumentResolver;
+import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.web.firewall.DefaultHttpFirewall;
 import org.springframework.security.web.firewall.HttpFirewall;
-import org.springframework.security.web.firewall.StrictHttpFirewall;
+import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.filter.UrlHandlerFilter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.util.UrlPathHelper;
 
 import java.util.List;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
+  @Override
+  public void configurePathMatch(PathMatchConfigurer configurer) {
+    UrlPathHelper urlPathHelper = new UrlPathHelper();
+    urlPathHelper.setUrlDecode(false);
+    configurer.setUrlPathHelper(urlPathHelper);
+  }
+
   @Bean
-  public HttpFirewall allowUrlEncodedPercentHttpFirewall() {
-    StrictHttpFirewall firewall = new StrictHttpFirewall();
-    firewall.setAllowSemicolon(true);
-    return firewall;
+  public HttpFirewall allowUrlEncodedSlashHttpFirewall() {
+    var fw = new DefaultHttpFirewall();
+    fw.setAllowUrlEncodedSlash(true);
+    return fw;
+  }
+
+  @Bean
+  public WebServerFactoryCustomizer<TomcatServletWebServerFactory> tomcatCustomizer() {
+    return factory -> factory.addConnectorCustomizers(connector -> {
+      connector.setEncodedSolidusHandling(EncodedSolidusHandling.PASS_THROUGH.getValue());
+    });
+  }
+
+  @Bean
+  public FilterRegistrationBean<?> urlHandlerFilterRegistrationBean() {
+    FilterRegistrationBean<OncePerRequestFilter> registrationBean = new FilterRegistrationBean<>();
+    UrlHandlerFilter urlHandlerFilter =
+        UrlHandlerFilter.trailingSlashHandler("/**")
+            .wrapRequest()
+            .build();
+    registrationBean.setFilter(urlHandlerFilter);
+    return registrationBean;
   }
 
   @Override
