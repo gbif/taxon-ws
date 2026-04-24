@@ -61,7 +61,9 @@ class DatasetKeyMapTest {
     {"mainIndex": {"clbDatasetKey": 1234}}
     """, JsonNode.class);
     when(jsonFetcher.fetchJson(any())).thenReturn(json);
-    map = new DatasetKeyMap(factory, cache, jsonFetcher, new ColConfig());
+    var cfg = new ColConfig();
+    cfg.setMatchingUrl("http://localhost:8080/matcher-ws"); // this is ignored
+    map = new DatasetKeyMap(factory, cache, jsonFetcher, cfg);
   }
 
   @Test
