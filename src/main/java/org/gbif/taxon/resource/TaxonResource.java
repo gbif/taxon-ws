@@ -56,20 +56,20 @@ import static java.lang.annotation.ElementType.METHOD;
 @OpenAPIDefinition(
     info =
         @Info(
-            title = "Species API",
+            title = "Taxon API",
             version = "v2",
             description = """
-                This API provides access to species (name usage) data indexed by ChecklistBank for GBIF.
-                It exposes taxonomic name usages from registered checklist datasets including scientific names,
-                synonymy, vernacular names, geographic distributions, media, bibliographic references, and
-                measurements or facts. Taxon keys are scoped to individual datasets and are not global identifiers.
+                This API provides access to taxa (name usages) indexed by ChecklistBank for GBIF.
+                It exposes taxonomic data from registered checklist datasets including scientific names,
+                synonymy, vernacular names, geographic distributions, media, bibliographic references and
+                measurements or facts. Taxon keys are scoped to individual datasets and are not necessarily globally unique.
                 """,
             termsOfService = "https://www.gbif.org/terms"),
     servers = {
       @Server(url = "https://api.gbif.org/v2/", description = "Production"),
       @Server(url = "https://api.gbif-test.org/v2/", description = "Test")
     })
-@Tag(name = "Species", description = "Species indexed by ChecklistBank for GBIF")
+@Tag(name = "Taxon", description = "Taxa indexed by ChecklistBank for GBIF")
 @RequestMapping(value = "taxon", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
 public class TaxonResource {

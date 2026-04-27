@@ -64,7 +64,7 @@ public class TreeResource {
 
   @Operation(
     operationId = "getClassification",
-    summary = "Get the classification path for a taxon",
+    summary = "Get the classification for a taxon",
     description = "Returns the ordered list of ancestor taxa from the root of the classification down to the given taxon, " +
       "inclusive of the taxon itself."
   )
@@ -91,8 +91,7 @@ public class TreeResource {
   @Operation(
     operationId = "getChildren",
     summary = "Get direct children of a taxon",
-    description = "Returns the direct accepted child taxa of the given taxon. " +
-      "Synonyms are excluded. Results are paginated."
+    description = "Returns the direct accepted child taxa of the given taxon. Synonyms are excluded. Results are paginated."
   )
   @ApiResponse(responseCode = "200", description = "Child taxa")
   @ApiResponse(responseCode = "404", description = "Taxon not found")

@@ -550,7 +550,6 @@ public class ApiConverter {
 
     metrics.setBareNameCount(imp.getBareNameCount());
     metrics.setDistributionCount(imp.getDistributionCount());
-    metrics.setEstimateCount(imp.getEstimateCount());
     metrics.setMediaCount(imp.getMediaCount());
     metrics.setNameCount(imp.getNameCount());
     metrics.setReferenceCount(imp.getReferenceCount());

@@ -55,7 +55,7 @@ public class Distribution {
     example = "escape_from_cultivation")
   private String pathway;
 
-  @Schema(description = "Flag to indicate that the introduced species is considered to be invasive in the given area",
+  @Schema(description = "Flag to indicate that the introduced taxon is considered to be invasive in the given area",
     example = "true")
   private Boolean isInvasive;
 

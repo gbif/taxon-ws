@@ -254,6 +254,8 @@ public class TaxonDao {
     var nodes = treeDao.classification(dsid, -1, true, false, null, null);
     if (nodes == null || nodes.isEmpty()) {
       throw new NotFoundException(taxonKey, "No classification found for taxon " + taxonKey);
+    } else if (nodes.getLast().getStatus().isTaxon()) {
+      throw new NotFoundException(taxonKey, "Synonym found for taxon " + taxonKey);
     }
     return nodes.stream()
       .map(converter::convertTree)

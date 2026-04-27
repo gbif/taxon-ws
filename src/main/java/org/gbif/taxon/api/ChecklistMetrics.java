@@ -41,9 +41,6 @@ public class ChecklistMetrics {
   @Schema(description = "Number of distribution records in the dataset", example = "4500")
   private Integer distributionCount;
 
-  @Schema(description = "Number of species estimate records", example = "30")
-  private Integer estimateCount;
-
   @Schema(description = "Number of media records (images, sounds, videos) in the dataset", example = "8200")
   private Integer mediaCount;
 
