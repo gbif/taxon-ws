@@ -20,9 +20,7 @@ import org.slf4j.LoggerFactory;
  */
 @Intercepts({
   @Signature(type = Executor.class, method = "query",
-      args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}),
-  @Signature(type = Executor.class, method = "update",
-      args = {MappedStatement.class, Object.class})
+      args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class})
 })
 public class SlowSqlInterceptor implements Interceptor {
   private static final Logger LOG = LoggerFactory.getLogger(SlowSqlInterceptor.class);

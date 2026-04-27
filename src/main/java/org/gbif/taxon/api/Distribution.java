@@ -5,6 +5,8 @@ import lombok.Data;
 
 import java.util.UUID;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 /**
  * Geographic distribution information for a taxon.
  * Based on the GBIF Distribution extension: https://rs.gbif.org/extension/gbif/1.0/distribution.xml
@@ -13,10 +15,10 @@ import java.util.UUID;
 @Schema(description = "Geographic distribution information for a taxon, based on the GBIF Distribution extension")
 public class Distribution {
 
-  @Schema(description = "The identifier for the dataset", example = "7ddf754f-d193-4cc9-b351-99906754a03b")
+  @Schema(requiredMode = REQUIRED, description = "The identifier for the dataset", example = "7ddf754f-d193-4cc9-b351-99906754a03b")
   private UUID datasetKey;
 
-  @Schema(description = "The unique identifier for this taxon (dwc:taxonID)", example = "2435099")
+  @Schema(requiredMode = REQUIRED, description = "The unique identifier for this taxon (dwc:taxonID)", example = "2435099")
   private String taxonID;
 
   @Schema(description = "A CURIE identifier (scope:id) for the named area (dwc:locationID), " +

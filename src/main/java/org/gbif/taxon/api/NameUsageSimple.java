@@ -7,6 +7,8 @@ import lombok.Data;
 import java.net.URI;
 import java.util.UUID;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 /**
  * Simplified taxon usage class containing core taxonomic information.
  */
@@ -14,10 +16,10 @@ import java.util.UUID;
 @Schema(description = "Simplified taxon usage containing core taxonomic information")
 public class NameUsageSimple extends ClassificationUsage {
 
-  @Schema(description = "The identifier for the dataset", example = "7ddf754f-d193-4cc9-b351-99906754a03b")
+  @Schema(requiredMode = REQUIRED, description = "The identifier for the dataset", example = "7ddf754f-d193-4cc9-b351-99906754a03b")
   private UUID datasetKey;
 
-  @Schema(description = "The identifier of the name", example = "1052714-2")
+  @Schema(requiredMode = REQUIRED, description = "The identifier of the name", example = "1052714-2")
   private String scientificNameID;
 
   @Schema(description = "The identifier of the accepted taxon (for synonyms)", example = "2435098")
@@ -26,7 +28,7 @@ public class NameUsageSimple extends ClassificationUsage {
   @Schema(description = "The identifier of the parent taxon in the classification", example = "2435001")
   private String parentNameUsageID;
 
-  @Schema(description = "The taxonomic status of the taxon (e.g., accepted, synonym)", example = "accepted")
+  @Schema(requiredMode = REQUIRED, description = "The taxonomic status of the taxon (e.g., accepted, synonym)", example = "accepted")
   private TaxonomicStatus taxonomicStatus;
 
   @Schema(description = "The nomenclatural code governing the taxon name", example = "BOTANICAL")

@@ -3,6 +3,8 @@ package org.gbif.taxon.api;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 /**
  * A bibliographic reference or citation for a taxon.
  * Based on the GBIF References extension: https://rs.gbif.org/extension/gbif/1.0/references.xml
@@ -11,7 +13,7 @@ import lombok.Data;
 @Schema(description = "A bibliographic reference or citation for a taxon")
 public class Reference {
 
-  @Schema(description = "An identifier for the reference in the dataset",
+  @Schema(requiredMode = REQUIRED, description = "An identifier for the reference in the dataset",
     example = "Smith2020")
   private String referenceID;
 

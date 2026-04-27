@@ -21,6 +21,8 @@ import life.catalogue.api.vocab.TaxonomicStatus;
 import lombok.Data;
 import org.gbif.nameparser.api.Rank;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 /**
  * Class used for returning results of a taxon suggest operation.
  * This class contains additional attributes that are required for displaying/providing textual information.
@@ -29,14 +31,14 @@ import org.gbif.nameparser.api.Rank;
 @Schema(description = "A single result from a name usage prefix suggestion search")
 public class NameUsageSuggestResult {
 
-  @Schema(description = "The unique identifier for this taxon within the dataset", example = "CXA")
+  @Schema(requiredMode = REQUIRED, description = "The unique identifier for this taxon within the dataset", example = "CXA")
   private String taxonID;
 
-  @Schema(description = "The identifier for the scientific name", example = "50123456")
+  @Schema(requiredMode = REQUIRED, description = "The identifier for the scientific name", example = "50123456")
   private String scientificNameID;
 
   // The name matching the search phrase: an accepted name/synonym/bare name
-  @Schema(description = "The scientific name matching the search prefix", example = "Abies alba")
+  @Schema(requiredMode = REQUIRED, description = "The scientific name matching the search prefix", example = "Abies alba")
   private String scientificName;
 
   @Schema(description = "The taxonomic rank of the suggested name", example = "SPECIES")
@@ -59,10 +61,7 @@ public class NameUsageSuggestResult {
 
   // The classification context to report in the suggestion hint.
   // For species this is the first taxon above genus level, mostly the family.
-  @Schema(description = "Classification context shown as a hint, typically the family or order name", example = "Pinaceae")
+  @Schema(requiredMode = REQUIRED, description = "Classification context shown as a hint, typically the family or order name", example = "Pinaceae")
   private String context;
-
-  @Schema(description = "Relevance score of this suggestion", example = "1.23")
-  private Double score;
 
 }

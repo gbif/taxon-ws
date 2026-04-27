@@ -6,6 +6,8 @@ import lombok.Data;
 import java.net.URI;
 import java.time.LocalDate;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 /**
  * Media (images, videos, sounds, etc.) associated with a taxon.
  * Based on the GBIF Simple Multimedia extension: https://rs.gbif.org/extension/gbif/1.0/multimedia.xml
@@ -14,7 +16,7 @@ import java.time.LocalDate;
 @Schema(description = "Media item (image, video, sound, etc.) associated with a taxon, based on the GBIF Simple Multimedia extension")
 public class Media {
 
-  @Schema(description = "A public URL that is a direct link to the media file itself, not an HTML page (dc:identifier). " +
+  @Schema(requiredMode = REQUIRED, description = "A public URL that is a direct link to the media file itself, not an HTML page (dc:identifier). " +
     "For images this should be a URL to the image file, not a webpage displaying it.",
     example = "https://example.com/images/abies-alba.jpg")
   private String identifier;

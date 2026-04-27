@@ -7,6 +7,8 @@ import lombok.Data;
 import java.net.URI;
 import java.util.List;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 /**
  * Comprehensive taxon usage information including all related data.
  */
@@ -14,7 +16,7 @@ import java.util.List;
 @Schema(description = "Comprehensive taxon usage information including all related data such as vernacular names, synonyms, media, distributions, and bibliography")
 public class NameUsageInfo {
 
-  @Schema(description = "The accepted taxon this info object is about")
+  @Schema(requiredMode = REQUIRED, description = "The accepted taxon this info object is about")
   private NameUsage taxon;
 
   @Schema(description = "The major taxonomic group the taxon is considered in", example = "Gymnosperms")

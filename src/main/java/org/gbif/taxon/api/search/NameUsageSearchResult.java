@@ -9,11 +9,13 @@ import org.gbif.taxon.api.VernacularNameSimple;
 
 import java.util.List;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 @Data
 @Schema(description = "A single result from a name usage full-text search, including the matched taxon, it's classification, and matching vernacular names")
 public class NameUsageSearchResult {
 
-  @Schema(description = "The matched taxon name usage")
+  @Schema(requiredMode = REQUIRED, description = "The matched taxon name usage")
   private NameUsageSimple taxon;
 
   @Schema(description = "The major taxonomic group the taxon is considered in", example = "Gymnosperms")
@@ -24,7 +26,4 @@ public class NameUsageSearchResult {
 
   @Schema(description = "Vernacular names that matched the search query")
   private List<VernacularNameSimple> vernacularNames;
-
-  @Schema(description = "Relevance score of this result", example = "1.23")
-  private Double score;
 }
