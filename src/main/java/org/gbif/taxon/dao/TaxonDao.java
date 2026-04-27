@@ -16,6 +16,7 @@ import life.catalogue.img.ThumborService;
 import life.catalogue.matching.nidx.NameIndexFactory;
 import life.catalogue.printer.JsonTreeCollector;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.gbif.api.model.common.paging.Pageable;
@@ -28,6 +29,8 @@ import org.gbif.taxon.api.Distribution;
 import org.gbif.taxon.api.NameUsage;
 import org.gbif.taxon.api.search.*;
 import org.gbif.taxon.config.RelatedInfoConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
@@ -41,6 +44,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class TaxonDao {
+  private static final Logger LOG = LoggerFactory.getLogger(TaxonDao.class);
   private final static Set<String> INVASIVE_TRUE_VALUES = Set.of("yes", "true", "1", "invasive", "isinvasive");
   private final DatasetKeyMap map;
   private final ApiConverter converter;
@@ -131,6 +135,7 @@ public class TaxonDao {
   }
 
   public NameUsageInfo getInfo(UUID uuid, String taxonKey) {
+    StopWatch sw = StopWatch.createStarted();
     var dsid = map.toDSID(uuid, taxonKey);
     try (var session = factory.openSession()) {
       var num = session.getMapper(NameUsageMapper.class);
@@ -138,12 +143,16 @@ public class TaxonDao {
       if (usage == null) {
         throw NotFoundException.notFound(NameUsage.class, dsid);
       }
+      LOG.debug("{} {}/{} usage took {}ms", usage.getClass().getSimpleName(), uuid, taxonKey, sw.getDuration());
 
       var clbInfo = new life.catalogue.api.model.UsageInfo(usage);
       tDao.fillUsageInfo(session, clbInfo, null, true, false, true, true, true, true, false, false, true, true, false, false, false, false, false);
       var info = converter.convert(clbInfo);
 
       return info;
+    } finally {
+      sw.stop();
+      LOG.debug("NameUsageInfo {}/{} took {}ms", uuid, taxonKey, sw.getDuration());
     }
   }
 

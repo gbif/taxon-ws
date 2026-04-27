@@ -17,7 +17,9 @@ package org.gbif.taxon;
 import com.zaxxer.hikari.HikariDataSource;
 import life.catalogue.dao.DatasetInfoCache;
 import life.catalogue.db.MybatisFactory;
+import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.autoconfigure.elasticsearch.ElasticsearchRestHealthContributorAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -31,10 +33,12 @@ import org.springframework.context.annotation.ComponentScan;
 public class TaxonApplication {
 
   @Bean
-  public SqlSessionFactory factory(HikariDataSource dataSource) {
+  public SqlSessionFactory factory(HikariDataSource dataSource, ObjectProvider<Interceptor> interceptors) {
     var factory = MybatisFactory.configure(dataSource, "test-env");
     // set factory in DatasetInfoCache singleton
     DatasetInfoCache.CACHE.setFactory(factory);
+    // register any MyBatis interceptor beans (e.g. SlowSqlInterceptor when monitoring.slow-sql.enabled=true)
+    interceptors.orderedStream().forEach(factory.getConfiguration()::addInterceptor);
     return factory;
   }
 

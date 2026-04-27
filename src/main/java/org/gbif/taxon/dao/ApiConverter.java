@@ -56,7 +56,7 @@ public class ApiConverter {
     var name = from.getName();
     to.setDatasetKey(map.toGBIF(from.getDatasetKey()));
     to.setTaxonID(from.getId());
-    if (from.getStatus().isSynonym()) {
+    if (from.getStatus() != null && from.getStatus().isSynonym()) {
       to.setAcceptedNameUsageID(from.getParentId());
     } else {
       to.setParentNameUsageID(from.getParentId());
