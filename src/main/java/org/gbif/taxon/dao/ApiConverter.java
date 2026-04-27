@@ -54,6 +54,7 @@ public class ApiConverter {
   }
 
   private void copy(Name name, NameUsageSimple to, boolean inclLabel) {
+    to.setScientificNameID(name.getId());
     to.setScientificName(name.getScientificName());
     to.setScientificNameAuthorship(name.getAuthorship());
     to.setTaxonRank(name.getRank());
@@ -91,7 +92,6 @@ public class ApiConverter {
     copy(bn.getName(), sn, true);
     sn.setDatasetKey(map.toGBIF(bn.getDatasetKey()));
     sn.setTaxonomicStatus(TaxonomicStatus.BARE_NAME);
-    // TODO: add scientificNameID and map it to the name.ID?
     return sn;
   }
 

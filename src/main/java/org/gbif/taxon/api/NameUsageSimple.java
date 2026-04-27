@@ -17,6 +17,9 @@ public class NameUsageSimple extends ClassificationUsage {
   @Schema(description = "The identifier for the dataset", example = "7ddf754f-d193-4cc9-b351-99906754a03b")
   private UUID datasetKey;
 
+  @Schema(description = "The identifier of the name", example = "1052714-2")
+  private String scientificNameID;
+
   @Schema(description = "The identifier of the accepted taxon (for synonyms)", example = "2435098")
   private String acceptedNameUsageID;
 

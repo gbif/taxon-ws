@@ -137,7 +137,7 @@ public class TaxonResource {
   @Operation(
     operationId = "getTaxonBreakdown",
     summary = "Get descendant species count breakdown",
-    description = "Returns a breakdown by all descendant taxa sharing the highest major Linnean rank, " +
+    description = "Returns a breakdown by all descendant taxa sharing the highest major Linnean rank down to genus at most, " +
       "counting the number of accepted species within each group."
   )
   @ApiResponse(responseCode = "200", description = "Taxonomic breakdown")
