@@ -7,6 +7,7 @@ import life.catalogue.api.search.NameUsageSuggestion;
 import life.catalogue.api.search.NameUsageWrapper;
 import life.catalogue.api.vocab.Issue;
 import life.catalogue.api.vocab.NomRelType;
+import life.catalogue.api.vocab.TaxonomicStatus;
 import life.catalogue.api.vocab.area.Gazetteer;
 import life.catalogue.parser.AreaParser;
 import life.catalogue.parser.SafeParser;
@@ -52,20 +53,26 @@ public class ApiConverter {
     this.cfg = cfg;
   }
 
+  private void copy(Name name, NameUsageSimple to, boolean inclLabel) {
+    to.setDatasetKey(map.toGBIF(name.getDatasetKey()));
+    to.setScientificName(name.getScientificName());
+    to.setScientificNameAuthorship(name.getAuthorship());
+    to.setTaxonRank(name.getRank());
+    to.setNomenclaturalCode(str(name.getCode()));
+    if (inclLabel) {
+      to.setLabel(name.getLabelHtml());
+    }
+  }
+
   private void copy(NameUsageBase from, NameUsageSimple to) {
-    var name = from.getName();
-    to.setDatasetKey(map.toGBIF(from.getDatasetKey()));
+    copy(from.getName(), to, false);
     to.setTaxonID(from.getId());
     if (from.getStatus() != null && from.getStatus().isSynonym()) {
       to.setAcceptedNameUsageID(from.getParentId());
     } else {
       to.setParentNameUsageID(from.getParentId());
     }
-    to.setScientificName(name.getScientificName());
-    to.setScientificNameAuthorship(name.getAuthorship());
-    to.setTaxonRank(name.getRank());
     to.setTaxonomicStatus(from.getStatus());
-    to.setNomenclaturalCode(str(name.getCode()));
     to.setReferences(from.getLink());
     if (from instanceof Taxon tax) {
       to.setExtinct(tax.isExtinct());
@@ -76,6 +83,14 @@ public class ApiConverter {
   NameUsageSimple convert(NameUsageBase nub) {
     var sn = new NameUsageSimple();
     copy(nub, sn);
+    return sn;
+  }
+
+  NameUsageSimple convert(BareName bn) {
+    var sn = new NameUsageSimple();
+    copy(bn.getName(), sn, true);
+    // TODO: add scientificNameID and map it to the name.ID?
+    sn.setTaxonomicStatus(TaxonomicStatus.BARE_NAME);
     return sn;
   }
 
@@ -411,7 +426,11 @@ public class ApiConverter {
   private NameUsageSearchResult convert(NameUsageWrapper wrapper) {
     var result = new NameUsageSearchResult();
     if (wrapper.getUsage() != null) {
-      result.setTaxon(convert(wrapper.getUsage().asUsageBase()));
+      if (wrapper.getUsage().getStatus().isBareName()) {
+        result.setTaxon(convert((BareName)wrapper.getUsage()));
+      } else {
+        result.setTaxon(convert(wrapper.getUsage().asUsageBase()));
+      }
     }
     result.setGroup(wrapper.getGroup());
     if (wrapper.getClassification() != null) {
