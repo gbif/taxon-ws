@@ -54,7 +54,6 @@ public class ApiConverter {
   }
 
   private void copy(Name name, NameUsageSimple to, boolean inclLabel) {
-    to.setDatasetKey(map.toGBIF(name.getDatasetKey()));
     to.setScientificName(name.getScientificName());
     to.setScientificNameAuthorship(name.getAuthorship());
     to.setTaxonRank(name.getRank());
@@ -66,6 +65,7 @@ public class ApiConverter {
 
   private void copy(NameUsageBase from, NameUsageSimple to) {
     copy(from.getName(), to, false);
+    to.setDatasetKey(map.toGBIF(from.getDatasetKey()));
     to.setTaxonID(from.getId());
     if (from.getStatus() != null && from.getStatus().isSynonym()) {
       to.setAcceptedNameUsageID(from.getParentId());
@@ -89,8 +89,9 @@ public class ApiConverter {
   NameUsageSimple convert(BareName bn) {
     var sn = new NameUsageSimple();
     copy(bn.getName(), sn, true);
-    // TODO: add scientificNameID and map it to the name.ID?
+    sn.setDatasetKey(map.toGBIF(bn.getDatasetKey()));
     sn.setTaxonomicStatus(TaxonomicStatus.BARE_NAME);
+    // TODO: add scientificNameID and map it to the name.ID?
     return sn;
   }
 
