@@ -9,6 +9,8 @@ import org.gbif.nameparser.api.NameType;
 import java.util.List;
 import java.util.UUID;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 /**
  * Extended name usage class with additional taxonomic and nomenclatural details.
  */
@@ -38,7 +40,7 @@ public class NameUsage extends NameUsageSimple {
   @Schema(description = "The nomenclatural status of the name", example = "valid")
   private String nomenclaturalStatus;
 
-  @Schema(description = "The type of name (e.g., scientific, informal)", example = "SCIENTIFIC")
+  @Schema(requiredMode = REQUIRED, description = "The type of name (e.g., scientific, informal)", example = "SCIENTIFIC")
   private NameType nameType;
 
   @Schema(description = "Broad classification into taxonomic groups", example = "Plants")
