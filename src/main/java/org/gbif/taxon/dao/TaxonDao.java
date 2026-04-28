@@ -254,10 +254,11 @@ public class TaxonDao {
     var nodes = treeDao.classification(dsid, -1, true, false, null, null);
     if (nodes == null || nodes.isEmpty()) {
       throw new NotFoundException(taxonKey, "No classification found for taxon " + taxonKey);
-    } else if (nodes.getLast().getStatus().isTaxon()) {
-      throw new NotFoundException(taxonKey, "Synonym found for taxon " + taxonKey);
+    } else if (!nodes.getFirst().getStatus().isTaxon()) {
+      // disable synonyms, see https://github.com/gbif/taxon-ws/issues/37
+      throw new NotFoundException(taxonKey, nodes.getFirst().getStatus() + " found for taxonID " + taxonKey);
     }
-    return nodes.stream()
+    return nodes.reversed().stream()
       .map(converter::convertTree)
       .collect(Collectors.toList());
   }
