@@ -117,7 +117,7 @@ public class TaxonDao {
     }
   }
 
-  public NameUsageSimple get(UUID uuid, String taxonKey) {
+  public NameUsage get(UUID uuid, String taxonKey) {
     var key = map.toDSID(uuid, taxonKey);
     try (var session = factory.openSession()) {
       var num = session.getMapper(NameUsageMapper.class);
@@ -141,7 +141,7 @@ public class TaxonDao {
       var num = session.getMapper(NameUsageMapper.class);
       var usage = num.get(dsid);
       if (usage == null) {
-        throw NotFoundException.notFound(NameUsage.class, dsid);
+        throw NotFoundException.notFound(NameUsageInfo.class, dsid);
       }
       LOG.debug("{} {}/{} usage took {}ms", usage.getClass().getSimpleName(), uuid, taxonKey, sw.getDuration());
 
@@ -207,10 +207,10 @@ public class TaxonDao {
   }
 
   @SneakyThrows
-  public List<NameUsageSimple> listRelated(UUID uuid, String taxonKey,
-                                           @Nullable Collection<DatasetType> datasetTypes,
-                                           @Nullable Collection<UUID> datasetKeys,
-                                           @Nullable Collection<UUID> publisherKeys) {
+  public List<NameUsage> listRelated(UUID uuid, String taxonKey,
+                                     @Nullable Collection<DatasetType> datasetTypes,
+                                     @Nullable Collection<UUID> datasetKeys,
+                                     @Nullable Collection<UUID> publisherKeys) {
     final int dkey = map.toCLB(uuid);
     Set<Integer> datasetIntKeys = new HashSet<>();;
     if (datasetKeys != null) {
@@ -254,11 +254,11 @@ public class TaxonDao {
     var nodes = treeDao.classification(dsid, -1, true, false, null, null);
     if (nodes == null || nodes.isEmpty()) {
       throw new NotFoundException(taxonKey, "No classification found for taxon " + taxonKey);
-    } else if (!nodes.getFirst().getStatus().isTaxon()) {
-      // disable synonyms, see https://github.com/gbif/taxon-ws/issues/37
-      throw new NotFoundException(taxonKey, nodes.getFirst().getStatus() + " found for taxonID " + taxonKey);
     }
+    // remove synonyms from the tree (should only exist as the very last entry in the list)
+    // see https://github.com/gbif/taxon-ws/issues/37
     return nodes.reversed().stream()
+      .filter(n -> n.getStatus() != null && n.getStatus().isTaxon())
       .map(converter::convertTree)
       .collect(Collectors.toList());
   }

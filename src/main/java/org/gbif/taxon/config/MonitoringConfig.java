@@ -1,14 +1,12 @@
 package org.gbif.taxon.config;
 
+import lombok.Data;
 import org.gbif.taxon.monitoring.SlowRequestFilter;
 import org.gbif.taxon.monitoring.SlowSqlInterceptor;
-
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import lombok.Data;
 
 /**
  * Toggleable performance monitoring: a slow HTTP request filter and a slow MyBatis SQL interceptor.

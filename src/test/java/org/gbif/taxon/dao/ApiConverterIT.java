@@ -2,26 +2,24 @@ package org.gbif.taxon.dao;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.zaxxer.hikari.HikariDataSource;
-
 import life.catalogue.api.model.Name;
 import life.catalogue.api.model.Taxon;
 import life.catalogue.api.vocab.Origin;
+import life.catalogue.api.vocab.TaxonomicStatus;
 import life.catalogue.es.search.NameUsageSearchService;
 import life.catalogue.es.suggest.NameUsageSuggestionService;
-
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.gbif.nameparser.api.NomCode;
 import org.gbif.nameparser.api.Rank;
-import org.gbif.taxon.api.NameUsage;
+import org.gbif.taxon.api.NameUsageInfo;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import life.catalogue.api.vocab.TaxonomicStatus;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.gbif.taxon.dao.ApiConverterTest.toUsageInfo;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -74,7 +72,7 @@ class ApiConverterIT {
     // when trying to look up the dataset key. This validates the converter is
     // properly wired by Spring and fails at the expected point.
     try {
-      NameUsage nu = converter.convert(taxon, null);
+      NameUsageInfo nu = converter.convert(toUsageInfo(taxon));
       assertThat(nu.getTaxonID()).isEqualTo("t-it-1");
       assertThat(nu.getScientificName()).isEqualTo("Quercus robur");
       assertThat(nu.getGenericName()).isEqualTo("Quercus");

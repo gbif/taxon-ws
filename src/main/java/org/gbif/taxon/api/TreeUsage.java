@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Schema(description = "Extended simple usage for tree navigation with species counts")
-public class TreeUsage extends NameUsageSimple {
+public class TreeUsage extends NameUsage {
 
   @Schema(description = "Number of direct children which are accepted taxa of any rank but not synonyms", example = "7")
   private int children;

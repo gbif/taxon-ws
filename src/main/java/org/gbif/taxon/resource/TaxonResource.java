@@ -33,7 +33,7 @@ import org.gbif.nameparser.api.NameType;
 import org.gbif.nameparser.api.NomCode;
 import org.gbif.nameparser.api.Rank;
 import org.gbif.taxon.api.NameUsageInfo;
-import org.gbif.taxon.api.NameUsageSimple;
+import org.gbif.taxon.api.NameUsage;
 import org.gbif.taxon.api.RelatedInfo;
 import org.gbif.taxon.api.TaxonBreakdown;
 import org.gbif.taxon.api.search.*;
@@ -90,7 +90,7 @@ public class TaxonResource {
   @ApiResponse(responseCode = "200", description = "Taxon name usage")
   @ApiResponse(responseCode = "404", description = "Taxon not found")
   @GetMapping("/{datasetKey}/{taxonKey}")
-  public NameUsageSimple get(
+  public NameUsage get(
       @PathVariable("datasetKey")
       @Parameter(
           description = "UUID for the dataset key",
@@ -169,7 +169,7 @@ public class TaxonResource {
   @ApiResponse(responseCode = "200", description = "Related name usages")
   @ApiResponse(responseCode = "404", description = "Taxon not found")
   @GetMapping("/{datasetKey}/{taxonKey}/related")
-  public List<NameUsageSimple> getRelated(
+  public List<NameUsage> getRelated(
     @PathVariable("datasetKey")
     @Parameter(
       description = "UUID for the dataset key",

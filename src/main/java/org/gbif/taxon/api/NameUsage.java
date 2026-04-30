@@ -1,70 +1,56 @@
 package org.gbif.taxon.api;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import life.catalogue.api.vocab.TaxGroup;
+import life.catalogue.api.vocab.TaxonomicStatus;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import org.gbif.nameparser.api.NameType;
 
-import java.util.List;
+import java.net.URI;
 import java.util.UUID;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 /**
- * Extended name usage class with additional taxonomic and nomenclatural details.
+ * Basic taxon usage class containing core taxonomic information.
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-@Schema(description = "Extended taxon name usage with detailed taxonomic and nomenclatural information")
-public class NameUsage extends NameUsageSimple {
+@Schema(description = "Simplified taxon usage containing core taxonomic information")
+public class NameUsage extends ClassificationUsage {
 
-  @Schema(description = "The accepted name usage (for synonyms)", example = "Abies alba Mill.")
-  private String acceptedNameUsage;
+  @Schema(requiredMode = REQUIRED, description = "The identifier for the dataset", example = "7ddf754f-d193-4cc9-b351-99906754a03b")
+  private UUID datasetKey;
 
-  @Schema(description = "The identifier of the original name usage (basionym)", example = "2435090")
-  private String originalNameUsageID;
+  @Schema(description = "The identifier of the accepted taxon (for synonyms)", example = "2435098")
+  private String acceptedNameUsageID;
 
-  @Schema(description = "The original name usage (basionym)", example = "Pinus alba Mill.")
-  private String originalNameUsage;
+  @Schema(description = "The identifier of the parent taxon in the classification", example = "2435001")
+  private String parentNameUsageID;
 
-  @Schema(description = "The taxon concept reference", example = "Smith 2020")
-  private String nameAccordingTo;
+  @Schema(requiredMode = REQUIRED, description = "The taxonomic status of the taxon (e.g., accepted, synonym)", example = "accepted")
+  private TaxonomicStatus taxonomicStatus;
 
-  @Schema(description = "The bibliographic reference identifier for the publication where the name was first published", example = "Greuter1998")
-  private String namePublishedInID;
+  @Schema(description = "The nomenclatural code governing the taxon name", example = "BOTANICAL")
+  private String nomenclaturalCode;
 
-  @Schema(description = "An optional phrase appended to the name", example = "sensu lato")
-  private String namePhrase;
+  @Schema(description = "Indicates whether the taxon is extinct", example = "false")
+  private Boolean extinct;
 
-  @Schema(description = "The nomenclatural status of the name", example = "valid")
-  private String nomenclaturalStatus;
+  @Schema(description = "A link to a webpage for this name on the original, external site (dc:references)", example = "https://www.speciesplus.net/#/taxon_concepts/10836")
+  private URI references;
 
-  @Schema(requiredMode = REQUIRED, description = "The type of name (e.g., scientific, informal)", example = "SCIENTIFIC")
-  private NameType nameType;
+  // the following are only present in specific lists when used in RelatedInfo
+  @Schema(description = "The IUCN Red List threat status for this taxon. " +
+    "Only populated when this usage appears in a RelatedInfo.redlist context. " +
+    "Values follow IUCN Red List categories: EX (Extinct), EW (Extinct in the Wild), " +
+    "CR (Critically Endangered), EN (Endangered), VU (Vulnerable), NT (Near Threatened), " +
+    "LC (Least Concern), DD (Data Deficient), NE (Not Evaluated).",
+    example = "LC")
+  private String threatStatus;
 
-  @Schema(description = "Broad classification into taxonomic groups", example = "Plants")
-  private TaxGroup taxonomicGroup;
-
-  @Schema(description = "The genus component of the scientific name", example = "Abies")
-  private String genericName;
-
-  @Schema(description = "The infrageneric epithet (subgenus, section, etc.)", example = "Pseudotsuga")
-  private String infragenericEpithet;
-
-  @Schema(description = "The specific epithet (species name)", example = "alba")
-  private String specificEpithet;
-
-  @Schema(description = "The infraspecific epithet (subspecies, variety, form)", example = "alpina")
-  private String infraspecificEpithet;
-
-  @Schema(description = "The cultivar epithet for cultivated varieties", example = "Golden Sprite")
-  private String cultivarEpithet;
-
-  @Schema(description = "List of data quality issues using ChecklistBank issue vocabulary",
-    example = "[\"PUBLISHED_BEFORE_1753\", \"BASIONYM_ID_INVALID\"]")
-  private List<String> issues;
-
-  @Schema(description = "Remarks or notes about the taxon", example = "Common in mountainous regions of Europe")
-  private String taxonRemarks;
+  @Schema(description = "The CITES appendix under which this taxon is listed. " +
+    "Only populated when this usage appears in a RelatedInfo.cites context. " +
+    "Appendix I: species threatened with extinction; " +
+    "Appendix II: species not necessarily threatened but requiring trade controls; " +
+    "Appendix III: species protected in at least one country.",
+    example = "II")
+  private String citesAppendix;
 }

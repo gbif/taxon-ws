@@ -14,15 +14,15 @@ public class Synonymy {
 
   @Schema(description = "Homotypic (nomenclatural) synonyms that share the same type specimen as the accepted name. " +
     "These names are synonyms purely due to nomenclatural rules.")
-  private List<NameUsageSimple> homotypic;
+  private List<NameUsage> homotypic;
 
   @Schema(description = "Heterotypic (taxonomic) synonyms based on different type specimens, grouped by their common basionym. " +
     "Each inner list represents a homotypic group of names considered synonymous for taxonomic reasons.")
-  private List<List<NameUsageSimple>> heterotypic;
+  private List<List<NameUsage>> heterotypic;
 
   @Schema(description = "Names that have been misapplied to this taxon in literature, " +
     "i.e. used for a different taxon than the one they were originally described for.")
-  private List<NameUsageSimple> misapplied;
+  private List<NameUsage> misapplied;
 
   public int size() {
     return this.homotypic.size() + this.heterotypic.size() + this.misapplied.size();

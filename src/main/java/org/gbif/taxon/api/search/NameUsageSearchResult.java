@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import life.catalogue.api.vocab.TaxGroup;
 import lombok.Data;
 import org.gbif.taxon.api.ClassificationUsage;
-import org.gbif.taxon.api.NameUsageSimple;
+import org.gbif.taxon.api.NameUsage;
 import org.gbif.taxon.api.VernacularNameSimple;
 
 import java.util.List;
@@ -16,7 +16,7 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 public class NameUsageSearchResult {
 
   @Schema(requiredMode = REQUIRED, description = "The matched taxon name usage")
-  private NameUsageSimple taxon;
+  private NameUsage taxon;
 
   @Schema(description = "The major taxonomic group the taxon is considered in", example = "Gymnosperms")
   private TaxGroup group;

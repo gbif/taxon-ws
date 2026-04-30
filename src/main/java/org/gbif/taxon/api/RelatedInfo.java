@@ -16,11 +16,11 @@ public class RelatedInfo {
 
   @Schema(description = "The taxon's entry in the IUCN Red List dataset, carrying the global threat status " +
     "in its taxonomicStatus field (e.g. LC, NT, VU, EN, CR, EW, EX)")
-  private NameUsageSimple redlist;
+  private NameUsage redlist;
 
   @Schema(description = "The taxon's entries in CITES appendices (I, II, or III). " +
     "Each entry represents the taxon's listing under a specific CITES appendix.")
-  private List<NameUsageSimple> cites;
+  private List<NameUsage> cites;
 
   @Schema(description = "Distribution records from the Global Register of Introduced and Invasive Species (GRIIS) " +
     "for countries where this taxon is considered invasive")

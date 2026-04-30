@@ -25,7 +25,6 @@ import org.gbif.taxon.api.search.*;
 import org.gbif.taxon.config.RelatedInfoConfig;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nullable;
 import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -53,8 +52,7 @@ public class ApiConverter {
     this.cfg = cfg;
   }
 
-  private void copy(Name name, NameUsageSimple to, boolean inclLabel) {
-    to.setScientificNameID(name.getId());
+  private void copy(Name name, NameUsage to, boolean inclLabel) {
     to.setScientificName(name.getScientificName());
     to.setScientificNameAuthorship(name.getAuthorship());
     to.setTaxonRank(name.getRank());
@@ -64,7 +62,7 @@ public class ApiConverter {
     }
   }
 
-  private void copy(NameUsageBase from, NameUsageSimple to) {
+  private void copy(NameUsageBase from, NameUsage to) {
     copy(from.getName(), to, false);
     to.setDatasetKey(map.toGBIF(from.getDatasetKey()));
     to.setTaxonID(from.getId());
@@ -81,49 +79,21 @@ public class ApiConverter {
     to.setLabel(from.getLabelHtml());
   }
 
-  NameUsageSimple convert(NameUsageBase nub) {
-    var sn = new NameUsageSimple();
+  NameUsage convert(NameUsageBase nub) {
+    var sn = new NameUsage();
     copy(nub, sn);
     return sn;
   }
 
-  NameUsageSimple convert(BareName bn) {
-    var sn = new NameUsageSimple();
+  NameUsage convert(BareName bn) {
+    var sn = new NameUsage();
     copy(bn.getName(), sn, true);
     sn.setDatasetKey(map.toGBIF(bn.getDatasetKey()));
     sn.setTaxonomicStatus(TaxonomicStatus.BARE_NAME);
     return sn;
   }
 
-  NameUsage convert(NameUsageBase nub, @Nullable Set<Issue> issues) {
-    var nu = new NameUsage();
-    var name = nub.getName();
-
-    // SimpleUsage fields
-    copy(nub, nu);
-
-    // NameUsage-specific fields
-    if (nub instanceof Synonym syn && syn.getAccepted() != null) {
-      nu.setAcceptedNameUsage(syn.getAccepted().getLabel());
-    }
-    nu.setNameAccordingTo(nub.getAccordingTo());
-    nu.setNamePhrase(nub.getNamePhrase());
-    nu.setNomenclaturalStatus(str(name.getNomStatus()));
-    nu.setNameType(name.getType());
-    nu.setGenericName(name.getGenus());
-    nu.setInfragenericEpithet(name.getInfragenericEpithet());
-    nu.setSpecificEpithet(name.getSpecificEpithet());
-    nu.setInfraspecificEpithet(name.getInfraspecificEpithet());
-    nu.setCultivarEpithet(name.getCultivarEpithet());
-    nu.setReferences(nub.getLink());
-    nu.setTaxonRemarks(nub.getRemarks());
-    if (issues != null && !issues.isEmpty()) {
-      nu.setIssues(issues.stream().map(Issue::name).collect(Collectors.toList()));
-    }
-    return nu;
-  }
-
-  public NameUsageSimple convert(SimpleNameInDataset sn) {
+  public NameUsage convert(SimpleNameInDataset sn) {
     var su = convert((SimpleName)sn);
     // until we have CITES datasets in GBIF we can't map them
     if (cfg.isCites(sn.getDatasetKey())) {
@@ -141,7 +111,7 @@ public class ApiConverter {
   /**
    * Only to be used for converting the synonym as all the synonyms point to the same taxon and parentID is very redundant.
    */
-  private NameUsageSimple convert(Synonym s) {
+  private NameUsage convert(Synonym s) {
     s.setParentId(null);
     return convert(new SimpleName(s));
   }
@@ -160,8 +130,8 @@ public class ApiConverter {
     return su;
   }
 
-  public NameUsageSimple convert(SimpleName sn) {
-    var su = new NameUsageSimple();
+  public NameUsage convert(SimpleName sn) {
+    var su = new NameUsage();
     copy(sn, su);
     if (sn.getStatus() != null && sn.getStatus().isSynonym()) {
       su.setAcceptedNameUsageID(sn.getParentId());
@@ -283,12 +253,33 @@ public class ApiConverter {
   NameUsageInfo convert(life.catalogue.api.model.UsageInfo ui) {
     var info = new NameUsageInfo();
     var usage = ui.getUsage();
+    var name = usage.getName();
 
-    info.setTaxon(convert(usage, ui.getIssues()));
-    info.setGroup(ui.getGroup());
+    // SimpleUsage fields
+    copy(usage, info);
+
+    // NameUsage-specific fields
+    if (usage instanceof Synonym syn && syn.getAccepted() != null) {
+      info.setAcceptedNameUsage(syn.getAccepted().getLabel());
+    }
+    info.setNameAccordingTo(usage.getAccordingTo());
+    info.setNamePhrase(usage.getNamePhrase());
+    info.setNomenclaturalStatus(str(name.getNomStatus()));
+    info.setNameType(name.getType());
+    info.setGenericName(name.getGenus());
+    info.setInfragenericEpithet(name.getInfragenericEpithet());
+    info.setSpecificEpithet(name.getSpecificEpithet());
+    info.setInfraspecificEpithet(name.getInfraspecificEpithet());
+    info.setCultivarEpithet(name.getCultivarEpithet());
+    info.setReferences(usage.getLink());
+    info.setTaxonomicGroup(ui.getGroup());
+    info.setTaxonRemarks(usage.getRemarks());
+    if (ui.getIssues() != null && !ui.getIssues().isEmpty()) {
+      info.setIssues(ui.getIssues().stream().map(Issue::name).collect(Collectors.toList()));
+    }
     // acceptedNameUsage
-    if (usage.isSynonym()) {
-      info.getTaxon().setAcceptedNameUsage(convert(ui.getClassification().getLast()).getLabel());
+    if (usage.isSynonym() && ui.getClassification() != null && ui.getClassification().size() > 1) {
+      info.setAcceptedNameUsage(convert(ui.getClassification().getLast()).getLabel());
     }
 
     // vernacularNames
@@ -312,11 +303,11 @@ public class ApiConverter {
     // basionym
     if (ui.getNameRelations() != null) {
       ui.getNameRelations().stream().filter(rel -> rel.getType()== NomRelType.BASIONYM).findFirst().ifPresent(rel -> {
-        info.getTaxon().setOriginalNameUsageID(rel.getRelatedUsageId());
+        info.setOriginalNameUsageID(rel.getRelatedUsageId());
         if (ui.getSynonyms() != null) {
           ui.getSynonyms().getHomotypic().stream()
               .filter(s -> Objects.equals(s.getId(), rel.getRelatedUsageId()))
-              .findFirst().ifPresent(s -> info.getTaxon().setOriginalNameUsage(s.getLabel()));
+              .findFirst().ifPresent(s -> info.setOriginalNameUsage(s.getLabel()));
         }
       });
     }
@@ -363,7 +354,7 @@ public class ApiConverter {
     // publishedIn
     if (ui.getPublishedIn() != null) {
       var pubIn = ui.getPublishedIn();
-      info.getTaxon().setNamePublishedInID(pubIn.getId());
+      info.setNamePublishedInID(pubIn.getId());
       // make sure it's part of the references
       if (ui.getReferences() == null) {
         ui.setReferences(new HashMap<>());
@@ -399,7 +390,7 @@ public class ApiConverter {
     return info;
   }
 
-  private List<NameUsageSimple> convert(List<Synonym> syns) {
+  private List<NameUsage> convert(List<Synonym> syns) {
     return syns == null ? null : syns.stream().map(this::convert).collect(Collectors.toList());
   }
 

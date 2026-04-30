@@ -66,7 +66,7 @@ public class TreeResource {
     operationId = "getClassification",
     summary = "Get the classification for a taxon",
     description = "Returns the ordered list of ancestor taxa from the root of the classification down to the given taxon, " +
-      "inclusive of the taxon itself."
+      "inclusive of the taxon itself - unless they are synonyms."
   )
   @ApiResponse(responseCode = "200", description = "Classification path")
   @ApiResponse(responseCode = "404", description = "Taxon not found")
@@ -80,7 +80,7 @@ public class TreeResource {
     UUID datasetKey,
     @PathVariable("taxonKey")
     @Parameter(
-      description = "Taxon key scoped within the dataset",
+      description = "Taxon key scoped within the dataset, accepting also synonyms in which case we return the classification of their accepted parent",
       example = "CXA"
     )
     String taxonKey

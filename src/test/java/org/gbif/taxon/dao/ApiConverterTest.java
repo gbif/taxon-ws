@@ -1,49 +1,29 @@
 package org.gbif.taxon.dao;
 
+import life.catalogue.api.model.*;
+import life.catalogue.api.model.Synonymy;
+import life.catalogue.api.vocab.*;
+import life.catalogue.api.vocab.area.Country;
 import org.gbif.nameparser.api.NomCode;
 import org.gbif.nameparser.api.Rank;
+import org.gbif.taxon.api.*;
 import org.gbif.taxon.api.Distribution;
 import org.gbif.taxon.api.Media;
 import org.gbif.taxon.api.NameUsage;
-import org.gbif.taxon.api.NameUsageInfo;
-import org.gbif.taxon.api.NameUsageSimple;
 import org.gbif.taxon.api.Reference;
-import org.gbif.taxon.api.TreeUsage;
 import org.gbif.taxon.api.VernacularName;
 import org.gbif.taxon.config.RelatedInfoConfig;
-
-
-import java.net.URI;
-import java.time.LocalDate;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.UUID;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import life.catalogue.api.model.CslData;
-import life.catalogue.api.model.Name;
-import life.catalogue.api.model.SimpleName;
-import life.catalogue.api.model.Synonym;
-import life.catalogue.api.model.Synonymy;
-import life.catalogue.api.model.Taxon;
-import life.catalogue.api.model.TaxonProperty;
-import life.catalogue.api.model.TreeNode;
-import life.catalogue.api.vocab.area.Country;
-import life.catalogue.api.vocab.DegreeOfEstablishment;
-import life.catalogue.api.vocab.Environment;
-import life.catalogue.api.vocab.EstablishmentMeans;
-import life.catalogue.api.vocab.License;
-import life.catalogue.api.vocab.MediaType;
-import life.catalogue.api.vocab.NomStatus;
-import life.catalogue.api.vocab.Origin;
-import life.catalogue.api.vocab.Sex;
-import life.catalogue.api.vocab.TaxonomicStatus;
-import life.catalogue.api.vocab.ThreatStatus;
+import java.net.URI;
+import java.time.LocalDate;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -97,7 +77,7 @@ class ApiConverterTest {
 
     when(map.toGBIF(101)).thenReturn(uuid);
 
-    NameUsage nu = converter.convert(taxon, null);
+    NameUsageInfo nu = converter.convert(toUsageInfo(taxon));
 
     assertThat(nu.getTaxonID()).isEqualTo("t-1");
     assertThat(nu.getParentNameUsageID()).isEqualTo("p-1");
@@ -150,7 +130,7 @@ class ApiConverterTest {
 
     when(map.toGBIF(101)).thenReturn(uuid);
 
-    NameUsage nu = converter.convert(synonym, null);
+    NameUsageInfo nu = converter.convert(toUsageInfo(synonym));
 
     assertThat(nu.getTaxonID()).isEqualTo("s-1");
     assertThat(nu.getAcceptedNameUsageID()).isEqualTo("t-1");
@@ -177,7 +157,7 @@ class ApiConverterTest {
 
     when(map.toGBIF(101)).thenReturn(uuid);
 
-    NameUsage nu = converter.convert(taxon, null);
+    NameUsageInfo nu = converter.convert(toUsageInfo(taxon));
 
     assertThat(nu.getNomenclaturalCode()).isNull();
     assertThat(nu.getNomenclaturalStatus()).isNull();
@@ -193,7 +173,7 @@ class ApiConverterTest {
     sn.setCode(NomCode.ZOOLOGICAL);
     sn.setExtinct(false);
 
-    NameUsageSimple su = converter.convert(sn);
+    NameUsage su = converter.convert(sn);
 
     assertThat(su.getTaxonID()).isEqualTo("id-1");
     assertThat(su.getParentNameUsageID()).isEqualTo("parent-1");
@@ -212,7 +192,7 @@ class ApiConverterTest {
     sn.setStatus(TaxonomicStatus.SYNONYM);
     sn.setParent("accepted-1");
 
-    NameUsageSimple su = converter.convert(sn);
+    NameUsage su = converter.convert(sn);
 
     assertThat(su.getAcceptedNameUsageID()).isEqualTo("accepted-1");
     assertThat(su.getParentNameUsageID()).isNull();
@@ -223,7 +203,7 @@ class ApiConverterTest {
     var sn = new SimpleName("id-3", "Some name", Rank.GENUS);
     sn.setStatus(TaxonomicStatus.ACCEPTED);
 
-    NameUsageSimple su = converter.convert(sn);
+    NameUsage su = converter.convert(sn);
 
     assertThat(su.getNomenclaturalCode()).isNull();
   }
@@ -531,7 +511,7 @@ class ApiConverterTest {
 
     NameUsageInfo info = converter.convert(ui);
 
-    assertThat(info.getTaxon().getTaxonID()).isEqualTo("t-1");
+    assertThat(info.getTaxonID()).isEqualTo("t-1");
     assertThat(info.getVernacularNames()).hasSize(1);
     assertThat(info.getVernacularNames().get(0).getVernacularName()).isEqualTo("Silver Fir");
     assertThat(info.getMedia()).hasSize(1);
@@ -562,8 +542,11 @@ class ApiConverterTest {
 
     NameUsageInfo info = converter.convert(ui);
 
-    assertThat(info.getTaxon().getTaxonID()).isEqualTo("t-2");
+    assertThat(info.getTaxonID()).isEqualTo("t-2");
     assertThat(info.getChecklistbankURL()).isNotNull();
   }
 
+  static UsageInfo toUsageInfo(NameUsageBase nu) {
+    return new UsageInfo(nu);
+  }
 }
