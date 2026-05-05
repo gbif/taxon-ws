@@ -217,6 +217,42 @@ spring:
 ```
 
 
+## Load Testing
+
+The `load-test/` directory contains a [Locust](https://locust.io) load test covering all `TaxonResource` and `TreeResource` endpoints.
+
+### Prerequisites
+
+```bash
+cd load-test
+pip install -r requirements.txt
+```
+
+Taxon IDs are loaded at startup from the [Catalogue of Life sitemap files](https://www.catalogueoflife.org/sitemap) (plain-text gzip, one URL per line).
+The default location is `~/code/col/portal/sitemaps/` — override with the `SITEMAPS_DIR` environment variable.
+50,000 IDs are loaded by default (override with `MAX_IDS`).
+
+### Running
+
+```bash
+# Interactive UI at http://localhost:8089
+locust -f locustfile.py --host http://localhost:8080
+
+# Headless run — 100 users, 5 minutes, with CSV + HTML report
+locust -f locustfile.py --host http://localhost:8080 \
+  --users 100 --spawn-rate 10 --run-time 5m --headless \
+  --csv=results/run1 --html=results/run1.html
+
+# Use a larger ID pool to reduce cache hits further
+MAX_IDS=200000 locust -f locustfile.py --host http://localhost:8080 \
+  --users 100 --spawn-rate 10 --run-time 5m --headless
+```
+
+`TaxonUser` (weight 3) exercises the six taxon endpoints; `TreeUser` (weight 1) exercises the three tree endpoints.
+Both user types pick a random taxon ID from the loaded pool on every request to avoid caching at all levels (database, page cache, application).
+
+---
+
 ## CI/CD
 
 Jenkins pipeline (`Jenkinsfile`) builds with Maven 3.9.9 + LibericaJDK 21.
