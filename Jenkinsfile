@@ -67,6 +67,12 @@ pipeline {
           RELEASE_ARGS = utils.createReleaseArgs(params.RELEASE_VERSION, params.DEVELOPMENT_VERSION, params.DRY_RUN_RELEASE)
       }
       steps {
+          checkout([
+              $class: 'GitSCM',
+              branches: scm.branches,
+              extensions: scm.extensions + [[$class: 'LocalBranch', localBranch: 'master']],
+              userRemoteConfigs: scm.userRemoteConfigs
+          ])
           withMaven(
                   globalMavenSettingsConfig: 'org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig1387378707709',
                   mavenSettingsConfig: 'bfc2be1e-f172-4b84-bd26-8b033aad06cb',
