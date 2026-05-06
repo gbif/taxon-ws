@@ -30,20 +30,6 @@ import org.springframework.context.annotation.Primary;
 public class ClbConfig {
   private static final Logger LOG = LoggerFactory.getLogger(ClbConfig.class);
 
-  /**
-   * Remove the facetMultiselect parameter from the search endpoint openapi description.
-   */
-  @Bean
-  public OperationCustomizer removeFacetMultiselect() {
-    return (operation, handlerMethod) -> {
-      if (handlerMethod.getBeanType().equals(TaxonResource.class)) {
-        operation.getParameters().removeIf(p ->
-            "facetMultiselect".equals(p.getName()));
-      }
-      return operation;
-    };
-  }
-
   @Bean
   @Primary
   public LatestDatasetKeyCache latestDatasetKeyCache(SqlSessionFactory factory) {

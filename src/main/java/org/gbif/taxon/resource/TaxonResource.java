@@ -242,7 +242,6 @@ public class TaxonResource {
   @CommonParameters.QParameter
   @Pageable.OffsetLimitParameters
   @FacetedSearchRequest.FacetParameters
-  @Parameter(name = "facetMultiselect", hidden = true) // hide the unused parameter from FacetedSearchRequest.FacetParameters
   @ApiResponse(responseCode = "200", description = "Name usages found")
   @GetMapping("/search/{datasetKey}")
   public SearchResponse<NameUsageSearchResult, NameUsageSearchParameter> search(

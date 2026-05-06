@@ -476,6 +476,7 @@ public class ApiConverter {
         .collect(Collectors.toSet()));
     }
     req.setFacetMinCount(request.getFacetMinCount());
+    req.setFacetIncludeSelf(!request.isFacetMultiSelect());
     req.setFacetLimit(request.getFacetLimit());
     req.setFacetOffset(request.getFacetOffset());
     return req;
