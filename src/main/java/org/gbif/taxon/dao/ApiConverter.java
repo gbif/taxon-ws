@@ -412,7 +412,7 @@ public class ApiConverter {
         copy(wrapper.getUsage().asUsageBase(), result);
       }
     }
-    result.setGroup(wrapper.getGroup());
+    result.setTaxonomicGroup(wrapper.getGroup());
     if (wrapper.getClassification() != null) {
       result.setClassification(
         wrapper.getClassification().stream()

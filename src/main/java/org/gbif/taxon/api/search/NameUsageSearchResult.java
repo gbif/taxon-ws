@@ -9,14 +9,12 @@ import org.gbif.taxon.api.VernacularNameSimple;
 
 import java.util.List;
 
-import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
-
 @Data
 @Schema(description = "A single result from a name usage full-text search, including the matched taxon, it's classification, and matching vernacular names")
 public class NameUsageSearchResult extends NameUsage {
 
   @Schema(description = "The major taxonomic group the taxon is considered in", example = "Gymnosperms")
-  private TaxGroup group;
+  private TaxGroup taxonomicGroup;
 
   @Schema(description = "Ordered list of parent taxa from root to the direct parent of the matched taxon")
   private List<ClassificationUsage> classification;

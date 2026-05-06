@@ -24,7 +24,7 @@ public enum NameUsageSearchParameter implements SearchParameter {
   TAXONOMIC_STATUS(TaxonomicStatus.class, life.catalogue.api.search.NameUsageSearchParameter.STATUS),
   EXTINCT(Boolean.class, life.catalogue.api.search.NameUsageSearchParameter.EXTINCT),
   ENVIRONMENT(Environment.class, life.catalogue.api.search.NameUsageSearchParameter.ENVIRONMENT),
-  GROUP(TaxGroup.class, life.catalogue.api.search.NameUsageSearchParameter.GROUP),
+  TAXONOMIC_GROUP(TaxGroup.class, life.catalogue.api.search.NameUsageSearchParameter.GROUP),
   NOMENCLATURAL_CODE(NomCode.class, life.catalogue.api.search.NameUsageSearchParameter.NOM_CODE),
   NAME_TYPE(NameType.class, life.catalogue.api.search.NameUsageSearchParameter.NAME_TYPE),
   AUTHOR(String.class, life.catalogue.api.search.NameUsageSearchParameter.AUTHORSHIP),
