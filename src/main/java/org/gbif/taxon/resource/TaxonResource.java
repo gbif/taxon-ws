@@ -303,18 +303,22 @@ public class TaxonResource {
         name = "taxonID",
         description = "Filters by any of the higher Linnean rank keys. Note this is within the respective checklist " +
           "and not searching NUB keys across all checklists.",
+        explode = Explode.TRUE,
+        array = @ArraySchema(schema = @Schema(type = "string")),
         in = ParameterIn.QUERY
       ),
       @Parameter(
         name = "taxonRank",
         description = "Filters by taxonomic rank as defined in ChecklistBanks vocabulary: https://api.checklistbank.org/vocab/rank.",
-        schema = @Schema(implementation = Rank.class),
+        explode = Explode.TRUE,
+        array = @ArraySchema(schema = @Schema(implementation = Rank.class)),
         in = ParameterIn.QUERY
       ),
       @Parameter(
         name = "taxonomicStatus",
         description = "Filters by the taxonomic status as defined in ChecklistBanks vocabulary: https://api.checklistbank.org/vocab/taxonomicstatus.",
-        schema = @Schema(implementation = TaxonomicStatus.class),
+        explode = Explode.TRUE,
+        array = @ArraySchema(schema = @Schema(implementation = TaxonomicStatus.class)),
         in = ParameterIn.QUERY
       ),
       @Parameter(
@@ -326,49 +330,57 @@ public class TaxonResource {
       @Parameter(
         name = "environment",
         description = "Filters by environment values as defined in ChecklistBanks vocabulary: https://api.checklistbank.org/vocab/environment.",
-        schema = @Schema(implementation = Environment.class),
+        explode = Explode.TRUE,
+        array = @ArraySchema(schema = @Schema(implementation = Environment.class)),
         in = ParameterIn.QUERY
       ),
       @Parameter(
-        name = "group",
+        name = "taxonomicGroup",
         description = "Filters for name usages with a specific taxonomic group as defined in ChecklistBanks vocabulary: https://api.checklistbank.org/vocab/taxgroup.",
-        schema = @Schema(implementation = TaxGroup.class),
+        explode = Explode.TRUE,
+        array = @ArraySchema(schema = @Schema(implementation = TaxGroup.class)),
         in = ParameterIn.QUERY
       ),
       @Parameter(
         name = "nomenclaturalCode",
         description = "Filters by the nomenclatural code as defined in ChecklistBanks vocabulary: https://api.checklistbank.org/vocab/nomcode.",
-        schema = @Schema(implementation = NomCode.class),
+        explode = Explode.TRUE,
+        array = @ArraySchema(schema = @Schema(implementation = NomCode.class)),
         in = ParameterIn.QUERY
       ),
       @Parameter(
         name = "nameType",
         description = "Filters by the name type as defined in ChecklistBanks vocabulary: https://api.checklistbank.org/vocab/nametype.",
-        schema = @Schema(implementation = NameType.class),
+        explode = Explode.TRUE,
+        array = @ArraySchema(schema = @Schema(implementation = NameType.class)),
         in = ParameterIn.QUERY
       ),
       @Parameter(
         name = "author",
         description = "Filters for name usages with a specific author.",
-        schema = @Schema(implementation = String.class),
+        explode = Explode.TRUE,
+        array = @ArraySchema(schema = @Schema(type = "string")),
         in = ParameterIn.QUERY
       ),
       @Parameter(
         name = "year",
         description = "Filters for name usages with a specific publication year.",
-        schema = @Schema(implementation = Integer.class),
+        explode = Explode.TRUE,
+        array = @ArraySchema(schema = @Schema(implementation = Integer.class)),
         in = ParameterIn.QUERY
       ),
       @Parameter(
         name = "origin",
         description = "Filters for name usages with a specific origin as defined in ChecklistBanks vocabulary: https://api.checklistbank.org/vocab/datasetorigin.",
-        schema = @Schema(implementation = Origin.class),
+        explode = Explode.TRUE,
+        array = @ArraySchema(schema = @Schema(implementation = Origin.class)),
         in = ParameterIn.QUERY
       ),
       @Parameter(
         name = "issue",
         description = "A specific indexing issue as defined in ChecklistBanks vocabulary: https://api.checklistbank.org/vocab/issue.",
-        schema = @Schema(implementation = Issue.class),
+        explode = Explode.TRUE,
+        array = @ArraySchema(schema = @Schema(implementation = Issue.class)),
         in = ParameterIn.QUERY
       )
     }
