@@ -13,10 +13,7 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 @Data
 @Schema(description = "A single result from a name usage full-text search, including the matched taxon, it's classification, and matching vernacular names")
-public class NameUsageSearchResult {
-
-  @Schema(requiredMode = REQUIRED, description = "The matched taxon name usage")
-  private NameUsage taxon;
+public class NameUsageSearchResult extends NameUsage {
 
   @Schema(description = "The major taxonomic group the taxon is considered in", example = "Gymnosperms")
   private TaxGroup group;

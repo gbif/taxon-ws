@@ -79,20 +79,6 @@ public class ApiConverter {
     to.setLabel(from.getLabelHtml());
   }
 
-  NameUsage convert(NameUsageBase nub) {
-    var sn = new NameUsage();
-    copy(nub, sn);
-    return sn;
-  }
-
-  NameUsage convert(BareName bn) {
-    var sn = new NameUsage();
-    copy(bn.getName(), sn, true);
-    sn.setDatasetKey(map.toGBIF(bn.getDatasetKey()));
-    sn.setTaxonomicStatus(TaxonomicStatus.BARE_NAME);
-    return sn;
-  }
-
   public NameUsage convert(SimpleNameInDataset sn) {
     var su = convert((SimpleName)sn);
     // until we have CITES datasets in GBIF we can't map them
@@ -419,9 +405,11 @@ public class ApiConverter {
     var result = new NameUsageSearchResult();
     if (wrapper.getUsage() != null) {
       if (wrapper.getUsage().getStatus().isBareName()) {
-        result.setTaxon(convert((BareName)wrapper.getUsage()));
+        copy(wrapper.getUsage().getName(), result, true);
+        result.setDatasetKey(map.toGBIF(wrapper.getUsage().getDatasetKey()));
+        result.setTaxonomicStatus(TaxonomicStatus.BARE_NAME);
       } else {
-        result.setTaxon(convert(wrapper.getUsage().asUsageBase()));
+        copy(wrapper.getUsage().asUsageBase(), result);
       }
     }
     result.setGroup(wrapper.getGroup());
