@@ -260,8 +260,8 @@ public class TaxonResource {
 
   private static void setDatasetKey(SearchRequest<NameUsageSearchParameter> request, UUID datasetKey) {
     var existing = request.getParameters().get(NameUsageSearchParameter.DATASET_KEY);
-    if (existing != null) {
-      existing.clear();
+    if (existing != null && !existing.isEmpty()) {
+      throw new IllegalArgumentException("datasetKey query parameters are not allowed");
     }
     request.addParameter(NameUsageSearchParameter.DATASET_KEY, datasetKey.toString());
   }
