@@ -408,6 +408,7 @@ public class ApiConverter {
         copy(wrapper.getUsage().getName(), result, true);
         result.setDatasetKey(map.toGBIF(wrapper.getUsage().getDatasetKey()));
         result.setTaxonomicStatus(TaxonomicStatus.BARE_NAME);
+        result.setTaxonID(wrapper.getUsage().getName().getId());
       } else {
         copy(wrapper.getUsage().asUsageBase(), result);
       }

@@ -9,9 +9,16 @@ import org.gbif.taxon.api.VernacularNameSimple;
 
 import java.util.List;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
+
 @Data
 @Schema(description = "A single result from a name usage full-text search, including the matched taxon, it's classification, and matching vernacular names")
 public class NameUsageSearchResult extends NameUsage {
+
+  @Schema(requiredMode = NOT_REQUIRED, description = "The unique identifier for this taxon. Bare names do not have a taxonID", example = "2435099")
+  public String getTaxonID() {
+    return super.getTaxonID();
+  }
 
   @Schema(description = "The major taxonomic group the taxon is considered in", example = "Gymnosperms")
   private TaxGroup taxonomicGroup;
