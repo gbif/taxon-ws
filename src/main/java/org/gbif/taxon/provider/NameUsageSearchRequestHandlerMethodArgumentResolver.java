@@ -68,7 +68,7 @@ public class NameUsageSearchRequestHandlerMethodArgumentResolver
         req.setSearchType(NameUsageSearchRequest.SearchType.valueOf(searchType.toUpperCase()));
       } catch (IllegalArgumentException e) {
         throw new IllegalArgumentException("Unknown searchType value: " + sortBy +
-            ". Valid values are: " + Arrays.toString(NameUsageRequest.SearchType.values()));
+            ". Valid values are: " + Arrays.toString(NameUsageSearchRequest.SearchType.values()));
       }
     }
 
