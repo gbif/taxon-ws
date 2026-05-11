@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import life.catalogue.api.exception.NotFoundException;
 import life.catalogue.api.model.DSID;
 import life.catalogue.api.vocab.DatasetOrigin;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Map;
 import java.util.UUID;
 
 @Component
@@ -142,6 +145,14 @@ public class DatasetKeyMap {
 
   public DSID<String> toDSID(UUID datasetKey, String key) {
     return DSID.of(toCLB(datasetKey), key);
+  }
+
+  /**
+   * @return the currently cached dataset key map
+   */
+  public Map<UUID, Integer> bimap() throws IOException {
+    BiMap<UUID, Integer> map = HashBiMap.create(gbif2clb.asMap());
+    return map;
   }
 
   public void flush() throws IOException {
