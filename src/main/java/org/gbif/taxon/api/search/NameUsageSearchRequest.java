@@ -35,7 +35,7 @@ public class NameUsageSearchRequest extends FacetedSearchRequest<NameUsageSearch
   }
 
   public enum SearchType {
-    WORDS(NameUsageRequest.SearchType.WHOLE_WORDS),
+    WORDS(NameUsageRequest.SearchType.STANDARD),
     EXACT(NameUsageRequest.SearchType.EXACT),
     FUZZY(NameUsageRequest.SearchType.FUZZY);
 

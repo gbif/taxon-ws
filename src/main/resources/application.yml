@@ -29,7 +29,7 @@ datasource:
 col:
   matchingUrl: https://api.gbif.org/v2/species/match/metadata?checklistKey=7ddf754f-d193-4cc9-b351-99906754a03b
 sitemap:
-  api: https://api.gbif.org/
+  api: https://api.gbif.org/v2/experimental/
   portal: https://www.gbif.org/
 monitoring:
   slow-request:
