@@ -422,7 +422,8 @@ public class TaxonResource {
       @Parameter(
         name = "searchContent",
         description = "Restricts full-text search to specific fields. Defaults to scientific name only.",
-        schema = @Schema(implementation = NameUsageSearchRequest.SearchContent.class),
+        explode = Explode.TRUE,
+        array = @ArraySchema(schema = @Schema(implementation = NameUsageSearchRequest.SearchContent.class)),
         in = ParameterIn.QUERY
       )
     }
