@@ -112,8 +112,9 @@ public class SitemapResource {
     StreamingResponseBody stream = os -> {
       Writer writer = new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
       // we cannot use the constructor properly as our limit is larger than allowed :)
-      Page req = new Page((page - 1) * SITEMAP_SIZE, 10);
+      Page req = new Page();
       req.setLimit(SITEMAP_SIZE);
+      req.setOffset((page - 1) * SITEMAP_SIZE);
       try (SqlSession session = factory.openSession()) {
         var num = session.getMapper(NameUsageMapper.class);
         for (String key : num.pageIds(colKey, INCL_SYNONYMS, MIN_LEN, req)) {
