@@ -67,7 +67,7 @@ public class NameUsageSearchRequestHandlerMethodArgumentResolver
       try {
         req.setSearchType(NameUsageSearchRequest.SearchType.valueOf(searchType.toUpperCase()));
       } catch (IllegalArgumentException e) {
-        throw new IllegalArgumentException("Unknown searchType value: " + sortBy +
+        throw new IllegalArgumentException("Unknown searchType value: " + searchType +
             ". Valid values are: " + Arrays.toString(NameUsageSearchRequest.SearchType.values()));
       }
     }
@@ -81,7 +81,7 @@ public class NameUsageSearchRequestHandlerMethodArgumentResolver
                 .collect(Collectors.toSet())
         );
       } catch (IllegalArgumentException e) {
-        throw new IllegalArgumentException("Unknown searchContent value: " + sortBy +
+        throw new IllegalArgumentException("Unknown searchContent value: " + Arrays.toString(searchContent) +
             ". Valid values are: " + Arrays.toString(NameUsageSearchRequest.SearchContent.values()));
       }
     }

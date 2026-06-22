@@ -356,14 +356,16 @@ public class TaxonDao {
             Boolean invasive = null;
             if (props != null) {
               TaxonProperty invasiveTP = props.stream()
-                .filter(tp -> tp.getProperty().equalsIgnoreCase(GbifTerm.isInvasive.name()))
+                // ColDP stores the unprefixed property name, DwC archives the prefixed gbif:isInvasive
+                .filter(tp -> tp.getProperty().equalsIgnoreCase(GbifTerm.isInvasive.name())
+                  || tp.getProperty().equalsIgnoreCase(GbifTerm.isInvasive.prefixedName()))
                 .findFirst().orElse(null);
               if (invasiveTP != null && invasiveTP.getValue() != null && INVASIVE_TRUE_VALUES.contains(invasiveTP.getValue().trim().toLowerCase())) {
                 invasive = true;
               }
             }
             for (var d : dm.listByTaxon(taxKey)) {
-              if (d.getEstablishmentMeans() == EstablishmentMeans.INTRODUCED && d.getArea() != null) {
+              if (isIntroduced(d.getEstablishmentMeans()) && d.getArea() != null) {
                 var griis = converter.convert(d);
                 griis.setDatasetKey(gbifKey);
                 griis.setTaxonID(rel.getId());
@@ -395,6 +397,19 @@ public class TaxonDao {
         relInfo.getCites().add(cite);
       }
     }
+  }
+
+  /**
+   * @return true if the establishment means is INTRODUCED or any of its subtypes, e.g. INTRODUCED_ASSISTED_COLONISATION
+   */
+  private static boolean isIntroduced(EstablishmentMeans em) {
+    while (em != null) {
+      if (em == EstablishmentMeans.INTRODUCED) {
+        return true;
+      }
+      em = em.getParent();
+    }
+    return false;
   }
 
   private SimpleNameInDataset findSingleRelated(Integer datasetKey, String taxonKey, Integer targetDatasetKey) {
