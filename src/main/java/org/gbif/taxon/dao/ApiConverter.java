@@ -6,7 +6,6 @@ import life.catalogue.api.search.NameUsageSearchResponse;
 import life.catalogue.api.search.NameUsageSuggestion;
 import life.catalogue.api.search.NameUsageWrapper;
 import life.catalogue.api.vocab.IdentifierScope;
-import life.catalogue.api.vocab.IdentifierScopes;
 import life.catalogue.api.vocab.Issue;
 import life.catalogue.api.vocab.NomRelType;
 import life.catalogue.api.vocab.TaxonomicStatus;
@@ -400,7 +399,7 @@ public class ApiConverter {
     if (id.getScope() == null || id.getId() == null) {
       return null;
     }
-    IdentifierScope scope = IdentifierScopes.byScope(id.getScope());
+    IdentifierScope scope = IdentifierScopeRegistry.byScope(id.getScope());
     if (scope != null && scope.getResolver() != null) {
       return scope.getResolver().replace("{id}", id.getId());
     }
