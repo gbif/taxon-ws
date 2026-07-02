@@ -19,7 +19,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.gbif.taxon.api.ChecklistMetrics;
-import org.gbif.taxon.api.DatasetMetadata;
 import org.gbif.taxon.dao.DatasetKeyMap;
 import org.gbif.taxon.dao.TaxonDao;
 import org.springframework.http.MediaType;
@@ -60,26 +59,6 @@ public class DatasetResource {
       UUID datasetKey
     ) {
     return dao.metrics(datasetKey);
-  }
-
-  @Operation(
-    operationId = "getDatasetMetadata",
-    summary = "Get basic metadata for a checklist dataset",
-    description = "Returns basic descriptive metadata for the given checklist dataset, including its title, alias, " +
-      "DOIs, alternative identifiers, version, type and the relevant timestamps."
-  )
-  @ApiResponse(responseCode = "200", description = "Dataset metadata")
-  @ApiResponse(responseCode = "404", description = "Dataset not found")
-  @GetMapping("/{datasetKey}/metadata")
-  public DatasetMetadata metadata(
-      @PathVariable("datasetKey")
-      @Parameter(
-          description = "UUID for the dataset key",
-          example = "2d59e5db-57ad-41ff-97d6-11f5fb264527"
-      )
-      UUID datasetKey
-    ) {
-    return dao.metadata(datasetKey);
   }
 
   @Hidden

@@ -5,8 +5,6 @@ import life.catalogue.api.search.NameUsageRequest;
 import life.catalogue.api.search.NameUsageSearchResponse;
 import life.catalogue.api.search.NameUsageSuggestion;
 import life.catalogue.api.search.NameUsageWrapper;
-import life.catalogue.api.vocab.IdentifierScope;
-import life.catalogue.api.vocab.IdentifierScopes;
 import life.catalogue.api.vocab.Issue;
 import life.catalogue.api.vocab.NomRelType;
 import life.catalogue.api.vocab.TaxonomicStatus;
@@ -519,58 +517,6 @@ public class ApiConverter {
       }
       req.setFilters(filters);
     }
-  }
-
-  /**
-   * Converts a CLB dataset to the basic GBIF metadata DTO.
-   * @param d the CLB dataset
-   * @param gbifKey the GBIF UUID the dataset was requested with, used as the public key
-   */
-  public DatasetMetadata convert(Dataset d, UUID gbifKey) {
-    var meta = new DatasetMetadata();
-    meta.setKey(gbifKey);
-    meta.setClbKey(d.getKey());
-    meta.setTitle(d.getTitle());
-    meta.setAlias(d.getAlias());
-    meta.setDoi(str(d.getDoi()));
-    meta.setVersionDoi(str(d.getVersionDoi()));
-    meta.setVersion(d.getVersion());
-    meta.setType(d.getType());
-    meta.setCreated(d.getCreated());
-    meta.setModified(d.getModified());
-    meta.setIssued(d.getIssued() != null ? d.getIssued().toISO() : null);
-    meta.setImported(d.getImported());
-    if (d.getIdentifier() != null && !d.getIdentifier().isEmpty()) {
-      meta.setIdentifier(
-        d.getIdentifier().stream()
-          .map(ApiConverter::convert)
-          .collect(Collectors.toList())
-      );
-    }
-    return meta;
-  }
-
-  private static DatasetIdentifier convert(Identifier id) {
-    return new DatasetIdentifier(id.getScope(), id.getId(), link(id));
-  }
-
-  /**
-   * Builds a resolvable URL for an identifier using the CLB identifier scope registry.
-   * Falls back to the raw id for URL-typed scopes and null when the scope is unknown or not resolvable.
-   */
-  private static String link(Identifier id) {
-    if (id.getScope() == null || id.getId() == null) {
-      return null;
-    }
-    IdentifierScope scope = IdentifierScopes.byScope(id.getScope());
-    if (scope != null && scope.getResolver() != null) {
-      return scope.getResolver().replace("{id}", id.getId());
-    }
-    // URL identifiers are their own link
-    if (Identifier.Scope.URL.prefix().equalsIgnoreCase(id.getScope())) {
-      return id.getId();
-    }
-    return null;
   }
 
   public ChecklistMetrics convert(DatasetImport imp) {
