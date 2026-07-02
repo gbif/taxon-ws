@@ -42,7 +42,7 @@ public class ExceptionMapper {
 
   @ExceptionHandler(MissingGBIFKeyException.class)
   public ResponseEntity<?> handleMissingGBIFKeyException(MissingGBIFKeyException e, HttpServletRequest request) {
-    LOG.error("Missing GBIF key handling {}", request.getRequestURI(), e);
+    LOG.warn("Missing GBIF key handling {}: {}", request.getRequestURI(), e.getMessage());
     return respond(request, HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
   }
 
