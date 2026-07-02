@@ -5,6 +5,8 @@ import life.catalogue.api.search.NameUsageRequest;
 import life.catalogue.api.search.NameUsageSearchResponse;
 import life.catalogue.api.search.NameUsageSuggestion;
 import life.catalogue.api.search.NameUsageWrapper;
+import life.catalogue.api.vocab.IdentifierScope;
+import life.catalogue.api.vocab.IdentifierScopes;
 import life.catalogue.api.vocab.Issue;
 import life.catalogue.api.vocab.NomRelType;
 import life.catalogue.api.vocab.TaxonomicStatus;
@@ -16,6 +18,7 @@ import org.gbif.api.model.common.search.SearchRequest;
 import org.gbif.api.model.common.search.SearchResponse;
 import org.gbif.taxon.api.*;
 import org.gbif.taxon.api.Distribution;
+import org.gbif.taxon.api.Identifier;
 import org.gbif.taxon.api.Media;
 import org.gbif.taxon.api.NameUsage;
 import org.gbif.taxon.api.Reference;
@@ -373,7 +376,39 @@ public class ApiConverter {
       );
     }
 
+    // alternative identifiers
+    if (usage.getIdentifier() != null && !usage.getIdentifier().isEmpty()) {
+      info.setIdentifiers(
+        usage.getIdentifier().stream()
+          .map(ApiConverter::convert)
+          .collect(Collectors.toList())
+      );
+    }
+
     return info;
+  }
+
+  private static Identifier convert(life.catalogue.api.model.Identifier id) {
+    return new Identifier(id.getScope(), id.getId(), link(id));
+  }
+
+  /**
+   * Builds a resolvable URL for an identifier using the CLB identifier scope registry.
+   * Falls back to the raw id for URL-typed scopes and null when the scope is unknown or not resolvable.
+   */
+  private static String link(life.catalogue.api.model.Identifier id) {
+    if (id.getScope() == null || id.getId() == null) {
+      return null;
+    }
+    IdentifierScope scope = IdentifierScopes.byScope(id.getScope());
+    if (scope != null && scope.getResolver() != null) {
+      return scope.getResolver().replace("{id}", id.getId());
+    }
+    // URL identifiers are their own link
+    if (life.catalogue.api.model.Identifier.Scope.URL.prefix().equalsIgnoreCase(id.getScope())) {
+      return id.getId();
+    }
+    return null;
   }
 
   private List<NameUsage> convert(List<Synonym> syns) {

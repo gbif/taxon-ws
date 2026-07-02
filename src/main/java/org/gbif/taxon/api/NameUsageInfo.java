@@ -95,4 +95,7 @@ public class NameUsageInfo extends NameUsage {
 
   @Schema(description = "Measurements or facts about the taxon")
   private List<MeasurementOrFact> measurementOrFacts;
+
+  @Schema(description = "Alternative identifiers for the taxon, each given as a CURIE-style scope, its local id and a resolvable link")
+  private List<Identifier> identifiers;
 }
