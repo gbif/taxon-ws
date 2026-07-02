@@ -117,6 +117,18 @@ public class TaxonDao {
     }
   }
 
+  public DatasetMetadata metadata(UUID uuid) {
+    int datasetKey = map.toCLB(uuid);
+    try (var session = factory.openSession()) {
+      var dm = session.getMapper(DatasetMapper.class);
+      var dataset = dm.get(datasetKey);
+      if (dataset == null) {
+        throw NotFoundException.notFound(DatasetMetadata.class, uuid);
+      }
+      return converter.convert(dataset, uuid);
+    }
+  }
+
   public NameUsage get(UUID uuid, String taxonKey) {
     var key = map.toDSID(uuid, taxonKey);
     try (var session = factory.openSession()) {
