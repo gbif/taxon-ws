@@ -6,6 +6,8 @@ import life.catalogue.api.exception.NotFoundException;
 import life.catalogue.api.exception.SynonymException;
 import org.gbif.taxon.api.ErrorMessage;
 import org.gbif.taxon.dao.MissingGBIFKeyException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class ExceptionMapper {
+  private static final Logger LOG = LoggerFactory.getLogger(ExceptionMapper.class);
 
   @ExceptionHandler(SynonymException.class)
   public ResponseEntity<?> handleSynonymException(SynonymException e, HttpServletRequest request) {
@@ -21,26 +24,31 @@ public class ExceptionMapper {
     if (e.acceptedKey != null) {
       details += ". Accepted taxon: " + e.acceptedKey.getId();
     }
+    LOG.debug("Synonym {} requested as accepted taxon", request.getRequestURI());
     return respond(request, HttpStatus.NOT_FOUND, details);
   }
 
   @ExceptionHandler(NotFoundException.class)
   public ResponseEntity<?> handleNotFoundException(NotFoundException e, HttpServletRequest request) {
+    LOG.debug("Not found: {}", request.getRequestURI());
     return respond(request, HttpStatus.NOT_FOUND, e.getMessage());
   }
 
   @ExceptionHandler(IllegalArgumentException.class)
   public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException e, HttpServletRequest request) {
+    LOG.debug("Bad request {}: {}", request.getRequestURI(), e.getMessage());
     return respond(request, HttpStatus.BAD_REQUEST, e.getMessage());
   }
 
   @ExceptionHandler(MissingGBIFKeyException.class)
   public ResponseEntity<?> handleMissingGBIFKeyException(MissingGBIFKeyException e, HttpServletRequest request) {
+    LOG.error("Missing GBIF key handling {}", request.getRequestURI(), e);
     return respond(request, HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
   }
 
-  @ExceptionHandler(Exception.class)
-  public ResponseEntity<?> handleException(Exception e, HttpServletRequest request) {
+  @ExceptionHandler(Throwable.class)
+  public ResponseEntity<?> handleException(Throwable e, HttpServletRequest request) {
+    LOG.error("Unhandled error processing {}", request.getRequestURI(), e);
     return respond(request, HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
   }
 
