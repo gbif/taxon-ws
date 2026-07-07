@@ -15,6 +15,10 @@ public class Identifier {
     example = "doi")
   private String scope;
 
+  @Schema(description = "The human readable title of the scope",
+      example = "World Register of Marine Species")
+  private String title;
+
   @Schema(description = "The local identifier within the scope", example = "10.5281/zenodo.6407053")
   private String id;
 

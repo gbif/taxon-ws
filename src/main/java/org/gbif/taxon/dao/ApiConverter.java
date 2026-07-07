@@ -388,19 +388,19 @@ public class ApiConverter {
   }
 
   private static Identifier convert(life.catalogue.api.model.Identifier id) {
-    return new Identifier(id.getScope(), id.getId(), link(id));
+    IdentifierScope scope = IdentifierScopeRegistry.byScope(id.getScope());
+    return new Identifier(id.getScope(), scope == null ? null : scope.getTitle(), id.getId(), link(scope, id));
   }
 
   /**
    * Builds a resolvable URL for an identifier using the CLB identifier scope registry.
    * Falls back to the raw id for URL-typed scopes and null when the scope is unknown or not resolvable.
    */
-  private static String link(life.catalogue.api.model.Identifier id) {
-    if (id.getScope() == null || id.getId() == null) {
+  private static String link(IdentifierScope scope, life.catalogue.api.model.Identifier id) {
+    if (scope == null || id.getId() == null) {
       return null;
     }
-    IdentifierScope scope = IdentifierScopeRegistry.byScope(id.getScope());
-    if (scope != null && scope.getResolver() != null) {
+    if (scope.getResolver() != null) {
       return scope.getResolver().replace("{id}", id.getId());
     }
     // URL identifiers are their own link
