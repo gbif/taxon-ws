@@ -47,10 +47,10 @@
   </repositories>
 
   <properties>
-    <!-- Java 21 configuration for CLB compatibility -->
-    <java.version>21</java.version>
-    <maven.compiler.source>21</maven.compiler.source>
-    <maven.compiler.target>21</maven.compiler.target>
+    <!-- Java 25 configuration for CLB compatibility -->
+    <java.version>25</java.version>
+    <maven.compiler.source>25</maven.compiler.source>
+    <maven.compiler.target>25</maven.compiler.target>
     <start-class>org.gbif.taxon.TaxonApplication</start-class>
 
     <!-- .mvn/jvm.config is not being used by surefire - we need to replicate the settings here! -->
@@ -80,7 +80,7 @@
     <curator-framework.version>5.5.0-disable-connectstr-updates</curator-framework.version>
 
     <!-- GBIF -->
-    <clb.version>1.2.2</clb.version>
+    <clb.version>1.3.1-SNAPSHOT</clb.version>
     <gbif-api.version>2.2.2</gbif-api.version>
     <gbif-common-ws.version>2.1.2</gbif-common-ws.version>
 
@@ -387,8 +387,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${maven-compiler-plugin.version}</version>
         <configuration>
-          <source>21</source>
-          <target>21</target>
+          <source>25</source>
+          <target>25</target>
           <annotationProcessorPaths>
             <path>
               <groupId>org.projectlombok</groupId>
