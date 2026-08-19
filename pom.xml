@@ -381,6 +381,17 @@
   </dependencies>
 
   <build>
+    <extensions>
+      <!-- sets ${os.detected.classifier} (osx-aarch_64, linux-x86_64, ...) which the transitive
+           org.catalogueoflife:parser dependency uses as the classifier of the name-parser-rust
+           native JAR. Build extensions are not inherited from dependency poms, so it must be
+           declared here as well as in the CLB backend. -->
+      <extension>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>os-maven-plugin</artifactId>
+        <version>1.7.1</version>
+      </extension>
+    </extensions>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
