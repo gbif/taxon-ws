@@ -80,7 +80,7 @@
     <curator-framework.version>5.5.0-disable-connectstr-updates</curator-framework.version>
 
     <!-- GBIF -->
-    <clb.version>1.3.1-SNAPSHOT</clb.version>
+    <clb.version>1.3.1</clb.version>
     <gbif-api.version>2.2.2</gbif-api.version>
     <gbif-common-ws.version>2.1.2</gbif-common-ws.version>
 
