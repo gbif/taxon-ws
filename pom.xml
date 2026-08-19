@@ -10,7 +10,7 @@
 
   <groupId>org.gbif.taxon</groupId>
   <artifactId>taxon-ws</artifactId>
-  <version>1.0.11-SNAPSHOT</version>
+  <version>1.0.12-SNAPSHOT</version>
   <name>GBIF Taxon WS</name>
 
   <scm>
