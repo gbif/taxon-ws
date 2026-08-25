@@ -559,7 +559,7 @@ public class ApiConverter {
     metrics.setFormat(imp.getFormat());
     metrics.setDownload(imp.getDownload());
     metrics.setAttempt(imp.getAttempt());
-    metrics.setState(imp.getState());
+    metrics.setState(imp.getStatus());
     metrics.setStarted(imp.getStarted());
     metrics.setFinished(imp.getFinished());
 
