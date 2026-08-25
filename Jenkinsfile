@@ -64,7 +64,9 @@ pipeline {
           }
       }
       environment {
-          RELEASE_ARGS = utils.createReleaseArgs(params.RELEASE_VERSION, params.DEVELOPMENT_VERSION, params.DRY_RUN_RELEASE)
+          // trim the version params: a stray space makes the shell split $RELEASE_ARGS,
+          // leaving -DreleaseVersion= empty and the version dangling as a maven goal
+          RELEASE_ARGS = utils.createReleaseArgs((params.RELEASE_VERSION ?: '').trim(), (params.DEVELOPMENT_VERSION ?: '').trim(), params.DRY_RUN_RELEASE)
       }
       steps {
           checkout([
