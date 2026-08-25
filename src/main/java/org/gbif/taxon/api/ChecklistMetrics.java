@@ -26,8 +26,8 @@ public class ChecklistMetrics {
   @Schema(description = "Sequential import attempt number for this dataset", example = "5")
   private int attempt;
 
-  @Schema(description = "The state of the latest import (e.g. FINISHED, FAILED, PROCESSING)", example = "FINISHED")
-  private ImportState state;
+  @Schema(description = "The status of the latest import (e.g. FINISHED, FAILED, RUNNING)", example = "FINISHED")
+  private JobStatus state;
 
   @Schema(description = "Timestamp when the latest import started", example = "2024-03-15T10:00:00")
   private LocalDateTime started;
