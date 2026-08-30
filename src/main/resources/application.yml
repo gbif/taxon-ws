@@ -28,6 +28,16 @@ datasource:
     connectionTimeout: 30000
 col:
   matchingUrl: https://api.gbif.org/v2/species/match/metadata?checklistKey=7ddf754f-d193-4cc9-b351-99906754a03b
+  refresh-interval: PT1H
+checklists:
+  clbApi: https://api.checklistbank.org/
+  clbUi: https://www.checklistbank.org/
+registry:
+  enabled: false
+  api: https://api.gbif.org/v1/
+  username: ${REGISTRY_USER:}
+  appKey: ${REGISTRY_APP_KEY:}
+  secret: ${REGISTRY_SECRET:}
 sitemap:
   api: https://api.gbif.org/v2/experimental/
   portal: https://www.gbif.org/

@@ -73,6 +73,43 @@ class DatasetKeyMapTest {
   }
 
   @Test
+  void refreshColKeyUnchanged() {
+    assertThat(map.getColKey()).isEqualTo(1234);
+    assertThat(map.refreshColKey()).isFalse();
+    assertThat(map.getColKey()).isEqualTo(1234);
+  }
+
+  @Test
+  void refreshColKeyChanged() throws IOException {
+    JsonNode json = new ObjectMapper().readValue("""
+    {"mainIndex": {"clbDatasetKey": 5678}}
+    """, JsonNode.class);
+    when(jsonFetcher.fetchJson(any())).thenReturn(json);
+
+    assertThat(map.refreshColKey()).isTrue();
+    assertThat(map.getColKey()).isEqualTo(5678);
+  }
+
+  @Test
+  void refreshColKeyKeepsOldKeyOnFailure() {
+    when(jsonFetcher.fetchJson(any())).thenThrow(new IllegalStateException("matcher is down"));
+
+    assertThatThrownBy(map::refreshColKey).isInstanceOf(IllegalStateException.class);
+    assertThat(map.getColKey()).isEqualTo(1234);
+  }
+
+  @Test
+  void refreshColKeyIgnoredWhenFixed() throws IOException {
+    var cfg = new ColConfig();
+    cfg.setDatasetKey(4242);
+    var fixed = new DatasetKeyMap(factory, cache, jsonFetcher, cfg);
+
+    assertThat(fixed.getColKey()).isEqualTo(4242);
+    assertThat(fixed.refreshColKey()).isFalse();
+    assertThat(fixed.getColKey()).isEqualTo(4242);
+  }
+
+  @Test
   void toCLBSuccess() {
     var uuid = UUID.randomUUID();
     when(datasetMapper.getKeyByGBIF(uuid)).thenReturn(42);

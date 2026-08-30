@@ -14,6 +14,7 @@
 package org.gbif.taxon.resource;
 
 import io.swagger.v3.oas.annotations.Hidden;
+import org.gbif.taxon.dao.ChecklistDao;
 import org.gbif.taxon.dao.DatasetKeyMap;
 import org.gbif.taxon.dao.TaxonDao;
 import org.springframework.http.MediaType;
@@ -32,9 +33,11 @@ import java.util.UUID;
 public class MetadataResource {
   private final DatasetKeyMap keyMap;
   private final TaxonDao dao;
+  private final ChecklistDao checklistDao;
 
-  public MetadataResource(TaxonDao taxonDao, DatasetKeyMap keyMap) {
+  public MetadataResource(TaxonDao taxonDao, ChecklistDao checklistDao, DatasetKeyMap keyMap) {
     this.dao = taxonDao;
+    this.checklistDao = checklistDao;
     this.keyMap = keyMap;
   }
 
@@ -52,6 +55,7 @@ public class MetadataResource {
   public boolean flush() throws IOException {
     keyMap.flush();
     dao.flushCache();
+    checklistDao.flushCache();
     return true;
   }
 

@@ -18,26 +18,65 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.gbif.taxon.api.Checklist;
 import org.gbif.taxon.api.ChecklistMetrics;
+import org.gbif.taxon.dao.ChecklistDao;
 import org.gbif.taxon.dao.DatasetKeyMap;
 import org.gbif.taxon.dao.TaxonDao;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
-@Tag(name = "Checklist", description = "Checklist dataset operations — import metrics and cache management")
+@Tag(name = "Checklist", description = "Checklist dataset operations — discovery, import metrics and cache management")
 @RequestMapping(value = "dataset", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
 public class DatasetResource {
 
   private final TaxonDao dao;
+  private final ChecklistDao checklistDao;
   private final DatasetKeyMap keyMap;
 
-  public DatasetResource(TaxonDao taxonDao, DatasetKeyMap keyMap) {
+  public DatasetResource(TaxonDao taxonDao, ChecklistDao checklistDao, DatasetKeyMap keyMap) {
     this.dao = taxonDao;
+    this.checklistDao = checklistDao;
     this.keyMap = keyMap;
+  }
+
+  @Operation(
+    operationId = "listChecklists",
+    summary = "List all checklists served by this API",
+    description = "Returns every taxonomy this API serves, each with its GBIF dataset key, the ChecklistBank dataset key " +
+      "currently backing it, alias, title, version and download locations. " +
+      "For the Catalogue of Life the ChecklistBank key changes with every new edition, so this is the authoritative " +
+      "answer to which version GBIF currently uses to interpret occurrences."
+  )
+  @ApiResponse(responseCode = "200", description = "The list of checklists")
+  @GetMapping
+  public List<Checklist> list() {
+    return checklistDao.list();
+  }
+
+  @Operation(
+    operationId = "getChecklist",
+    summary = "Get a single checklist",
+    description = "Returns the ChecklistBank dataset currently backing the given GBIF checklist dataset, " +
+      "including its alias, title, version, issue date, license and download locations."
+  )
+  @ApiResponse(responseCode = "200", description = "The checklist")
+  @ApiResponse(responseCode = "404", description = "Dataset not found")
+  @GetMapping("/{datasetKey}")
+  public Checklist get(
+      @PathVariable("datasetKey")
+      @Parameter(
+          description = "UUID for the dataset key",
+          example = "2d59e5db-57ad-41ff-97d6-11f5fb264527"
+      )
+      UUID datasetKey
+    ) {
+    return checklistDao.get(datasetKey);
   }
 
   @Operation(
@@ -50,7 +89,7 @@ public class DatasetResource {
   @ApiResponse(responseCode = "200", description = "Dataset metrics")
   @ApiResponse(responseCode = "404", description = "Dataset not found")
   @GetMapping("/{datasetKey}/metrics")
-  public ChecklistMetrics get(
+  public ChecklistMetrics metrics(
       @PathVariable("datasetKey")
       @Parameter(
           description = "UUID for the dataset key",
@@ -72,6 +111,7 @@ public class DatasetResource {
   public boolean flush() throws IOException {
     keyMap.flush();
     dao.flushCache();
+    checklistDao.flushCache();
     return true;
   }
 

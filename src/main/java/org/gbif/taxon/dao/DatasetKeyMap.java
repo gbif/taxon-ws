@@ -123,6 +123,25 @@ public class DatasetKeyMap {
     return colkey;
   }
 
+  /**
+   * Re-reads the currently live COL XR key from the matching service.
+   * Does nothing if the key is fixed via configuration, e.g. on the dev environment.
+   *
+   * @return true if the key has changed
+   */
+  public boolean refreshColKey() {
+    if (fixedColKey) {
+      return false;
+    }
+    int newKey = retrieveCurrentColXRKey();
+    if (newKey == colkey) {
+      return false;
+    }
+    LOG.info("COL XR key changed from {} to {}", colkey, newKey);
+    colkey = newKey;
+    return true;
+  }
+
   public int toCLB(UUID datasetKey) {
     Integer dk;
     if (cfg.getExtendedRelease().equals(datasetKey)) {
@@ -157,9 +176,7 @@ public class DatasetKeyMap {
 
   public void flush() throws IOException {
     LOG.info("Flushing dataset key map. Current COL key: " + colkey);
-    if (!fixedColKey) {
-      colkey = retrieveCurrentColXRKey();
-    }
+    refreshColKey();
     gbif2clb.invalidateAll();
     clb2gbif.invalidateAll();
     cache.clear();
