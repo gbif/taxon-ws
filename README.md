@@ -2,7 +2,7 @@
 
 A Spring Boot 3.5.x REST API that wraps the [ChecklistBank](https://checklistbank.org) (CLB) PostgreSQL database and Elasticsearch index with GBIF-compatible endpoints.
 It translates between GBIF UUID-based dataset identifiers and ChecklistBank numeric IDs, exposing taxonomic data under `/taxon` and checklist discovery
-and statistics under `/dataset`.
+and statistics under `/taxon/checklist`.
 
 ## Goals
 
@@ -33,8 +33,7 @@ Spring Boot REST API (taxon-ws)
   │
   ├── TaxonResource    (/taxon/{datasetKey}/{taxonKey}/*)   — name usage detail & search
   ├── TreeResource     (/taxon/tree/{datasetKey}/*)         — taxonomic tree traversal
-  └── DatasetResource  (/dataset, /dataset/{datasetKey})    — checklist discovery
-                       (/dataset/{datasetKey}/metrics)      — checklist-level statistics
+  └── ChecklistResource (/taxon/checklist/*)                — checklist discovery & statistics
   │
   ├── TaxonDao ──────────────────────────────────────────────────────────┐
   │     ├── MyBatis mappers → CLB PostgreSQL (name usages, synonyms,    │
@@ -65,7 +64,7 @@ For search/suggest requests, the flow goes through the CLB Elasticsearch client 
 
 | Layer | Package | Description |
 |-------|---------|-------------|
-| REST controllers | `resource/` | `TaxonResource` (name usage endpoints), `DatasetResource` (checklist discovery & metrics), `TreeResource` (tree traversal) |
+| REST controllers | `resource/` | `TaxonResource` (name usage endpoints), `ChecklistResource` (checklist discovery & metrics), `TreeResource` (tree traversal) |
 | Data access | `dao/` | `TaxonDao` — orchestrates PostgreSQL (MyBatis) and Elasticsearch queries; `DatasetKeyMap` — UUID↔integer translation with Caffeine cache; `ChecklistDao` — the checklists served by this API; `ColKeyRefresher` — hourly COL XR key refresh; `ApiConverter` — CLB model → GBIF DTO mapping |
 | API DTOs | `api/` | `NameUsageSimple` (base), `NameUsage` (full detail), `UsageInfo` (composite), `Distribution`, `Media`, `VernacularName`, `Reference`, `ChecklistMetrics` |
 | Configuration | `config/` | `ClbConfig` (HikariCP datasource), `WebMvcConfig` (Jackson, semicolons in URLs), `WebSecurityConfigurer` (permit-all, CSRF disabled), `ChecklistConfig` (the curated checklist list), `RegistryConfig` (optional GBIF registry write access) |
@@ -102,8 +101,14 @@ The key is loaded on startup, cached in memory and re-read every hour (`col.refr
 A secondary GBIF UUID [e007cc4a-8704-449d-8829-bb209d26d6c8](https://www.gbif.org/dataset/7ddf754f-d193-4cc9-b351-99906754a03b)
 maps to the [latest base release of COL](https://www.checklistbank.org/dataset/3LR).
 
+#### Deprecated paths
+
+`GET /dataset/{datasetKey}/metrics` is kept alive as a deprecated alias of `GET /taxon/checklist/{datasetKey}/metrics` until all clients, the GBIF portal in
+particular, have migrated. The `dataset` prefix cannot stay, as it would clash with the registry dataset resource once the `experimental` prefix is dropped
+from the v2 API.
+
 #### Flush
-The cache can be flushed at any time by calling `DatasetKeyMap.flush()` or the exposed admin endpoint `DELETE /dataset/flush`.
+The cache can be flushed at any time by calling `DatasetKeyMap.flush()` or the exposed admin endpoint `DELETE /taxon/checklist/flush`.
 This forces an immediate re-read instead of waiting for the hourly refresh.
 
 #### GBIF registry sync
@@ -138,7 +143,7 @@ The index name is configured via `elasticsearch.index.name` in `application.yml`
 ### Dataset key cache
 
 `DatasetKeyMap` caches UUID↔integer mappings in memory (Caffeine).
-If a dataset is newly registered or its GBIF key changes, `DELETE /dataset/flush` or a service restart will clear the cache and re-read from the database.
+If a dataset is newly registered or its GBIF key changes, `DELETE /taxon/checklist/flush` or a service restart will clear the cache and re-read from the database.
 The COL XR key is refreshed hourly on its own.
 
 ---
