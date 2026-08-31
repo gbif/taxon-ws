@@ -31,7 +31,6 @@ col:
   refresh-interval: PT1H
 checklists:
   clbApi: https://api.checklistbank.org/
-  clbUi: https://www.checklistbank.org/
 registry:
   enabled: false
   api: https://api.gbif.org/v1/

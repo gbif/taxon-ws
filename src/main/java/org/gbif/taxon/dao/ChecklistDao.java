@@ -81,7 +81,7 @@ public class ChecklistDao {
   private Checklist convert(Dataset d) {
     var c = new Checklist();
     c.setKey(keyMap.toGBIF(d.getKey()));
-    c.setChecklistBankKey(d.getKey());
+    c.setClbDatasetKey(d.getKey());
     c.setAlias(d.getAlias());
     c.setTitle(d.getTitle());
     c.setVersion(d.getVersion());
@@ -96,10 +96,9 @@ public class ChecklistDao {
     }
     c.setUrl(d.getUrl());
     c.setLogo(d.getLogo());
-    c.setUsageCount(d.getSize());
-    c.setChecklistBankUrl(cfg.checklistBankUrl(d.getKey()));
-    c.setColdpDownloadUrl(cfg.downloadUrl(d.getKey(), COLDP));
-    c.setDwcaDownloadUrl(cfg.downloadUrl(d.getKey(), DWCA));
+    c.setNameUsageCount(d.getSize());
+    c.setDownloadUrlColdp(cfg.downloadUrl(d.getKey(), COLDP));
+    c.setDownloadUrlDwca(cfg.downloadUrl(d.getKey(), DWCA));
     return c;
   }
 }

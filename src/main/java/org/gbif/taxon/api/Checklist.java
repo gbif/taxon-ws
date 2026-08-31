@@ -25,7 +25,7 @@ public class Checklist {
   @Schema(requiredMode = REQUIRED, description = "The ChecklistBank dataset key that currently backs this checklist. " +
     "For the Catalogue of Life this changes with every new edition",
     example = "315557")
-  private int checklistBankKey;
+  private int clbDatasetKey;
 
   @Schema(description = "Short unique name of the exact version in use, if given (dcterms:alternative)",
     example = "COL26.6 XR")
@@ -54,17 +54,13 @@ public class Checklist {
   private URI logo;
 
   @Schema(description = "The total number of name usages in the version in use", example = "7991756")
-  private Integer usageCount;
-
-  @Schema(description = "The ChecklistBank landing page for the version in use",
-    example = "https://www.checklistbank.org/dataset/315557/about")
-  private URI checklistBankUrl;
+  private Integer nameUsageCount;
 
   @Schema(description = "A ColDP archive download of the exact version in use",
     example = "https://api.checklistbank.org/dataset/315557/export.zip?format=ColDP&extended=true")
-  private URI coldpDownloadUrl;
+  private URI downloadUrlColdp;
 
   @Schema(description = "A Darwin Core archive download of the exact version in use",
     example = "https://api.checklistbank.org/dataset/315557/export.zip?format=DwCA&extended=true")
-  private URI dwcaDownloadUrl;
+  private URI downloadUrlDwca;
 }

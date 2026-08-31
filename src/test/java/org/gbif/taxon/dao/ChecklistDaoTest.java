@@ -80,7 +80,7 @@ class ChecklistDaoTest {
     var c = dao.get(COL);
 
     assertThat(c.getKey()).isEqualTo(COL);
-    assertThat(c.getChecklistBankKey()).isEqualTo(315557);
+    assertThat(c.getClbDatasetKey()).isEqualTo(315557);
     assertThat(c.getAlias()).isEqualTo("COL26.6 XR");
     assertThat(c.getTitle()).isEqualTo("Catalogue of Life");
     assertThat(c.getVersion()).isEqualTo("June 2026");
@@ -88,12 +88,10 @@ class ChecklistDaoTest {
     assertThat(c.getDoi()).isEqualTo("10.48580/dgy8b");
     assertThat(c.getVersionDoi()).isEqualTo("10.48580/dgxsq");
     assertThat(c.getUrl()).isEqualTo(URI.create("https://www.catalogueoflife.org"));
-    assertThat(c.getUsageCount()).isEqualTo(7991756);
-    assertThat(c.getChecklistBankUrl())
-      .isEqualTo(URI.create("https://www.checklistbank.org/dataset/315557/about"));
-    assertThat(c.getColdpDownloadUrl())
+    assertThat(c.getNameUsageCount()).isEqualTo(7991756);
+    assertThat(c.getDownloadUrlColdp())
       .isEqualTo(URI.create("https://api.checklistbank.org/dataset/315557/export.zip?format=ColDP&extended=true"));
-    assertThat(c.getDwcaDownloadUrl())
+    assertThat(c.getDownloadUrlDwca())
       .isEqualTo(URI.create("https://api.checklistbank.org/dataset/315557/export.zip?format=DwCA&extended=true"));
   }
 
@@ -112,7 +110,7 @@ class ChecklistDaoTest {
     assertThat(c.getIssued()).isNull();
     assertThat(c.getDoi()).isNull();
     assertThat(c.getVersionDoi()).isNull();
-    assertThat(c.getUsageCount()).isNull();
+    assertThat(c.getNameUsageCount()).isNull();
   }
 
   @Test

@@ -23,14 +23,6 @@ public class ChecklistConfig {
   );
 
   private String clbApi = "https://api.checklistbank.org/";
-  private String clbUi = "https://www.checklistbank.org/";
-
-  /**
-   * @return the ChecklistBank landing page for the given ChecklistBank dataset key
-   */
-  public URI checklistBankUrl(int clbKey) {
-    return URI.create(assertTrailingSlash(clbUi) + "dataset/" + clbKey + "/about");
-  }
 
   /**
    * @return the ChecklistBank export URL for the given ChecklistBank dataset key and data format
