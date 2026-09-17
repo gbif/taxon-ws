@@ -13,44 +13,50 @@
  */
 package org.gbif.taxon.resource;
 
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.gbif.taxon.api.ChecklistMetrics;
-import org.gbif.taxon.dao.DatasetKeyMap;
 import org.gbif.taxon.dao.TaxonDao;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.util.UUID;
 
-@Tag(name = "Checklist", description = "Checklist dataset operations — import metrics and cache management")
+/**
+ * The former home of the checklist metrics, kept alive until all clients, the GBIF portal in
+ * particular, have moved to {@link ChecklistResource} at taxon/checklist.
+ * The dataset path cannot stay, as it would clash with the registry dataset resource once the
+ * experimental prefix is dropped from the v2 API.
+ */
+@Tag(name = "Checklist")
 @RequestMapping(value = "dataset", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
+@Deprecated
 public class DatasetResource {
 
   private final TaxonDao dao;
-  private final DatasetKeyMap keyMap;
 
-  public DatasetResource(TaxonDao taxonDao, DatasetKeyMap keyMap) {
+  public DatasetResource(TaxonDao taxonDao) {
     this.dao = taxonDao;
-    this.keyMap = keyMap;
   }
 
+  @Deprecated
   @Operation(
     operationId = "getDatasetMetrics",
     summary = "Get import metrics for a checklist dataset",
-    description = "Returns counts and statistics from the latest successful import of the given checklist dataset, " +
-      "including record counts by type (taxa, synonyms, vernacular names, distributions, media, references) " +
-      "and breakdowns by rank, nomenclatural code, name type, taxonomic status, and origin."
+    description = "Deprecated, use /taxon/checklist/{datasetKey}/metrics instead. " +
+      "Returns counts and statistics from the latest successful import of the given checklist dataset.",
+    deprecated = true
   )
   @ApiResponse(responseCode = "200", description = "Dataset metrics")
   @ApiResponse(responseCode = "404", description = "Dataset not found")
   @GetMapping("/{datasetKey}/metrics")
-  public ChecklistMetrics get(
+  public ChecklistMetrics metrics(
       @PathVariable("datasetKey")
       @Parameter(
           description = "UUID for the dataset key",
@@ -59,20 +65,6 @@ public class DatasetResource {
       UUID datasetKey
     ) {
     return dao.metrics(datasetKey);
-  }
-
-  @Hidden
-  @Operation(
-    operationId = "flushDatasetCache",
-    summary = "Flush the dataset key map cache",
-    description = "Clears the internal dataset key map cache and the DAO cache. Admin/internal use only."
-  )
-  @ApiResponse(responseCode = "200", description = "Cache flushed successfully")
-  @DeleteMapping("/flush")
-  public boolean flush() throws IOException {
-    keyMap.flush();
-    dao.flushCache();
-    return true;
   }
 
 }

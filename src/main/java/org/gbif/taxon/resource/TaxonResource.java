@@ -164,9 +164,12 @@ public class TaxonResource {
     operationId = "getRelatedUsages",
     summary = "Get name usages for this taxon from other datasets",
     description = "Returns name usages matching this taxon from other checklist datasets registered in ChecklistBank. " +
-      "Results can be filtered by dataset type, specific dataset keys, or publisher keys."
+      "Results can be filtered by dataset type, specific dataset keys, or publisher keys. " +
+      "By default all usages sharing the same names index entry are returned, which includes authorship variants " +
+      "and homonyms. Use `strict=true` together with a single `datasetKey` to get only the best match in that dataset."
   )
   @ApiResponse(responseCode = "200", description = "Related name usages")
+  @ApiResponse(responseCode = "400", description = "Invalid filter combination for strict mode")
   @ApiResponse(responseCode = "404", description = "Taxon not found")
   @GetMapping("/{datasetKey}/{taxonKey}/related")
   public List<NameUsage> getRelated(
@@ -204,8 +207,25 @@ public class TaxonResource {
       explode = Explode.TRUE,
       array = @ArraySchema(schema = @Schema(type = "string", format = "uuid"))
     )
-    List<UUID> publisherKeys
+    List<UUID> publisherKeys,
+    @RequestParam(name = "strict", defaultValue = "false")
+    @Parameter(
+      description = "If true only the single best match is returned, as the matching service would pick it: " +
+        "candidates must agree in rank and authorship and homonyms are resolved by their classification. " +
+        "If several candidates remain, the one with the closest classification is returned. " +
+        "Requires exactly one `datasetKey` and no other filter."
+    )
+    boolean strict
   ) {
+    if (strict) {
+      if (datasetKeys == null || datasetKeys.size() != 1) {
+        throw new IllegalArgumentException("strict=true requires exactly one datasetKey");
+      }
+      if ((datasetTypes != null && !datasetTypes.isEmpty()) || (publisherKeys != null && !publisherKeys.isEmpty())) {
+        throw new IllegalArgumentException("strict=true cannot be combined with datasetType or publisherKey filters");
+      }
+      return dao.listRelatedStrict(datasetKey, taxonKey, datasetKeys.getFirst());
+    }
     return dao.listRelated(datasetKey, taxonKey, datasetTypes, datasetKeys, publisherKeys);
   }
 

@@ -7,12 +7,15 @@ import life.catalogue.api.exception.SynonymException;
 import life.catalogue.api.model.*;
 import life.catalogue.api.vocab.DatasetType;
 import life.catalogue.api.vocab.EstablishmentMeans;
+import life.catalogue.api.vocab.MatchType;
 import life.catalogue.dao.*;
 import life.catalogue.db.mapper.*;
 import life.catalogue.es.indexing.NameUsageIndexService;
 import life.catalogue.es.search.NameUsageSearchService;
 import life.catalogue.img.ThumborConfig;
 import life.catalogue.img.ThumborService;
+import life.catalogue.matching.UsageMatcher;
+import life.catalogue.matching.UsageMatcherPgStore;
 import life.catalogue.matching.nidx.NameIndexFactory;
 import life.catalogue.printer.JsonTreeCollector;
 import lombok.SneakyThrows;
@@ -222,6 +225,42 @@ public class TaxonDao {
       .filter(u -> u.getDatasetKey() != dkey)
       .map(converter::convert)
       .toList();
+  }
+
+  /**
+   * Strict variant of listRelated that returns only the single best match in one target dataset.
+   * It runs the ChecklistBank usage matcher, which filters the names index candidates by rank and authorship,
+   * and resolves homonyms by their classification. If several candidates remain the matcher still picks one
+   * (an ambiguous match), which is included as the best guess available.
+   * No higher rank fallback is used, so a missing name never matches its genus or another parent.
+   * The matcher reads live from postgres and never consults the names index, as the canonical id of the
+   * source usage is already known.
+   *
+   * @return a list with at most one usage
+   */
+  public List<NameUsage> listRelatedStrict(UUID uuid, String taxonKey, UUID targetDatasetKey) {
+    final int dkey = map.toCLB(uuid);
+    final int targetKey = map.toCLB(targetDatasetKey);
+    if (dkey == targetKey) {
+      throw new IllegalArgumentException("The datasetKey filter must differ from the dataset of the taxon");
+    }
+    SimpleNameClassified<SimpleNameCached> snc;
+    try (var src = new UsageMatcherPgStore(dkey, factory)) {
+      var sn = src.get(taxonKey);
+      if (sn == null) {
+        throw NotFoundException.notFound(org.gbif.taxon.api.NameUsage.class, DSID.of(dkey, taxonKey));
+      }
+      snc = new SimpleNameClassified<>(sn, src.getClassification(sn.getParent()));
+    }
+    try (var matcher = new UsageMatcher(targetKey, NameIndexFactory.passThru(), new UsageMatcherPgStore(targetKey, factory), false)) {
+      var match = matcher.match(snc, false, false);
+      if (match.isMatch() && match.type != MatchType.HIGHERRANK) {
+        var u = converter.convert(match.usage);
+        u.setDatasetKey(targetDatasetKey);
+        return List.of(u);
+      }
+    }
+    return List.of();
   }
 
   private List<SimpleNameInDataset> listRelatedCLB(UUID uuid, String taxonKey,

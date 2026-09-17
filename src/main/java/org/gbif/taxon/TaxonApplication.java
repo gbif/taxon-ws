@@ -26,10 +26,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication(exclude = {ElasticsearchRestHealthContributorAutoConfiguration.class})
 @EnableConfigurationProperties
 @ComponentScan(basePackages = {"org.gbif.ws.server.mapper", "org.gbif.taxon", "org.gbif.taxon.resource"})
+@EnableScheduling
 public class TaxonApplication {
 
   @Bean

@@ -55,7 +55,7 @@ public class SitemapResource {
   private static final int MIN_LEN = 20;
   private final Configuration freemarker;
   private final SqlSessionFactory factory;
-  private final int colKey;
+  private final DatasetKeyMap keyMap;
   private final String portalTaxonUrl;
   private final String apiUrl;
 
@@ -63,7 +63,7 @@ public class SitemapResource {
                          SitemapConfig cfg) {
     this.freemarker = freemarker;
     this.factory = factory;
-    this.colKey = keyMap.getColKey();
+    this.keyMap = keyMap;
     this.portalTaxonUrl = assertTrailingSlash(cfg.getPortal()) + "taxon/";
     this.apiUrl = assertTrailingSlash(cfg.getApi());
   }
@@ -82,7 +82,7 @@ public class SitemapResource {
   public ResponseEntity<?> sitemapIndex() throws IOException {
     try (SqlSession session = factory.openSession()) {
       var num = session.getMapper(NameUsageMapper.class);
-      int cnt = num.countIds(colKey, INCL_SYNONYMS, MIN_LEN);
+      int cnt = num.countIds(keyMap.getColKey(), INCL_SYNONYMS, MIN_LEN);
       int maps = (int) Math.ceil((double) cnt/SITEMAP_SIZE);
       LOG.info("Requested sitemap index to {} index files with {} usages", maps, cnt);
 
@@ -117,7 +117,7 @@ public class SitemapResource {
       req.setOffset((page - 1) * SITEMAP_SIZE);
       try (SqlSession session = factory.openSession()) {
         var num = session.getMapper(NameUsageMapper.class);
-        for (String key : num.pageIds(colKey, INCL_SYNONYMS, MIN_LEN, req)) {
+        for (String key : num.pageIds(keyMap.getColKey(), INCL_SYNONYMS, MIN_LEN, req)) {
           writer.write(portalTaxonUrl);
           writer.write(key);
           writer.write("\n");
