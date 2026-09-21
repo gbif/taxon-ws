@@ -34,7 +34,7 @@ public class DatasetKeyMap {
   private final String matchingMetadata;
   private final ColConfig cfg;
   private final boolean fixedColKey;
-  private int colkey; // we load the COL key eagerly and keep it also outside of the expiring coffeine cache
+  private volatile int colkey; // we load the COL key eagerly and keep it also outside of the expiring coffeine cache
 
   public DatasetKeyMap(SqlSessionFactory factory, LatestDatasetKeyCache cache, JsonFetcher  jsonFetcher, ColConfig cfg) throws IOException {
     this.cfg = cfg;

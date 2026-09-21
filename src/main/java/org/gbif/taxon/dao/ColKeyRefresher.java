@@ -40,8 +40,9 @@ public class ColKeyRefresher {
   }
 
   @Scheduled(fixedDelayString = "${col.refresh-interval:PT1H}", initialDelayString = "${col.refresh-interval:PT1H}")
-  public void refresh() {
+  public synchronized void refresh() {
     try {
+      LOG.info("Refreshing the COL XR key. Currently={}", keyMap.getColKey());
       if (keyMap.refreshColKey()) {
         checklistDao.flushCache();
         taxonDao.flushCache();

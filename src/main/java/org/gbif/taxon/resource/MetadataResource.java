@@ -15,11 +15,13 @@ package org.gbif.taxon.resource;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import org.gbif.taxon.dao.ChecklistDao;
+import org.gbif.taxon.dao.ColKeyRefresher;
 import org.gbif.taxon.dao.DatasetKeyMap;
 import org.gbif.taxon.dao.TaxonDao;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,11 +36,13 @@ public class MetadataResource {
   private final DatasetKeyMap keyMap;
   private final TaxonDao dao;
   private final ChecklistDao checklistDao;
+  private final ColKeyRefresher colKeyRefresher;
 
-  public MetadataResource(TaxonDao taxonDao, ChecklistDao checklistDao, DatasetKeyMap keyMap) {
+  public MetadataResource(TaxonDao taxonDao, ChecklistDao checklistDao, DatasetKeyMap keyMap, ColKeyRefresher colKeyRefresher) {
     this.dao = taxonDao;
     this.checklistDao = checklistDao;
     this.keyMap = keyMap;
+    this.colKeyRefresher = colKeyRefresher;
   }
 
   @GetMapping
@@ -51,7 +55,17 @@ public class MetadataResource {
     return keyMap.getColKey();
   }
 
-  @DeleteMapping("/flush")
+  /**
+   * Runs the scheduled COL key refresh right away, including the GBIF registry sync.
+   * @return the COL key in use afterwards
+   */
+  @PostMapping("col/refresh")
+  public int refreshCol() {
+    colKeyRefresher.refresh();
+    return keyMap.getColKey();
+  }
+
+  @DeleteMapping("flush")
   public boolean flush() throws IOException {
     keyMap.flush();
     dao.flushCache();
