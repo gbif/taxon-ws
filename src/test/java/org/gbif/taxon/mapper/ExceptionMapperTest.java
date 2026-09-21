@@ -11,6 +11,11 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -54,6 +59,19 @@ class ExceptionMapperTest {
   @Test
   void clientErrorsAreNotLoggedAtError() {
     mapper.handleNotFoundException(new NotFoundException("nope"), request());
+
+    assertThat(appender.list).noneMatch(e -> e.getLevel() == Level.ERROR);
+  }
+
+  @Test
+  void springClientErrorsKeepTheirStatus() {
+    // e.g. /taxon/suggest requested with an Accept header that excludes application/json
+    var response = mapper.handleException(
+      new HttpMediaTypeNotAcceptableException(List.of(MediaType.APPLICATION_JSON)), request());
+    assertThat(response.getStatusCode().value()).isEqualTo(406);
+
+    response = mapper.handleException(new HttpRequestMethodNotSupportedException("POST"), request());
+    assertThat(response.getStatusCode().value()).isEqualTo(405);
 
     assertThat(appender.list).noneMatch(e -> e.getLevel() == Level.ERROR);
   }

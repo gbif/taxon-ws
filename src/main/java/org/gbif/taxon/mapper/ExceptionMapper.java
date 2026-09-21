@@ -8,9 +8,11 @@ import org.gbif.taxon.api.ErrorMessage;
 import org.gbif.taxon.dao.MissingGBIFKeyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -46,8 +48,20 @@ public class ExceptionMapper {
     return respond(request, HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
   }
 
+  @ExceptionHandler(TypeMismatchException.class)
+  public ResponseEntity<?> handleTypeMismatchException(TypeMismatchException e, HttpServletRequest request) {
+    LOG.debug("Bad request {}: {}", request.getRequestURI(), e.getMessage());
+    return respond(request, HttpStatus.BAD_REQUEST, e.getMessage());
+  }
+
   @ExceptionHandler(Throwable.class)
   public ResponseEntity<?> handleException(Throwable e, HttpServletRequest request) {
+    // Spring MVC's own exceptions (406 not acceptable, 405, 415, 404 no resource, missing parameters, ...)
+    // carry their HTTP status and must not be reported as server errors
+    if (e instanceof ErrorResponse er && !er.getStatusCode().is5xxServerError()) {
+      LOG.debug("Client error {} for {}: {}", er.getStatusCode().value(), request.getRequestURI(), e.getMessage());
+      return respond(request, HttpStatus.valueOf(er.getStatusCode().value()), e.getMessage());
+    }
     LOG.error("Unhandled error processing {}", request.getRequestURI(), e);
     return respond(request, HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
   }
