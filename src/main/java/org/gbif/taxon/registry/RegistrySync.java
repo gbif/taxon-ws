@@ -62,7 +62,7 @@ public class RegistrySync {
       if (registryCfg.isMisconfigured()) {
         LOG.warn("Registry syncing is enabled but no app key is configured, not syncing COL key {}", clbKey);
       } else {
-        LOG.debug("Registry access is disabled, not syncing COL key {}", clbKey);
+        LOG.info("Registry access is disabled, not syncing COL key {}", clbKey);
       }
       return false;
     }
@@ -73,7 +73,7 @@ public class RegistrySync {
     if (changed) {
       LOG.info("Updated GBIF registry dataset {} to CLB dataset {}", datasetKey, clbKey);
     } else {
-      LOG.debug("GBIF registry dataset {} already points at CLB dataset {}", datasetKey, clbKey);
+      LOG.info("GBIF registry dataset {} already points at CLB dataset {}", datasetKey, clbKey);
     }
     return changed;
   }
