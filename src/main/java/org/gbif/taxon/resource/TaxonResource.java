@@ -288,7 +288,8 @@ public class TaxonResource {
   @Operation(
     operationId = "suggestNames",
     summary = "Suggestion service for name usages",
-    description = "Prefix search of name usages covering the scientific and vernacular names.\n\n" +
+    description = "Prefix search of name usages on their scientific names. " +
+      "Vernacular names are not covered, use the search with searchContent=VERNACULAR for these.\n\n" +
       "Results are ordered by relevance by default as this search usually returns a lot of results."
   )
   @Tag(name = "Searching names")
