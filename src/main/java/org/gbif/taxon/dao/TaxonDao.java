@@ -7,7 +7,6 @@ import life.catalogue.api.exception.SynonymException;
 import life.catalogue.api.model.*;
 import life.catalogue.api.vocab.DatasetType;
 import life.catalogue.api.vocab.EstablishmentMeans;
-import life.catalogue.api.vocab.MatchType;
 import life.catalogue.dao.*;
 import life.catalogue.db.mapper.*;
 import life.catalogue.es.indexing.NameUsageIndexService;
@@ -15,9 +14,7 @@ import life.catalogue.es.search.NameUsageSearchService;
 import life.catalogue.img.ThumborConfig;
 import life.catalogue.img.ThumborService;
 import life.catalogue.matching.UsageMatcher;
-import life.catalogue.matching.UsageMatcherPgStore;
 import life.catalogue.matching.nidx.NameIndexFactory;
-import life.catalogue.printer.JsonTreeCollector;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.ibatis.session.SqlSession;
@@ -27,9 +24,11 @@ import org.gbif.api.model.common.paging.PagingResponse;
 import org.gbif.api.model.common.search.SearchRequest;
 import org.gbif.api.model.common.search.SearchResponse;
 import org.gbif.dwc.terms.GbifTerm;
+import org.gbif.nameparser.api.Rank;
 import org.gbif.taxon.api.*;
 import org.gbif.taxon.api.Distribution;
 import org.gbif.taxon.api.NameUsage;
+import org.gbif.taxon.api.TaxonBreakdown;
 import org.gbif.taxon.api.search.*;
 import org.gbif.taxon.config.RelatedInfoConfig;
 import org.slf4j.Logger;
@@ -38,7 +37,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
 import java.util.function.Function;
@@ -161,33 +159,16 @@ public class TaxonDao {
 
   public TaxonBreakdown childrenBreakdown(UUID uuid, String taxonID) {
     int datasetKey = map.toCLB(uuid);
-    // this can throw NotFoundException
-    var collector = tDao.childrenBreakdownCollector(datasetKey, taxonID);
-    try {
-      collector.print();
-    } catch (IOException e) {
-      // this should not be possible as the collector does not write to IO !!!
-      // artefact of the abstract base printer class which is targeting real writers
-      throw new RuntimeException(e);
-    }
+    // this can throw NotFoundException, also for genera and below
+    // species counted in a single ring, the first Linnean rank below the taxon that has members
+    var clb = tDao.taxonBreakdown(datasetKey, taxonID, Rank.SPECIES, 1);
 
     TaxonBreakdown breakdown = new TaxonBreakdown();
     breakdown.setTaxonID(taxonID);
-    breakdown.setTaxonRank(collector.getTaxon().getRank());
-    breakdown.setScientificName(collector.getTaxon().getName());
+    breakdown.setTaxonRank(clb.getTaxon().getRank());
+    breakdown.setScientificName(clb.getTaxon().getName());
     breakdown.setSpecies(countSpecies(datasetKey, taxonID));
-    breakdown.setBreakdown(new ArrayList<>(collector.getRoot().size()));
-    for (var n : collector.getRoot()) {
-      var tb = tb(n);
-      breakdown.getBreakdown().add(tb);
-      if (!n.children.isEmpty()) {
-        tb.setBreakdown(new ArrayList<>(n.children.size()));
-        for (var n2 : n.children) {
-          var tb2 = tb(n2);
-          tb.getBreakdown().add(tb2);
-        }
-      }
-    }
+    breakdown.setBreakdown(tb(clb.getChildren()));
     return breakdown;
   }
 
@@ -200,13 +181,27 @@ public class TaxonDao {
     return -1;
   }
 
-  private static TaxonBreakdown tb(JsonTreeCollector.TreeName tn) {
-    TaxonBreakdown tb = new TaxonBreakdown();
-    tb.setTaxonID(tn.name.getId());
-    tb.setTaxonRank(tn.name.getRank());
-    tb.setScientificName(tn.name.getName());
-    tb.setSpecies(tn.count);
-    return tb;
+  /**
+   * Converts the ChecklistBank breakdown nodes, leaving out the remainder nodes without an id:
+   * every GBIF breakdown entry is a taxon.
+   */
+  private static List<TaxonBreakdown> tb(List<life.catalogue.api.model.TaxonBreakdown.Node> nodes) {
+    List<TaxonBreakdown> list = new ArrayList<>();
+    if (nodes != null) {
+      for (var n : nodes) {
+        if (n.isRemainder()) continue;
+        TaxonBreakdown tb = new TaxonBreakdown();
+        tb.setTaxonID(n.getName().getId());
+        tb.setTaxonRank(n.getName().getRank());
+        tb.setScientificName(n.getName().getName());
+        tb.setSpecies(n.getCount());
+        if (n.getChildren() != null && !n.getChildren().isEmpty()) {
+          tb.setBreakdown(tb(n.getChildren()));
+        }
+        list.add(tb);
+      }
+    }
+    return list;
   }
 
   @SneakyThrows
@@ -244,21 +239,11 @@ public class TaxonDao {
     if (dkey == targetKey) {
       throw new IllegalArgumentException("The datasetKey filter must differ from the dataset of the taxon");
     }
-    SimpleNameClassified<SimpleNameCached> snc;
-    try (var src = new UsageMatcherPgStore(dkey, factory)) {
-      var sn = src.get(taxonKey);
-      if (sn == null) {
-        throw NotFoundException.notFound(org.gbif.taxon.api.NameUsage.class, DSID.of(dkey, taxonKey));
-      }
-      snc = new SimpleNameClassified<>(sn, src.getClassification(sn.getParent()));
-    }
-    try (var matcher = new UsageMatcher(targetKey, NameIndexFactory.passThru(), new UsageMatcherPgStore(targetKey, factory), false)) {
-      var match = matcher.match(snc, false, false);
-      if (match.isMatch() && match.type != MatchType.HIGHERRANK) {
-        var u = converter.convert(match.usage);
-        u.setDatasetKey(targetDatasetKey);
-        return List.of(u);
-      }
+    var match = UsageMatcher.matchRelated(factory, DSID.of(dkey, taxonKey), targetKey);
+    if (match != null) {
+      var u = converter.convert(match);
+      u.setDatasetKey(targetDatasetKey);
+      return List.of(u);
     }
     return List.of();
   }
@@ -352,19 +337,26 @@ public class TaxonDao {
 
     var tax = taxonOr404(datasetKeyCLB, taxonID);
     // REDLIST
+    // IUCN often holds a name twice, accepted with its own assessment and as the synonym of another assessed species.
+    // The matcher prefers the accepted one, the first related usage could be either.
+    // See https://github.com/CatalogueOfLife/backend/issues/1705
     if (relatedInfoConfig.getIucn() != null) {
       int datasetKeyIucn = map.toCLB(relatedInfoConfig.getIucn());
-      var iucn = findSingleRelated(datasetKeyCLB, taxonID, datasetKeyIucn);
-      if (iucn != null) {
+      var match = UsageMatcher.matchRelated(factory, DSID.of(datasetKeyCLB, taxonID), datasetKeyIucn);
+      if (match != null) {
+        var key = DSID.of(datasetKeyIucn, match.getId());
         try (var session = factory.openSession()) {
           DistributionMapper dim = session.getMapper(DistributionMapper.class);
-          var dists = dim.listByTaxon(iucn.toDSID(datasetKeyIucn));
           // find global entry
-          for (var d : dists) {
-            if (d.getArea().getName().equalsIgnoreCase("Global") && d.getThreatStatus() != null) {
-              var red = converter.convert(iucn);
-              red.setThreatStatus(d.getThreatStatus().name());
-              relInfo.setRedlist(red);
+          for (var d : dim.listByTaxon(key)) {
+            if (d.getArea() != null && "Global".equalsIgnoreCase(d.getArea().getName()) && d.getThreatStatus() != null) {
+              // the matched usage lacks the link to the assessment and the dataset key, so load it fully
+              var iucn = session.getMapper(NameUsageMapper.class).getSimpleInDataset(key);
+              if (iucn != null) {
+                var red = converter.convert(iucn);
+                red.setThreatStatus(d.getThreatStatus().name());
+                relInfo.setRedlist(red);
+              }
               break;
             }
           }
