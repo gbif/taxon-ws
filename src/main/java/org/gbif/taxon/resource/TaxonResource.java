@@ -59,10 +59,11 @@ import static java.lang.annotation.ElementType.METHOD;
             title = "Taxon API",
             version = "v2",
             description = """
-                This API provides access to taxa (name usages) indexed by ChecklistBank for GBIF.
-                It exposes taxonomic data from registered checklist datasets including scientific names,
-                synonymy, vernacular names, geographic distributions, media, bibliographic references and
-                measurements or facts. Taxon keys are scoped to individual datasets and are not necessarily globally unique.
+This API provides access to taxa (name usages) from checklist datasets registered with GBIF and indexed by ChecklistBank (checklistbank.org). It covers scientific names, synonymy, vernacular names, geographic distributions, media, bibliographic references, and measurements or facts.
+
+Taxon keys are scoped to their dataset and are not globally unique; a taxon is identified by its dataset key together with its taxon key.
+
+This API replaces the deprecated v1 Species API.
                 """,
             termsOfService = "https://www.gbif.org/terms"),
     servers = {
