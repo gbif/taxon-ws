@@ -39,7 +39,7 @@ public class RegistryConfig {
   @ConditionalOnExpression("${registry.enabled:false} && !'${registry.appKey:}'.isEmpty()")
   public RegistryDatasetClient registryDatasetClient() {
     return new ClientBuilder()
-      // the object mapper must be set before the credentials, which capture it for content signing
+      // requests are signed with the GBIF scheme of gbif-common-ws 2.1.4+ (HMAC-SHA256, x-gbif-date, MD5 of the raw body)
       .withObjectMapper(JacksonJsonObjectMapperProvider.getObjectMapperWithBuilderSupport())
       .withAppKeyCredentials(username, appKey, secret)
       .withUrl(api)
